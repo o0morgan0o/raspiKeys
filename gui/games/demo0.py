@@ -6,8 +6,17 @@ class Demo0:
         print( "launching game 0 -------------- ")
         self.parent = parent
         self.parent.pack_propagate(0)
-        self.parent.button1 = tk.Button(self.parent, text="game1", command=self)
-        self.parent.button1.pack(side=tk.LEFT)
+        
+        #self.parent.button1 = tk.Button(self.parent, text="game1", command=self)
+        #self.parent.button1.pack(side=tk.TOP)
+
+        # labels
+        self.parent.label1 = tk.Label(self.parent, text="Score :")
+        self.parent.label2 = tk.Label(self.parent, text="Listen !")
+        self.parent.label1.pack(side=tk.TOP)
+        self.parent.label2.pack(side=tk.TOP)
+
+
         self.game = Game(self.parent)
         
 

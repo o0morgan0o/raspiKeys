@@ -1,5 +1,6 @@
 import time
 import threading
+import random
 from threading import Timer
 import mido
 
@@ -38,13 +39,25 @@ class Game:
         self.outport.reset()
         self.inport.callback = self.handleMIDIInput
 
+        # gamestate is used to know when the user is guessing
+        self.gameState = "notStarted"
+
+        # startGame
+        self.startGame()
+
         #just to test
         self.counter=0
 
+        self.correctAnswer = -1
+        self.startingNote = -1
 
-    def activateListening(self):
-        print( "adskfja;dsjfa;lkjf")
 
+    def startGame(self):
+        self.score = 0
+        self.gameState = "waitingUserInput" 
+
+    def askNewQuestion():
+        pass
 
 
     def showIOPorts(self):
@@ -68,8 +81,8 @@ class Game:
         # close ports
         self.outport.close()
         self.inport.close()
-        print("is closed output? : ",self.outport.closed)
-        print("is closed input? : ",self.inport.closed)
+        # print("is closed output? : ",self.outport.closed)
+        # print("is closed input? : ",self.inport.closed)
         del self.inport
         del self.outport
         # delete WantingNotes
@@ -92,25 +105,55 @@ class Game:
         self.outport.send(msgOff)
 
     # prepare the future midi noteOff it is stored in waitingNotes list
-    def prepareNoteOut(self, mNote):
+    def prepareNoteOut(self, mNote, offset=0):
         print("preparing")
         # creation of midi message
         msg = mido.Message( 'note_on', note = mNote)
         # send note on
         self.outport.send(msg)
         currentNote = self.waitingNotes[mNote]
-        currentNote.resetTimer()
+        currentNote.resetTimer(offset)
         
 
     def handleMIDIInput(self,msg):
+        # Needed because we still receive signals even if the class is destroyed
         if(self.isListening == False):
             print("[--] Ignoring queue message...", msg, self.isListening)
             return
         
         print("[-]receiving something", msg, self.isListening)
         if( msg.type == "note_on"):
-            # just for test we send note if we receive keyboard signal
-            self.prepareNoteOut(msg.note)
+            #we test according to the gamestate
+            if self.gameState == "waitingUserInput":
+                self.startingNote = msg.note
+                #pick a random note
+                questionNote = self.pickNewNote(self.startingNote)
+                #self.prepareNoteOut(questionNote)
+                self.questionNote = self.QuestionNote(questionNote, self)
+                self.gameState= "waitingUserAnswer"
+                self.parent.label1["text"] = "What is your answer ?"
+                self.parent.label2["text"] = "{} {}".format(self.startingNote, questionNote)
+                self.parent.label2["bg"] = "blue"
+            elif self.gameState == "waitingUserAnswer":
+                self.parent.label2["bg"] = "red" 
+                self.parent.label2["text"] = "{}".format(msg.note)
+                self.parent.label1["text"] = "Pick a note"
+                self.gameState="waitingUserInput"
+
+
+    def pickNewNote(self, startingNote):
+        maxInterval = 8
+        offset = 0
+        # we dont want the same note
+        while offset == 0:
+            offset = random.randint(-maxInterval, maxInterval)
+        return startingNote + offset
+
+    def handleQuestionNote(self, mNote):
+        self.prepareNoteOut
+
+        
+
 
 
  
@@ -125,7 +168,7 @@ class Game:
 
 
         # if we received at midi note we reset the timer so that the noteOff don't overlap
-        def resetTimer(self):
+        def resetTimer(self, offset):
             self.timer.cancel()
             self.timer = Timer(self.noteOffDelay, lambda: self.parent.noteOff(self.note))
             self.timer.start()
@@ -134,3 +177,13 @@ class Game:
         def startTimer(self):
             self.timer.start()
         
+    # Inner class to play a noteOn with a delay. It is used for the note the user must guess
+    class QuestionNote:
+        noteOnDelay = 1
+
+        def __init__(self, note, parent):
+            self.parent = parent
+            self.note = note
+            self.timer = Timer(self.noteOnDelay, lambda: self.parent.prepareNoteOut(self.note))
+            self.timer.start()
+
