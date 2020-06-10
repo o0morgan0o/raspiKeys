@@ -1,8 +1,6 @@
-#!/usr/bin/python3
 import mido
 import time
 from threading import Timer
-
 
 
 
@@ -52,15 +50,20 @@ def sendNoteOut(mNote):
     currentNote = waitingNotes[mNote]
     currentNote.resetTimer()
 
+class Game:
+    def __init__(self):
 
-print( "launchin program... \n")
-# ['Midi Through:Midi Through Port-0 14:0', 'USB-MIDI:USB-MIDI MIDI 1 24:0']
-print(80*"=")
-print( "Availables inputs: ", mido.get_input_names())
-print( "Availables outputs: ", mido.get_output_names())
-print(80*"=")
+        print( "launchin program... \n")
+        # ['Midi Through:Midi Through Port-0 14:0', 'USB-MIDI:USB-MIDI MIDI 1 24:0']
+        print(80*"=")
+        print( "Availables inputs: ", mido.get_input_names())
+        print( "Availables outputs: ", mido.get_output_names())
+        print(80*"=")
+        self.waitingNotes= []
+        
 
-playingNotes = []
+
+
 waitingNotes = []
 
 debug=True
