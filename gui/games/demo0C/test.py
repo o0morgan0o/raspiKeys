@@ -1,31 +1,50 @@
-import mido
 import time
 import threading
 from threading import Timer
+import mido
 
 class Game:
 
     def __init__(self, parent):
         self.parent = parent
+        self.isListening = False
 
         self.stopGame = False
-        print( "launchin program... \n")
+        print( "launchin MIDI program... \n")
         self.waitingNotes= []
 
         debug=True
         self.initMIDIArray(128)
 
         # define input and ouput USB midi
-        self.inport= mido.open_input('USB-MIDI:USB-MIDI MIDI 1 24:0')
-        self.inport.callback = self.handleMIDIInput
         self.outport= mido.open_output('USB-MIDI:USB-MIDI MIDI 1 24:0')
+        self.inport= mido.open_input('USB-MIDI:USB-MIDI MIDI 1 24:0')
+        self.inport.callback = None
+        self.inport.poll()
+
+        #try to clear pending notes
+        print("TRY TO CLEAR ==========")
+        self.inport._queue._queue.mutex.acquire()
+        self.inport._queue._queue.queue.clear()
+        self.inport._queue._queue.all_tasks_done.notify_all()
+        self.inport._queue._queue.unfinished_tasks=0
+        self.inport._queue._queue.mutex.release()
+        print("END ==========")
+
+        #for msg in self.inport.iter_pending():
+        #    print("pending : ", msg)
         self.showIOPorts()
+        self.outport.panic()
+        self.outport.reset()
+        self.inport.callback = self.handleMIDIInput
 
         #just to test
         self.counter=0
 
-        # start the main loop
-        self.startGame()
+
+    def activateListening(self):
+        print( "adskfja;dsjfa;lkjf")
+
 
 
     def showIOPorts(self):
@@ -37,28 +56,27 @@ class Game:
         print("==> Selected output is {}".format(self.outport))
         print(80*"=")
 
-
-    # create and start the main thread
-    def startGame(self):
-        print("game thread starting")
-        self.t1= threading.Thread(target=self.gameLoop)
-        self.t1.start()
+    def __del__(self):
+        print( "destroyyyyyyyyyyyyyyyyyyyyyyyyyy")
 
     def destroy(self):
-        print("destroying thread !!!!")
-        self.stopGame=True
+        print("destroy in class")
+        # send midi panic to be sure that there is no note off
+        self.isListening = False
+        self.inport.callback = None
+        self.outport.panic()
+        # close ports
+        self.outport.close()
+        self.inport.close()
+        print("is closed output? : ",self.outport.closed)
+        print("is closed input? : ",self.inport.closed)
+        del self.inport
+        del self.outport
+        # delete WantingNotes
+        del self.waitingNotes
+        del self
 
-    # Empty gameLoop just for listening the callbacks of midiIn and midiOut
-    def gameLoop(self):
-        while(self.stopGame == False):
-            # The update of the UI is here
-            self.counter = self.counter+1
-            #may be there can be error handling here
-            self.parent.button1["text"]=self.counter
-            if(self.counter > 1500):
-                self.parent.button1["bg"]="red"
-            pass
-        print("ended !!!")
+
 
     # init a 128 array of WaitingNote in order to store all the timers
     def initMIDIArray(self, maxNote):
@@ -67,12 +85,15 @@ class Game:
 
     # callback launched when the timer is at 0
     def noteOff(self,note):
+        if self.isListening == False:
+            return
         print("[+] sending note off on ", note)
         msgOff = mido.Message('note_off', note=note)
         self.outport.send(msgOff)
 
     # prepare the future midi noteOff it is stored in waitingNotes list
     def prepareNoteOut(self, mNote):
+        print("preparing")
         # creation of midi message
         msg = mido.Message( 'note_on', note = mNote)
         # send note on
@@ -82,7 +103,11 @@ class Game:
         
 
     def handleMIDIInput(self,msg):
-        print("[-]receiving something", msg)
+        if(self.isListening == False):
+            print("[--] Ignoring queue message...", msg, self.isListening)
+            return
+        
+        print("[-]receiving something", msg, self.isListening)
         if( msg.type == "note_on"):
             # just for test we send note if we receive keyboard signal
             self.prepareNoteOut(msg.note)

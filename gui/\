@@ -9,6 +9,10 @@ from games.demo1 import Demo1
 class MainApplication(tk.Frame):
     # definition de la fenetre globale
     def __init__(self, master):
+        self.resetFrame(master)
+
+        
+    def resetFrame(self, master):
         self.colors=['red', 'green', 'yellow']
         self.gameMode=0
         self.master=master
@@ -43,56 +47,33 @@ class MainApplication(tk.Frame):
         # storage of the current Game Classe
         self.currentGameClass = None
 
-        # initialization
-        self.new_window(1)
-        
-       # self.toggleMode(0)
-    def new_window(self, intMode):
-        self.frame.pack_propagate(0)
-        self.frame.gameFrame = tk.Frame(self.master, bg="red", width=200, height=200)
-        if intMode == 0:
-            self.app = Demo0(self.frame.gameFrame)
-            print("ready")
-            self.app.activateListening()
-        else :
-            self.app = Demo1(self.frame.gameFrame)
-        self.frame.gameFrame.pack()
-
-    def destroyExistingFrame(self):
-        print("before", self.app)
-        self.frame.gameFrame.pack_forget()
-        self.frame.gameFrame.destroy()
-        self.app.destroy()
-        del self.app
-
-
 
     def toggleMode(self, intMode):
         #destroy the existing gameFrame
-        self.destroyExistingFrame()
-        
-        self.new_window(intMode)
-        #try:
-            #self.gameFrame.pack_forget()
-            #self.gameFrame.destroy()
-        #except :
-            #print("no element")
-        ## recreation of the frame containing the game Mode
-        #self.gameFrame = tk.Frame(self.frame, bg= "red", width=200, height=200)
-        ## we instatiate the correct gameMode
-        ## TODO : handle the destruction of created threads
-        #try:
-            #del self.currentGameClass
-        #except:
-            #print("cant delete self.currentGameClass ")
-        #if(intMode == 0):
+        try:
+            self.gameFrame.pack_forget()
+            self.gameFrame.destroy()
+        except :
+            print("no element")
+ 
+
+        # recreation of the frame containing the game Mode
+        self.gameFrame = tk.Frame(self.frame, bg= "red", width=200, height=200)
+        # we instatiate the correct gameMode
+        # TODO : handle the destruction of created threads
+        try:
+            del self.currentGameClass
+        except:
+            print("cant delete self.currentGameClass ")
+        if(intMode == 0):
+            self.master.destroy()
             #self.currentGameClass = Demo0(self.gameFrame)
-        #elif(intMode == 1):
-            #self.currentGameClass = Demo1(self.gameFrame)
-#
-        ##print(self.currentGameClass)
-        ## packing the ensemble
-        #self.gameFrame.pack()
+        elif(intMode == 1):
+            self.currentGameClass = Demo1(self.gameFrame)
+
+        #print(self.currentGameClass)
+        # packing the ensemble
+        self.gameFrame.pack()
 
 
 
