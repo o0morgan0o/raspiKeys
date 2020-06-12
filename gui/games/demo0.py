@@ -11,10 +11,20 @@ class Demo0:
         #self.parent.button1.pack(side=tk.TOP)
 
         # labels
-        self.parent.label1 = tk.Label(self.parent, text="Score :")
-        self.parent.label2 = tk.Label(self.parent, text="Listen !")
-        self.parent.label1.pack(side=tk.TOP)
-        self.parent.label2.pack(side=tk.TOP)
+        # definition of sizes and fonts
+        self.parent.label1 = tk.Label(self.parent,wraplength=200) # for user instructions
+        self.parent.label1.config(font=("Courier", 12))
+        self.parent.label2 = tk.Label(self.parent, padx=10, pady=10) # for "correct" or "incorrect"response
+        self.parent.label2.config(font=("Courier", 18))
+        self.parent.label2.configure(anchor= "center")
+        self.parent.label3 = tk.Label(self.parent) # for global score
+        self.parent.label3.config(font=("Courier", 30))
+
+        # placement of differents labels
+        # TODO : may be there is a better way to center this
+        self.parent.label3.place(relx=.5, rely=.5, anchor=tk.CENTER)
+        self.parent.label1.place(relx=.5, rely= .2, anchor=tk.CENTER)
+        self.parent.label2.place(relx=.5, rely=.76, anchor=tk.CENTER)
 
 
         self.game = Game(self.parent)

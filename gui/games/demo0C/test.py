@@ -10,11 +10,15 @@ class Game:
         self.parent = parent
         self.isListening = False
 
-        self.stopGame = False
+        # variable for user score
+        self.counter=0
+        self.score=0
+
         print( "launchin MIDI program... \n")
+        debug=True
+        self.stopGame = False
         self.waitingNotes= []
 
-        debug=True
         self.initMIDIArray(128)
 
         # define input and ouput USB midi
@@ -45,20 +49,12 @@ class Game:
         # startGame
         self.startGame()
 
-        #just to test
-        self.counter=0
-
-        self.correctAnswer = -1
         self.startingNote = -1
 
-
     def startGame(self):
-        self.score = 0
-        self.gameState = "waitingUserInput" 
-
-    def askNewQuestion():
-        pass
-
+        self.changeGameState("waitingUserInput")
+        self.parent["bg"] = "black"
+        self.changeAllBg("black")
 
     def showIOPorts(self):
         print(80*"=")
@@ -70,7 +66,7 @@ class Game:
         print(80*"=")
 
     def __del__(self):
-        print( "destroyyyyyyyyyyyyyyyyyyyyyyyyyy")
+        print( "destroy")
 
     def destroy(self):
         print("destroy in class")
@@ -90,6 +86,29 @@ class Game:
         del self
 
 
+    def changeGameState(self, newstate):
+        if newstate == "notStarted":
+            pass
+        elif newstate == "waitingUserInput":
+            self.parent.label1["text"] = "Pick a starting Note"
+            self.gameState = "waitingUserInput"
+            percentage = int((self.score / self.counter) * 100) if(self.counter != 0) else 0
+            self.parent.label3["text"] = "{}/{} ({}%)".format(self.score, self.counter, percentage)
+        elif newstate == "listen":
+            #self.parent["bg"] = "orange"
+            #self.changeAllBg("orange")
+            self.parent.label2["bg"]= "black"
+            self.parent.label1["text"] = "Listen ..."
+            self.parent.label2["text"] = ""
+            self.gameState = "listen"
+            self.isListening = False
+        elif newstate == "waitingUserAnswer":
+            self.isListening= True
+            #self.parent["bg"] = "blue"
+            #self.changeAllBg("blue")
+            self.parent.label1["text"] = "What is your answer ?"
+            self.gameState= "waitingUserAnswer"
+        
 
     # init a 128 array of WaitingNote in order to store all the timers
     def initMIDIArray(self, maxNote):
@@ -100,12 +119,17 @@ class Game:
     def noteOff(self,note):
         if self.isListening == False:
             return
+
         print("[+] sending note off on ", note)
         msgOff = mido.Message('note_off', note=note)
         self.outport.send(msgOff)
 
     # prepare the future midi noteOff it is stored in waitingNotes list
     def prepareNoteOut(self, mNote, offset=0):
+        if self.gameState == "waitingUserInput":
+            self.changeGameState("listen")
+        elif self.gameState == "listen":
+            self.changeGameState("waitingUserAnswer")
         print("preparing")
         # creation of midi message
         msg = mido.Message( 'note_on', note = mNote)
@@ -124,27 +148,46 @@ class Game:
         print("[-]receiving something", msg, self.isListening)
         if( msg.type == "note_on"):
             #we test according to the gamestate
+
             if self.gameState == "waitingUserInput":
                 self.startingNote = msg.note
                 #pick a random note
                 questionNote = self.pickNewNote(self.startingNote)
                 #self.prepareNoteOut(questionNote)
                 self.questionNote = self.QuestionNote(questionNote, self)
-                self.gameState= "waitingUserAnswer"
-                self.parent.label1["text"] = "What is your answer ?"
-                self.parent.label2["text"] = "{} {}".format(self.startingNote, questionNote)
-                self.parent.label2["bg"] = "blue"
+                #self.gameState= "waitingUserAnswer"
+                #self.parent.label2["text"] = "{} {}".format(self.startingNote, questionNote)
+                self.changeGameState("listen")
+
             elif self.gameState == "waitingUserAnswer":
-                self.parent.label2["bg"] = "red" 
-                self.parent.label2["text"] = "{}".format(msg.note)
-                self.parent.label1["text"] = "Pick a note"
-                self.gameState="waitingUserInput"
+                # we want to ignore the starting note for the user.
+                if msg.note == self.startingNote:
+                    return
+                # we check the answer
+                self.checkAnswer(msg.note)
+                self.changeGameState("waitingUserInput")
+
+    def checkAnswer(self, answer):
+        print(answer, self.questionNote.note)
+        if answer == self.questionNote.note:
+            self.parent.label2[ "text"] = "correct ;-)"
+            self.parent.label2["bg"] = "green"
+            #self.parent["bg"] = "green"
+            #self.changeAllBg("green")
+            self.score = self.score + 1
+        else:
+            self.parent.label2["text"]= "incorrect\nA: {}".format(self.formatOutputInterval(self.questionNote.note - self.startingNote))
+            self.parent.label2["bg"] = "red"
+            #self.parent["bg"] = "red"
+            #self.changeAllBg("red")
 
 
     def pickNewNote(self, startingNote):
-        maxInterval = 8
+        self.counter = self.counter+1
+        #TODO : make the max interval customizable
+        maxInterval = 14
         offset = 0
-        # we dont want the same note
+        # we dont want the same note than the starting note
         while offset == 0:
             offset = random.randint(-maxInterval, maxInterval)
         return startingNote + offset
@@ -152,10 +195,38 @@ class Game:
     def handleQuestionNote(self, mNote):
         self.prepareNoteOut
 
+    def changeAllBg(self, newColor):
+
+        self.parent.label1["bg"] = newColor
+        self.parent.label2["bg"] = newColor
+        self.parent.label3["bg"] = newColor
+        self.parent.label1["fg"] = "white"
+        self.parent.label2["fg"] = "white"
+        self.parent.label3["fg"] = "white"
         
 
-
-
+        
+    def formatOutputInterval(self, mInterval):
+        #TODO: Extend to other responses
+        interval = abs(mInterval)
+        if interval == 1: return "min 2nd"
+        elif interval == 2: return "maj 2nd"
+        elif interval == 3 : return "min 3rd"
+        elif interval == 4: return "maj 3rd"
+        elif interval == 5: return "perf 4th"
+        elif interval == 6 : return "dim 5th"
+        elif interval == 7 : return "perf 5th"
+        elif interval ==8 : return "min 6th"
+        elif interval ==9: return "maj 6th"
+        elif interval ==10: return "min 7th"
+        elif interval == 11 : return "maj 7th"
+        elif interval == 12: return "octave"
+        elif interval == 13: return "min 9th"
+        elif interval == 14: return "maj 9th"
+        elif interval == 15: return "min 10th"
+        elif interval == 16: return "maj 10th"
+        elif interval == 17: return "perf 11th"
+        else: return ""
  
     # Inner class for storing in large liste all the timers corresponding to noteCCValue
     class WaitingNote:
@@ -179,6 +250,7 @@ class Game:
         
     # Inner class to play a noteOn with a delay. It is used for the note the user must guess
     class QuestionNote:
+        #TODO : make a way to customize noteOndelay or do several modes
         noteOnDelay = 1
 
         def __init__(self, note, parent):
