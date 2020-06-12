@@ -2,10 +2,13 @@
 import tkinter as tk
 from tkinter import ttk as ttk
 from random import choice
+import sys
 
 # import gamemodes
 from games.demo0 import Demo0
 from games.demo1 import Demo1
+
+
 
 # custom button class
 class NavButton(tk.Button):
@@ -15,7 +18,7 @@ class NavButton(tk.Button):
 
 class MainApplication(tk.Frame):
     # definition de la fenetre globale
-    def __init__(self, master):
+    def __init__(self, master, tag=""):
         self.colors=['red', 'green', 'yellow']
         self.gameMode=0
         self.master=master
@@ -24,10 +27,13 @@ class MainApplication(tk.Frame):
         
         # Main Frame
         self.master.title("RaspyKeys")
-        #self.master.attributes( "-fullscreen", True)
         self.master.geometry("320x480")
         self.master["bg"]="black"
         self.frame=tk.Frame(self.master)
+        if(tag == "pi"): # to run at fullscreen if we get the "pi" tag
+            self.master.attributes( "-fullscreen", True)
+            self.master.buttonQuit = tk.Button(self.master, text="exit", command=lambda: self.master.quit())
+            self.master.buttonQuit.pack(side=tk.BOTTOM, pady=(0,40))
 
         # keyboard shortcuts for dev
         self.master.bind("<Escape>", lambda event: self.master.quit())
@@ -61,6 +67,7 @@ class MainApplication(tk.Frame):
         self.master.button5.pack(side=tk.LEFT)
 
 
+
         # Populate the GUI
         #self.button1= tk.Button(self.frame, text="hello", command=self.new_window)
         #self.button1.pack()
@@ -74,6 +81,7 @@ class MainApplication(tk.Frame):
         # initialization
         # determine the default game mode at the launch
         self.new_window(0)
+
     
     # method to load a new game mode
     def new_window(self, intMode):
@@ -105,9 +113,10 @@ class MainApplication(tk.Frame):
 
 
 if __name__ == "__main__":
-    print("creating root")
+    tag= sys.argv[1].split("=")[1]
     root=tk.Tk()
-    MainApplication(root)
+    root.config(cursor="dot")
+    MainApplication(root, tag)
     root.mainloop()
 
 
