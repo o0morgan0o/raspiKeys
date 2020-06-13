@@ -7,7 +7,8 @@ import simpleaudio as sa
 
 from games.utils.waitingNote import WaitingNote
 from games.utils.questionNote import QuestionNote
-
+from games.utils.midiIO import MidiIO
+from games.utils.utilFunctions import formatOutputInterval
 
 class Game:
 
@@ -24,37 +25,17 @@ class Game:
         debug=True
         self.stopGame = False
         self.waitingNotes= []
-
         self.initMIDIArray(128)
 
-        # define input and ouput USB midi
-        self.outport= mido.open_output('USB-MIDI:USB-MIDI MIDI 1 24:0')
-        self.inport= mido.open_input('USB-MIDI:USB-MIDI MIDI 1 24:0')
-        self.inport.callback = None
-        self.inport.poll()
-
-        #try to clear pending notes
-        print("TRY TO CLEAR ==========")
-        self.inport._queue._queue.mutex.acquire()
-        self.inport._queue._queue.queue.clear()
-        self.inport._queue._queue.all_tasks_done.notify_all()
-        self.inport._queue._queue.unfinished_tasks=0
-        self.inport._queue._queue.mutex.release()
-        print("END ==========")
-
-        #for msg in self.inport.iter_pending():
-        #    print("pending : ", msg)
-        self.showIOPorts()
-        self.outport.panic()
-        self.outport.reset()
-        self.inport.callback = self.handleMIDIInput
+        # TODO : in this MidiIo class, allow user to select between available usb ports
+        self.midiIO = MidiIO() # open connections and ports
+        self.midiIO.setCallback(self.handleMIDIInput)
 
         # gamestate is used to know when the user is guessing
         self.gameState = "notStarted"
 
         # startGame
         self.startGame()
-
         self.startingNote = -1
 
     def loadSounds(self):
@@ -67,39 +48,17 @@ class Game:
         #play_obj_success = wave_obj_success.play()
         #play_obj_success.wait_done()
 
-
     def startGame(self):
         self.changeGameState("waitingUserInput")
         self.parent["bg"] = "black"
         self.changeAllBg("black")
 
-    def showIOPorts(self):
-        print(80*"=")
-        # ['Midi Through:Midi Through Port-0 14:0', 'USB-MIDI:USB-MIDI MIDI 1 24:0']
-        print( "Availables inputs: ", mido.get_input_names())
-        print( "Availables outputs: ", mido.get_output_names())
-        print("<== Selected input is {}".format(self.inport))
-        print("==> Selected output is {}".format(self.outport))
-        print(80*"=")
-
-
     def destroy(self):
         print("destroy in class")
-        # send midi panic to be sure that there is no note off
         self.isListening = False
-        self.inport.callback = None
-        self.outport.panic()
-        # close ports
-        self.outport.close()
-        self.inport.close()
-        # print("is closed output? : ",self.outport.closed)
-        # print("is closed input? : ",self.inport.closed)
-        del self.inport
-        del self.outport
-        # delete WantingNotes
-        del self.waitingNotes
+        self.midiIO.destroy() # delete everything in midiIO class
+        del self.waitingNotes # delete WantingNotes
         del self
-
 
     def changeGameState(self, newstate):
         if newstate == "notStarted":
@@ -134,10 +93,8 @@ class Game:
     def noteOff(self,note):
         if self.isListening == False:
             return
-
-        print("[+] sending note off on ", note)
-        msgOff = mido.Message('note_off', note=note)
-        self.outport.send(msgOff)
+        self.midiIO.sendOut("note_off", note)
+        
 
     # prepare the future midi noteOff it is stored in waitingNotes list
     def prepareNoteOut(self, mNote, offset=0):
@@ -146,13 +103,9 @@ class Game:
         elif self.gameState == "listen":
             self.changeGameState("waitingUserAnswer")
         print("preparing")
-        # creation of midi message
-        msg = mido.Message( 'note_on', note = mNote)
-        # send note on
-        self.outport.send(msg)
+        self.midiIO.sendOut("note_on", mNote) # send note on
         currentNote = self.waitingNotes[mNote]
         currentNote.resetTimer(offset)
-        
 
     def handleMIDIInput(self,msg):
         # Needed because we still receive signals even if the class is destroyed
@@ -178,12 +131,10 @@ class Game:
                 # we check the answer
                 self.checkAnswer(msg.note)
 
-
-
     def checkAnswer(self, answer):
         print(answer, self.questionNote.note)
         if answer == self.questionNote.note:
-            self.parent.label2[ "text"] = "correct ;-)\n{}".format(self.formatOutputInterval(self.questionNote.note - self.startingNote))
+            self.parent.label2[ "text"] = "correct ;-)\n{}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
             self.parent.label2["bg"] = "green"
             if self.questionNote.isFirstTry:
                 self.score = self.score + 1
@@ -192,7 +143,7 @@ class Game:
             sound_object.wait_done()
             self.changeGameState("waitingUserInput") # if we gave the good answer, we want a new note
         else:
-            self.parent.label2["text"]= "incorrect\nA: {}".format(self.formatOutputInterval(self.questionNote.note - self.startingNote))
+            self.parent.label2["text"]= "incorrect\nA: {}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
             self.questionNote.isFirstTry= False
             self.parent.label2["bg"] = "red"
             sound_object = self.error_sound.play()
@@ -201,8 +152,6 @@ class Game:
             self.replayNote = QuestionNote(self.startingNote, self, .2) # i want to replay both notes
             self.replayNote = QuestionNote(self.questionNote.note, self, .8) # i want to replay both notes
             self.changeGameState("listen")
- 
-
 
     def pickNewNote(self, startingNote):
         self.counter = self.counter+1
@@ -226,25 +175,4 @@ class Game:
         
 
         
-    def formatOutputInterval(self, mInterval):
-        #TODO: Extend to other responses
-        interval = abs(mInterval)
-        if interval == 1: return "min 2nd"
-        elif interval == 2: return "maj 2nd"
-        elif interval == 3 : return "min 3rd"
-        elif interval == 4: return "maj 3rd"
-        elif interval == 5: return "perf 4th"
-        elif interval == 6 : return "dim 5th"
-        elif interval == 7 : return "perf 5th"
-        elif interval ==8 : return "min 6th"
-        elif interval ==9: return "maj 6th"
-        elif interval ==10: return "min 7th"
-        elif interval == 11 : return "maj 7th"
-        elif interval == 12: return "octave"
-        elif interval == 13: return "min 9th"
-        elif interval == 14: return "maj 9th"
-        elif interval == 15: return "min 10th"
-        elif interval == 16: return "maj 10th"
-        elif interval == 17: return "perf 11th"
-        else: return ""
  
