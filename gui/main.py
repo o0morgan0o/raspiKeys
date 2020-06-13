@@ -9,7 +9,7 @@ from games.demo0 import Demo0
 from games.demo1 import Demo1
 
 
-
+ # p
 # custom button class
 class NavButton(tk.Button):
     def __init__(self, master, text):
@@ -50,7 +50,7 @@ class MainApplication(tk.Frame):
         self.master.button1["command"] = lambda: self.toggleMode(0)
         self.master.button1.pack(side=tk.LEFT, padx=(10,0))
         # ///////// btn
-        self.master.button2 = NavButton(self.master.toolbar, text="EarN")
+        self.master.button2 = NavButton(self.master.toolbar, text="EarC")
         self.master.button2["command"] = lambda: self.toggleMode(1)
         self.master.button2.pack(side=tk.LEFT,)
         # ///////// btn
@@ -80,13 +80,13 @@ class MainApplication(tk.Frame):
 
         # initialization
         # determine the default game mode at the launch
-        self.new_window(0)
+        # TODO make a way to retrieve the last open tab (config file load at startup ? )
+        self.new_window(1)
 
     
     # method to load a new game mode
     def new_window(self, intMode):
         self.frame.pack_propagate(0)
-        #self.frame.gameFrame = tk.Frame(self.master, bg="red", width=200, height=200)
         self.frame.gameFrame = tk.Frame(self.master)
         if intMode == 0:
             self.app = Demo0(self.frame.gameFrame)
@@ -94,6 +94,8 @@ class MainApplication(tk.Frame):
             self.app.activateListening()
         else :
             self.app = Demo1(self.frame.gameFrame)
+            self.app.activateListening()
+
         self.frame.gameFrame.pack(expand=True , fill=tk.BOTH, padx=20, pady=20)
 
     def destroyExistingFrame(self):
