@@ -3,10 +3,13 @@ import threading
 import random
 from threading import Timer
 import mido
+import simpleaudio as sa
+
 
 class Game:
 
     def __init__(self, parent):
+        self.loadSounds()
         self.parent = parent
         self.isListening = False
 
@@ -50,6 +53,17 @@ class Game:
         self.startGame()
 
         self.startingNote = -1
+
+    def loadSounds(self):
+        # success sound
+        success_sound = "/home/pi/raspiKeys/gui/games/demo0dir/wav/success.wav"
+        self.success_sound = sa.WaveObject.from_wave_file(success_sound)
+        # error sound
+        error_sound = "/home/pi/raspiKeys/gui/games/demo0dir/wav/error.wav"
+        self.error_sound= sa.WaveObject.from_wave_file(error_sound)
+        #play_obj_success = wave_obj_success.play()
+        #play_obj_success.wait_done()
+
 
     def startGame(self):
         self.changeGameState("waitingUserInput")
@@ -153,10 +167,7 @@ class Game:
                 self.startingNote = msg.note
                 #pick a random note
                 questionNote = self.pickNewNote(self.startingNote)
-                #self.prepareNoteOut(questionNote)
-                self.questionNote = self.QuestionNote(questionNote, self)
-                #self.gameState= "waitingUserAnswer"
-                #self.parent.label2["text"] = "{} {}".format(self.startingNote, questionNote)
+                self.questionNote = self.QuestionNote(questionNote, self, .8)
                 self.changeGameState("listen")
 
             elif self.gameState == "waitingUserAnswer":
@@ -165,21 +176,31 @@ class Game:
                     return
                 # we check the answer
                 self.checkAnswer(msg.note)
-                self.changeGameState("waitingUserInput")
+
+
 
     def checkAnswer(self, answer):
         print(answer, self.questionNote.note)
         if answer == self.questionNote.note:
-            self.parent.label2[ "text"] = "correct ;-)"
+            self.parent.label2[ "text"] = "correct ;-)\n{}".format(self.formatOutputInterval(self.questionNote.note - self.startingNote))
             self.parent.label2["bg"] = "green"
-            #self.parent["bg"] = "green"
-            #self.changeAllBg("green")
-            self.score = self.score + 1
+            if self.questionNote.isFirstTry:
+                self.score = self.score + 1
+            # TODO: make a try excerpt because may be the sound could not be loaded
+            sound_object = self.success_sound.play()
+            sound_object.wait_done()
+            self.changeGameState("waitingUserInput") # if we gave the good answer, we want a new note
         else:
             self.parent.label2["text"]= "incorrect\nA: {}".format(self.formatOutputInterval(self.questionNote.note - self.startingNote))
+            self.questionNote.isFirstTry= False
             self.parent.label2["bg"] = "red"
-            #self.parent["bg"] = "red"
-            #self.changeAllBg("red")
+            sound_object = self.error_sound.play()
+            sound_object.wait_done()
+            # TODO if we don't find we must replay the note
+            self.replayNote = self.QuestionNote(self.startingNote, self, .2) # i want to replay both notes
+            self.replayNote = self.QuestionNote(self.questionNote.note, self, .8) # i want to replay both notes
+            self.changeGameState("listen")
+ 
 
 
     def pickNewNote(self, startingNote):
@@ -187,8 +208,7 @@ class Game:
         #TODO : make the max interval customizable
         maxInterval = 14
         offset = 0
-        # we dont want the same note than the starting note
-        while offset == 0:
+        while offset == 0: # we dont want the same note than the starting note
             offset = random.randint(-maxInterval, maxInterval)
         return startingNote + offset
 
@@ -196,7 +216,6 @@ class Game:
         self.prepareNoteOut
 
     def changeAllBg(self, newColor):
-
         self.parent.label1["bg"] = newColor
         self.parent.label2["bg"] = newColor
         self.parent.label3["bg"] = newColor
@@ -250,10 +269,10 @@ class Game:
         
     # Inner class to play a noteOn with a delay. It is used for the note the user must guess
     class QuestionNote:
-        #TODO : make a way to customize noteOndelay or do several modes
-        noteOnDelay = 1
 
-        def __init__(self, note, parent):
+        def __init__(self, note, parent, delay):
+            self.noteOnDelay = delay
+            self.isFirstTry = True
             self.parent = parent
             self.note = note
             self.timer = Timer(self.noteOnDelay, lambda: self.parent.prepareNoteOut(self.note))

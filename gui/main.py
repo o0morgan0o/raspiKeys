@@ -113,7 +113,11 @@ class MainApplication(tk.Frame):
 
 
 if __name__ == "__main__":
-    tag= sys.argv[1].split("=")[1]
+    if len(sys.argv) > 1:
+        tag= sys.argv[1].split("=")[1]
+    else:
+        tag=""
+        print("run with no arguments...")
     root=tk.Tk()
     root.config(cursor="dot")
     MainApplication(root, tag)

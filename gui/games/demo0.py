@@ -1,5 +1,5 @@
 import tkinter as tk 
-from games.demo0C.test import Game
+from games.demo0dir.demo0 import Game
 
 class Demo0:
     def __init__(self,parent):
