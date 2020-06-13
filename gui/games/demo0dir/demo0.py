@@ -5,6 +5,9 @@ from threading import Timer
 import mido
 import simpleaudio as sa
 
+from games.utils.waitingNote import WaitingNote
+from games.utils.questionNote import QuestionNote
+
 
 class Game:
 
@@ -79,8 +82,6 @@ class Game:
         print("==> Selected output is {}".format(self.outport))
         print(80*"=")
 
-    def __del__(self):
-        print( "destroy")
 
     def destroy(self):
         print("destroy in class")
@@ -127,7 +128,7 @@ class Game:
     # init a 128 array of WaitingNote in order to store all the timers
     def initMIDIArray(self, maxNote):
         for i in range (maxNote):
-            self.waitingNotes.append( self.WaitingNote(i, self))
+            self.waitingNotes.append(WaitingNote(i, self))
 
     # callback launched when the timer is at 0
     def noteOff(self,note):
@@ -167,7 +168,7 @@ class Game:
                 self.startingNote = msg.note
                 #pick a random note
                 questionNote = self.pickNewNote(self.startingNote)
-                self.questionNote = self.QuestionNote(questionNote, self, .8)
+                self.questionNote = QuestionNote(questionNote, self, .8)
                 self.changeGameState("listen")
 
             elif self.gameState == "waitingUserAnswer":
@@ -197,8 +198,8 @@ class Game:
             sound_object = self.error_sound.play()
             sound_object.wait_done()
             # TODO if we don't find we must replay the note
-            self.replayNote = self.QuestionNote(self.startingNote, self, .2) # i want to replay both notes
-            self.replayNote = self.QuestionNote(self.questionNote.note, self, .8) # i want to replay both notes
+            self.replayNote = QuestionNote(self.startingNote, self, .2) # i want to replay both notes
+            self.replayNote = QuestionNote(self.questionNote.note, self, .8) # i want to replay both notes
             self.changeGameState("listen")
  
 
@@ -247,34 +248,3 @@ class Game:
         elif interval == 17: return "perf 11th"
         else: return ""
  
-    # Inner class for storing in large liste all the timers corresponding to noteCCValue
-    class WaitingNote:
-        noteOffDelay = 1
-
-        def __init__(self, note, parent):
-            self.parent = parent
-            self.note = note
-            self.timer = Timer(self.noteOffDelay, lambda: self.parent.noteOff(self.note))
-
-
-        # if we received at midi note we reset the timer so that the noteOff don't overlap
-        def resetTimer(self, offset):
-            self.timer.cancel()
-            self.timer = Timer(self.noteOffDelay, lambda: self.parent.noteOff(self.note))
-            self.timer.start()
-
-        # at the end of the timer the noteoff will be send
-        def startTimer(self):
-            self.timer.start()
-        
-    # Inner class to play a noteOn with a delay. It is used for the note the user must guess
-    class QuestionNote:
-
-        def __init__(self, note, parent, delay):
-            self.noteOnDelay = delay
-            self.isFirstTry = True
-            self.parent = parent
-            self.note = note
-            self.timer = Timer(self.noteOnDelay, lambda: self.parent.prepareNoteOut(self.note))
-            self.timer.start()
-
