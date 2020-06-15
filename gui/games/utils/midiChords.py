@@ -1,0 +1,97 @@
+import random
+class MidiChords:
+    
+    def __init__(self):
+        self.chords=[
+                ("min", [0,3,7]),
+                ("maj", [0,4,7]),
+                ("dim", [0,3,6]),
+                ("aug", [0,4,8]),
+                ("min7", [0,3,7,10]),
+                ("m7b5", [0,3,6,10]),
+                ("maj7", [0,4,7,11]),
+                ("dom7", [0,4,7,10]),
+
+                ('min/1stInv', [0, 4, 9]) ,
+                ('maj/1stInv', [0, 3, 8]) ,
+                ('dim/1stInv', [0, 3, 9]) ,
+                ('aug/1stInv', [0, 4, 8]) ,
+                ('min7/1stInv', [0, 4, 7, 9]) ,
+                ('m7b5/1stInv', [0, 3, 7, 9]) ,
+                ('maj7/1stInv', [0, 3, 7, 8]) ,
+                ('dom7/1stInv', [0, 3, 6, 8]) ,
+
+                ('min/2ndInv', [0, 5, 8]) ,
+                ('maj/2ndInv', [0, 5, 9]) ,
+                ('dim/2ndInv', [0, 6, 9]) ,
+                ('aug/2ndInv', [0, 4, 8]) ,
+                ('min7/2ndInv', [0, 3, 5, 8]) ,
+                ('m7b5/2ndInv', [0, 4, 6, 9]) ,
+                ('maj7/2ndInv', [0, 4, 5, 9]) ,
+                ('dom7/2ndInv', [0, 3, 5, 9]) ,
+
+                ('min/3rdInv', [0, 3, 7]) ,
+                ('maj/3rdInv', [0, 4, 7]) ,
+                ('dim/3rdInv', [0, 3, 6]) ,
+                ('aug/3rdInv', [0, 4, 8]) ,
+                ('min7/3rdInv', [0, 2, 5, 9]) ,
+                ('m7b5/3rdInv', [0, 2, 5, 8]) ,
+                ('maj7/3rdInv', [0, 1, 5, 8]) ,
+                ('dom7/3rdInv', [0, 2, 6, 9]),
+
+                ('min9', [0, 3, 7, 10, 14]),
+                ('maj9', [0, 4, 7, 11, 14]),
+                ('dom9', [0, 4,7, 10, 14]),
+                ]
+
+
+    def pickRandom(self):
+        size = len(self.chords)
+        rand = random.randint(0, size -1)
+        return self.chords[rand]
+
+### Next functions are just an util for having chord inversions before hardcoding. They are not used outside of dev context
+    def get1stInversion(self, chordtuple):
+        name = chordtuple[0]
+        name = name + "/1stInv"
+        chord = chordtuple[1]
+        newChord = chord[1:]
+        init = newChord[0]
+        for i in range(len(newChord)):
+            newChord[i] = newChord[i] - init
+
+        lastInterval = 12 - chord[-1]
+        end = newChord[-1] + lastInterval
+
+        newChord.append(end)
+        return (name, newChord)
+
+    def get2ndInversion(self, chordtuple):
+        name= chordtuple[0]
+        name = name + "/2ndInv"
+        tmp = self.get1stInversion(chordtuple)
+        chord=  self.get1stInversion(tmp)
+        return (name, chord[1])
+
+    def get3rdInversion(self, chordtuple):
+        name= chordtuple[0]
+        name = name + "/3rdInv"
+        tmp = self.get2ndInversion(chordtuple)
+        chord=  self.get1stInversion(tmp)
+        return (name, chord[1])
+
+    def printAllInversion(self):
+        for chord in self.chords:
+            print(self.get1stInversion(chord))
+            print("\n")
+        for chord in self.chords:
+            print(self.get2ndInversion(chord))
+            print("\n")
+        for chord in self.chords:
+            print(self.get3rdInversion(chord))
+            print("\n")
+            
+
+
+
+

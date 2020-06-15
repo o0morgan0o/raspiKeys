@@ -10,8 +10,9 @@ from games.utils.questionNote import QuestionNote
 from games.utils.midiIO import MidiIO
 from games.utils.utilFunctions import formatOutputInterval
 from games.utils.sounds import Sound
+from games.utils.midiChords import MidiChords
 
-""" the mode 1 is for eartraining on a SINGLE INTERVAL
+""" the mode 1 is for eartraining on a CHORD INTERVAL
 """
 class Game:
 
@@ -45,8 +46,8 @@ class Game:
 
     def startGame(self):
         self.changeGameState("waitingUserInput")
-        self.parent["bg"] = "red"
-        self.changeAllBg("red")
+        self.parent["bg"] = "black"
+        self.changeAllBg("black")
 
     def destroy(self):
         print("destroy in class")
@@ -59,13 +60,13 @@ class Game:
         if newstate == "notStarted":
             pass
         elif newstate == "waitingUserInput":
+            print( "waiting user input", self.score)
             self.parent.label1["text"] = "Pick a starting Note"
             self.gameState = "waitingUserInput"
             percentage = int((self.score / self.counter) * 100) if(self.counter != 0) else 0
             self.parent.label3["text"] = "{}/{} ({}%)".format(self.score, self.counter, percentage)
         elif newstate == "listen":
-            #self.parent["bg"] = "orange"
-            #self.changeAllBg("orange")
+            print("LISTENNNNNN")
             self.parent.label2["bg"]= "black"
             self.parent.label1["text"] = "Listen ..."
             self.parent.label2["text"] = ""
@@ -73,10 +74,10 @@ class Game:
             self.isListening = False
         elif newstate == "waitingUserAnswer":
             self.isListening= True
-            #self.parent["bg"] = "blue"
-            #self.changeAllBg("blue")
             self.parent.label1["text"] = "Your turn !"
             self.gameState= "waitingUserAnswer"
+        else : 
+            print( "ERROR : new state not defined", newstate)
         
 
     # init a 128 array of WaitingNote in order to store all the timers
@@ -121,17 +122,20 @@ class Game:
             #we test according to the gamestate
 
             if self.gameState == "waitingUserInput":
+                self.isListening = False # we will reactivate listening after all notes have been played
                 self.startingNote = msg.note
                 #pick a random chord intervals
-                questionChord = self.pickNewChord(self.startingNote)
+                self.questionArray = self.pickNewChord(self.startingNote)
                 # we want a array of QuestionNots
                 arr = []
                 counter = 1
-                for note in questionChord:
+                for note in self.questionArray:
                     # TODO : make a way to custom the harmonic delay between notes
                     arr.append(QuestionNote(note,self, .8* counter))
                     counter = counter + 1 
                 self.allIsCorrect = True # var to know if we make a mistake in the answrs
+                self.isFirstTry = True
+                self.counter = self.counter + 1
                 self.questionChord = arr
                 print("size of question: " ,  len(self.questionChord))
                 self.answerChord =[] # we initialize an answer chord
@@ -141,7 +145,9 @@ class Game:
                 self.answerIndex=0
                 self.canvasCounter=0
 
+
             elif self.gameState == "waitingUserAnswer":
+                print("answer: ", self.answerIndex, self.canvasCounter)
                 # we muste check all the notes of the chord.
                 # we trace the current note with self.answerIndex
                 correctNote = self.questionChord[self.answerIndex]
@@ -164,33 +170,57 @@ class Game:
 
         if self.answerIndex == len(self.questionChord) -1:
             
+            self.isListening= False
             print("WE CAN RETURN")
             print("WIN ? ", self.allIsCorrect)
-            # it means we tested the last note
-            # so we can change mode etc
-            self.changeGameState("waitingUserInput")
+            if self.allIsCorrect == False:
+                self.changeGameState( "listen")
+                self.parent.label2["text"]= "incorrect"
+                self.parent.label2["bg"] = "red"
+                # TODO : must play sound victory
+
+                for note in self.questionChord:
+                    print("resetting a timer")
+                    note.resetTimer()
+                self.answerBools = []
+                self.allIsCorrect= True
+                self.parent.canvas.delete("all") 
+                self.answerIndex=-1
+                self.canvasCounter = 0
+                self.isFirstTry= False
 
 
 
-#            self.parent.label2[ "text"] = "correct ;-)\n{}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
-#            self.parent.label2["bg"] = "green"
-#            if self.questionNote.isFirstTry:
-#                self.score = self.score + 1
-#            self.sounds.play_sound_success() # play success sound
-#            self.changeGameState("waitingUserInput") # if we gave the good answer, we want a new note
-#        else:
-#            self.parent.label2["text"]= "incorrect\nA: {}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
-#            self.questionNote.isFirstTry= False
-#            self.parent.label2["bg"] = "red"
-#            self.sounds.play_sound_error() # play success sound
-            # we replay the interval if the user didnt find the correct answer
-#            self.replayNote = QuestionNote(self.startingNote, self, .2) # i want to replay both notes
-#            self.replayNote = QuestionNote(self.questionNote.note, self, .8) # i want to replay both notes
-#            self.changeGameState("listen")
+
+            else :
+            # We won
+                self.parent.label2["text"] = "correct ;-)\n{}".format(self.chordName)
+                self.parent.label2["bg"] = "green"
+                print("first try" , self.isFirstTry)
+                if self.isFirstTry:
+                    self.score = self.score + 1
+                self.changeGameState("waitingUserInput")
+                self.isListening= True
+    #            self.sounds.play_sound_success() # play success sound
+                
+            # affichage score
+            self.parent
+            self.parent.canvas.delete("all") 
+
+
 
     def pickNewChord(self, startingNote):
         # TODO : pick random intervals
-        return [startingNote,  startingNote + 3,startingNote +  7,startingNote +  12]
+        chordsInit = MidiChords()
+        chord = chordsInit.pickRandom()
+        self.chordName = chord[0]
+        #return [startingNote,  startingNote + 3,startingNote +  7,startingNote +  12]
+        # we must add the starting note
+        returnChord = []
+        for note in chord[1]:
+            returnChord.append(note + self.startingNote)
+        return returnChord
+    
 
 
     def pickNewNote(self, startingNote):

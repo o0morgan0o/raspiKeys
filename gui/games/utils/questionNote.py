@@ -10,3 +10,7 @@ class QuestionNote:
         self.timer = Timer(self.noteOnDelay, lambda: self.parent.prepareNoteOut(self.note))
         self.timer.start()
 
+    def resetTimer(self):
+        self.timer = Timer(self.noteOnDelay, lambda: self.parent.prepareNoteOut(self.note))
+        self.timer.start()
+
