@@ -7,6 +7,7 @@ import sys
 # import gamemodes
 from games.demo0 import Demo0
 from games.demo1 import Demo1
+from games.demo3 import Demo3
 
 
  # p
@@ -81,7 +82,7 @@ class MainApplication(tk.Frame):
         # initialization
         # determine the default game mode at the launch
         # TODO make a way to retrieve the last open tab (config file load at startup ? )
-        self.new_window(0)
+        self.new_window(3)
 
     
     # method to load a new game mode
