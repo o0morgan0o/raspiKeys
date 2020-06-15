@@ -25,6 +25,7 @@ class Game:
         # variable for user score
         self.counter=0
         self.score=0
+        self.globalIsListening = True
 
         print( "launchin MIDI program... \n")
         debug=True
@@ -46,12 +47,26 @@ class Game:
         self.sounds = Sound() 
         self.sounds.loadEffectSounds() # load success and error sounds
 
+        self.parent.btnSkip.configure( command=self.skip)
+        self.parent.btnListen.configure(command=self.toggleGlobalListen)
+
+    def toggleGlobalListen(self):
+        if self.globalIsListening == True:
+            self.globalIsListening = False
+            self.parent.btnListen.configure(text="ListenOFF")
+        else:
+            self.globalIsListening = True
+            self.parent.btnListen.configure(text="ListenON")
+
+    def skip(self):
+        self.parent.label2[ "text"] = "It was ;-)\n{}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
+        self.parent.label2["bg"] = "orange"
+        self.changeGameState("waitingUserInput") # if we gave the good answer, we want a new note
+
     def startGame(self):
         self.changeGameState("waitingUserInput")
         self.parent["bg"] = "black"
         self.changeAllBg("black")
-
-## TESTING ==================================
         self.melodies = Melody(self)
 
     def destroy(self):
@@ -109,6 +124,9 @@ class Game:
         currentNote.resetTimer(offset)
 
     def handleMIDIInput(self,msg):
+        # used for the midiListening button
+        if(self.globalIsListening == False) : 
+            return 
         # Needed because we still receive signals even if the class is destroyed
         if(self.isListening == False):
             print("[--] Ignoring queue message...", msg, self.isListening)

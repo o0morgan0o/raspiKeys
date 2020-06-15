@@ -26,6 +26,12 @@ class Demo0:
         self.parent.label1.place(relx=.5, rely= .2, anchor=tk.CENTER)
         self.parent.label2.place(relx=.5, rely=.76, anchor=tk.CENTER)
 
+        self.parent.btnListen = tk.Button(self.parent, text="ListenON")
+        self.parent.btnListen.place(relx=0, rely = 1, anchor=tk.SW)
+
+        self.parent.btnSkip = tk.Button(self.parent, text= "SKIP >")
+        self.parent.btnSkip.place(relx=1, rely=1, anchor=tk.SE)
+
 
         self.game = Game(self.parent)
         
