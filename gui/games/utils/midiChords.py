@@ -42,6 +42,25 @@ class MidiChords:
                 ('min9', [0, 3, 7, 10, 14]),
                 ('maj9', [0, 4, 7, 11, 14]),
                 ('dom9', [0, 4,7, 10, 14]),
+                ('m9b5', [0, 3, 6, 10, 13]),
+
+                ('min9/1stInv', [0, 4, 7, 9, 11]) ,
+                ('maj9/1stInv', [0, 3, 7, 8, 10]) ,
+                ('dom9/1stInv', [0, 3, 6, 8, 10]) ,
+                ('min9/2ndInv', [0, 3, 5, 7, 8]) ,
+                ('maj9/2ndInv', [0, 4, 5, 7, 9]) ,
+                ('dom9/2ndInv', [0, 3, 5, 7, 9]) ,
+                ('min9/3rdInv', [0, 2, 4, 5, 9]) ,
+                ('maj9/3rdInv', [0, 1, 3, 5, 8]) ,
+                ('dom9/3rdInv', [0, 2, 4, 6, 9]),
+                ('m9b5/1stInv', [0, 3, 7, 9, 10]) ,
+                ('m9b5/2ndInv', [0, 4, 6, 7, 9]) ,
+                ('m9b5/3rdInv', [0, 2, 3, 5, 8]),
+
+                ('alt', [0, 4, 7, 13, 15]),
+                ('alt/1stInv', [0, 3, 8, 9, 11]) ,
+                ('alt/2ndInv', [0, 5, 6, 8, 9]) ,
+                ('alt/3rdInv', [-1, 0, 2, 3, 6]),
                 ]
 
 
@@ -81,17 +100,35 @@ class MidiChords:
         return (name, chord[1])
 
     def printAllInversion(self):
-        for chord in self.chords:
-            print(self.get1stInversion(chord))
-            print("\n")
-        for chord in self.chords:
-            print(self.get2ndInversion(chord))
-            print("\n")
-        for chord in self.chords:
-            print(self.get3rdInversion(chord))
-            print("\n")
+        tmpChords=[
+                ('alt', [0, 4, 7, 13, 15]),
+                ]
+        for chord in tmpChords:
+            ch = self.get1stInversion(chord)
+            a = ch[0]
+            b= ch[1]
+            b.sort()
+            cc = ( a, b)
+            print (cc)
+
+        for chord in tmpChords:
+            ch = self.get2ndInversion(chord)
+            a = ch[0]
+            b= ch[1]
+            b.sort()
+            cc = ( a, b)
+            print (cc)
+        for chord in tmpChords:
+            ch = self.get3rdInversion(chord)
+            a = ch[0]
+            b= ch[1]
+            b.sort()
+            cc = ( a, b)
+            print (cc)
             
 
+#a = MidiChords()
+#a.printAllInversion()
 
 
 

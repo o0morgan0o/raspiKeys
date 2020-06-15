@@ -11,6 +11,9 @@ from games.utils.midiIO import MidiIO
 from games.utils.utilFunctions import formatOutputInterval
 from games.utils.sounds import Sound
 
+from games.utils.questionNote import CustomNote
+from games.utils.questionNote import Melody
+
 """ the mode 0 is for eartraining on a SINGLE INTERVAL
 """
 class Game:
@@ -47,6 +50,9 @@ class Game:
         self.changeGameState("waitingUserInput")
         self.parent["bg"] = "black"
         self.changeAllBg("black")
+
+## TESTING ==================================
+        self.melodies = Melody(self)
 
     def destroy(self):
         print("destroy in class")
@@ -132,12 +138,15 @@ class Game:
             self.parent.label2["bg"] = "green"
             if self.questionNote.isFirstTry:
                 self.score = self.score + 1
-            self.sounds.play_sound_success() # play success sound
+#            self.sounds.play_sound_success() # play success sound
+            self.melodies.playWinMelody()
             self.changeGameState("waitingUserInput") # if we gave the good answer, we want a new note
         else:
             self.parent.label2["text"]= "incorrect\nA: {}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
             self.questionNote.isFirstTry= False
             self.parent.label2["bg"] = "red"
+            self.melodies.playLooseMelody()
+            # TODO : remove the play of wav sound. i keep it because it delays the retry
             self.sounds.play_sound_error() # play success sound
             # we replay the interval if the user didnt find the correct answer
             self.replayNote = QuestionNote(self.startingNote, self, .2) # i want to replay both notes

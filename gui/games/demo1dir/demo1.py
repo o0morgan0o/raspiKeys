@@ -11,6 +11,8 @@ from games.utils.midiIO import MidiIO
 from games.utils.utilFunctions import formatOutputInterval
 from games.utils.sounds import Sound
 from games.utils.midiChords import MidiChords
+from games.utils.questionNote import CustomNote
+from games.utils.questionNote import Melody
 
 """ the mode 1 is for eartraining on a CHORD INTERVAL
 """
@@ -43,6 +45,7 @@ class Game:
 
         self.sounds = Sound() 
         self.sounds.loadEffectSounds() # load success and error sounds
+        self.melodies = Melody(self)
 
     def startGame(self):
         self.changeGameState("waitingUserInput")
@@ -177,6 +180,7 @@ class Game:
                 self.changeGameState( "listen")
                 self.parent.label2["text"]= "incorrect"
                 self.parent.label2["bg"] = "red"
+                self.melodies.playLooseMelody()
                 # TODO : must play sound victory
 
                 for note in self.questionChord:
@@ -200,6 +204,7 @@ class Game:
                 if self.isFirstTry:
                     self.score = self.score + 1
                 self.changeGameState("waitingUserInput")
+                self.melodies.playWinMelody()
                 self.isListening= True
     #            self.sounds.play_sound_success() # play success sound
                 
