@@ -7,28 +7,33 @@ import mido
 import simpleaudio as sa
 import tkinter as tk
 
+from games.utils.midiIO import MidiIO
+
 from games.utils.sounds import Sound
+
 
 class Game:
 
     def __init__(self, parent):
         self.parent = parent
         self.sound = Sound()
-        self.tracksMp3 = self.sound.loadBacktracksMp3()
         self.parent.btnPlay.config(command=self.toggleBacktrack)
+        # midi io
+        self.midiIO=MidiIO()
+        self.midiIO.setCallback(self.handleMIDIInput)
+
         self.parent.btnRandom.config(command=self.playRandom)
         self.isPlaying = False
 
         #for filename in self.tracksMp3:
         #    self.sound.convertToWav(filename)
 
-
+        # TODO : handle errors if non valid files are loaded
         self.tracksWav = self.sound.loadBacktracksWav()
         self.activeSamples = self.pickRandomSamples()
         self.currentTrack = self.activeSamples[0]
 
         self.showRandomTracks()
-
         self.playBacktrack()
 
 
@@ -41,9 +46,9 @@ class Game:
         self.parent.label3["fg"] = "white"
 
     def destroy(self):
-        # TODO : make a destroy which destroy stored audio
         self.sound.unloadAudio()
-        pass
+        del self.sound
+        del self
 
     def showRandomTracks(self):
             name = os.path.basename(self.activeSamples[0])
@@ -55,8 +60,11 @@ class Game:
             name = os.path.basename(self.activeSamples[3])
             self.parent.randTrack3.config(text=name, command=lambda: self.changeTrack(3))
 
-            name = os.path.basename(self.currentTrack)
-            self.parent.labelCurrent.config(text="Currently Playing:\n"+ name)
+            self.showCurrentPlayingInLabel()
+
+    def showCurrentPlayingInLabel(self):
+        name = os.path.basename(self.currentTrack)
+        self.parent.labelCurrent.config(text="Currently Playing:\n"+ name)
 
     def changeTrack(self, index):
         try :
@@ -66,6 +74,7 @@ class Game:
 
         self.currentTrack = self.activeSamples[index]
         self.playBacktrack()
+        self.showCurrentPlayingInLabel()
         self.isPlaying = True
 
     def pickRandomSamples(self):
@@ -79,8 +88,10 @@ class Game:
         if self.isPlaying == True:
             self.sound.stopPlay()
         self.currentTrack = self.activeSamples[0]
+        self.showCurrentPlayingInLabel()
         self.isPlaying =False
         self.playBacktrack()
+        self.isPlaying= True
 
     def toggleBacktrack(self):
         if self.isPlaying == True:
@@ -100,4 +111,13 @@ class Game:
         
 
         
+    def handleMIDIInput(self,msg):
+        print("receiving : ", msg.note)
+        if msg.type =="note_on" :
+            #TODO : make this custimizable
+            if msg.note == 21:
+                self.playRandom()
+        pass
+
+
  

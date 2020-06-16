@@ -1,7 +1,9 @@
 import tkinter as tk
-from games.demo1dir.demo1 import Game
+from games.mode1.gameplay import Game
 
-class Demo1:
+from games.utils.customElements import BtnDefault
+
+class Mode1:
     def __init__(self,parent):
         print( "launching game 1 -------------- ")
         self.parent = parent
@@ -29,7 +31,12 @@ class Demo1:
         self.parent.label1.place(relx=.5, rely= .1, anchor=tk.CENTER)
         self.parent.label2.place(relx=.5, rely=.8, anchor=tk.CENTER)
         self.parent.canvas.place(relx=.5, rely=.4, anchor=tk.CENTER)
-
+        
+        # buttons LISTEN and SKIP
+        self.parent.btnListen = BtnDefault(self.parent,text="ListenON")
+        self.parent.btnListen.place(relx=0, rely = 1, anchor=tk.SW)
+        self.parent.btnSkip = BtnDefault(self.parent, text= "SKIP >")
+        self.parent.btnSkip.place(relx=1, rely=1, anchor=tk.SE)
 
         self.game = Game(self.parent)
         

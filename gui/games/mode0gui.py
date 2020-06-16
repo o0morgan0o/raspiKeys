@@ -1,14 +1,14 @@
 import tkinter as tk 
-from games.demo0dir.demo0 import Game
+from games.mode0.gameplay import Game
 
-class Demo0:
+from games.utils.customElements import BtnDefault
+
+class Mode0:
     def __init__(self,parent):
         print( "launching game 0 -------------- ")
         self.parent = parent
         self.parent.pack_propagate(0)
         
-        #self.parent.button1 = tk.Button(self.parent, text="game1", command=self)
-        #self.parent.button1.pack(side=tk.TOP)
 
         # labels
         # definition of sizes and fonts
@@ -26,10 +26,10 @@ class Demo0:
         self.parent.label1.place(relx=.5, rely= .2, anchor=tk.CENTER)
         self.parent.label2.place(relx=.5, rely=.76, anchor=tk.CENTER)
 
-        self.parent.btnListen = tk.Button(self.parent, text="ListenON")
+        self.parent.btnListen = BtnDefault(self.parent,text="ListenON")
         self.parent.btnListen.place(relx=0, rely = 1, anchor=tk.SW)
 
-        self.parent.btnSkip = tk.Button(self.parent, text= "SKIP >")
+        self.parent.btnSkip = BtnDefault(self.parent, text= "SKIP >")
         self.parent.btnSkip.place(relx=1, rely=1, anchor=tk.SE)
 
 

@@ -1,21 +1,19 @@
 #!/usr/bin/python3
 import tkinter as tk
-from tkinter import ttk as ttk
 from random import choice
 import sys
 
 # import gamemodes
-from games.demo0 import Demo0
-from games.demo1 import Demo1
-from games.demo3 import Demo3
+from games.mode0gui import Mode0
+from games.mode1gui import Mode1
+from games.mode3gui import Mode3
+from games.mode4gui import Mode4
+from games.mode5gui import Mode5
+
+# import button styles
+from games.utils.customElements import BtnMenu
 
 
- # p
-# custom button class
-class NavButton(tk.Button):
-    def __init__(self, master, text):
-        #self.nav_button = tk.Button(master, text="aa", width=25)
-        super().__init__(master, text= text)
 
 class MainApplication(tk.Frame):
     # definition de la fenetre globale
@@ -23,8 +21,6 @@ class MainApplication(tk.Frame):
         self.colors=['red', 'green', 'yellow']
         self.gameMode=0
         self.master=master
-        self.style = ttk.Style()
-        self.style.configure("BW.TLabel")
         
         # Main Frame
         self.master.title("RaspyKeys")
@@ -47,11 +43,11 @@ class MainApplication(tk.Frame):
         # TODO: make a way to load last settigns. save automatically each time a change
         # toolbar buttons
         # ///////// btn
-        self.master.button1 = NavButton(self.master.toolbar, text="EarN")
+        self.master.button1 = BtnMenu(self.master.toolbar, text="EarN")
         self.master.button1["command"] = lambda: self.toggleMode(0)
         self.master.button1.pack(side=tk.LEFT, padx=(10,0))
         # ///////// btn
-        self.master.button2 = NavButton(self.master.toolbar, text="EarC")
+        self.master.button2 = BtnMenu(self.master.toolbar, text="EarC")
         self.master.button2["command"] = lambda: self.toggleMode(1)
         self.master.button2.pack(side=tk.LEFT,)
         # ///////// btn
@@ -59,13 +55,17 @@ class MainApplication(tk.Frame):
         # self.master.button3["command"]=lambda: self.toggleMode(2)
         # self.master.button3.pack(side=tk.LEFT, )
         # ///////// btn
-        self.master.button4=NavButton(self.master.toolbar , text= "BkTr")
+        self.master.button4=BtnMenu(self.master.toolbar , text= "BkTr")
         self.master.button4["command"]=lambda: self.toggleMode(3)
         self.master.button4.pack(side=tk.LEFT, )
         # ///////// btn
-        self.master.button5 = NavButton(self.master.toolbar, text="Keyb")
+        self.master.button5 = BtnMenu(self.master.toolbar, text="Lick")
         self.master.button5["command"]= lambda: self.toggleMode(4)
         self.master.button5.pack(side=tk.LEFT)
+        # ///////// btn
+        self.master.button6 = BtnMenu(self.master.toolbar, text="Opts")
+        self.master.button6["command"]= lambda: self.toggleMode(5)
+        self.master.button6.pack(side=tk.LEFT)
 
 
 
@@ -90,22 +90,26 @@ class MainApplication(tk.Frame):
         self.frame.pack_propagate(0)
         self.frame.gameFrame = tk.Frame(self.master)
         if intMode == 0:
-            self.app = Demo0(self.frame.gameFrame)
+            self.app = Mode0(self.frame.gameFrame)
             # specific to mode0 bc in order to skip all midi notes during another mode
             self.app.activateListening()
         elif intMode == 1:
-            self.app = Demo1(self.frame.gameFrame)
+            self.app = Mode1(self.frame.gameFrame)
             self.app.activateListening()
 
         elif intMode == 3:
-            self.app = Demo3(self.frame.gameFrame)
+            self.app = Mode3(self.frame.gameFrame)
 
+        elif intMode == 4:
+            self.app = Mode4(self.frame.gameFrame)
         
+        elif intMode == 5:
+            self.app = Mode5(self.frame.gameFrame)
 
         else:
             return
 
-        self.frame.gameFrame.pack(expand=True , fill=tk.BOTH, padx=20, pady=20)
+        self.frame.gameFrame.pack(expand=True , fill=tk.BOTH, padx=0, pady=20)
 
     def destroyExistingFrame(self):
         self.frame.gameFrame.pack_forget()

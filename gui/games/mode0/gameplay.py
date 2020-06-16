@@ -156,16 +156,21 @@ class Game:
             self.parent.label2["bg"] = "green"
             if self.questionNote.isFirstTry:
                 self.score = self.score + 1
-#            self.sounds.play_sound_success() # play success sound
+
+            # TODO : is it really the best way to do time.sleep here ?
+            time.sleep(1)
             self.melodies.playWinMelody()
+            time.sleep(1)
             self.changeGameState("waitingUserInput") # if we gave the good answer, we want a new note
         else:
             self.parent.label2["text"]= "incorrect\nA: {}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
             self.questionNote.isFirstTry= False
             self.parent.label2["bg"] = "red"
+
+            # TODO : is it really the best way to do time.sleep here ?
+            time.sleep(1)
             self.melodies.playLooseMelody()
-            # TODO : remove the play of wav sound. i keep it because it delays the retry
-            self.sounds.play_sound_error() # play success sound
+            time.sleep(1)
             # we replay the interval if the user didnt find the correct answer
             self.replayNote = QuestionNote(self.startingNote, self, .2) # i want to replay both notes
             self.replayNote = QuestionNote(self.questionNote.note, self, .8) # i want to replay both notes

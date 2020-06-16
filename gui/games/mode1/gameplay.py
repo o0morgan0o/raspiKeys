@@ -25,6 +25,7 @@ class Game:
         # variable for user score
         self.counter=0
         self.score=0
+        self.globalIsListening = True
 
         print( "launchin MIDI program... \n")
         debug=True
@@ -44,8 +45,24 @@ class Game:
         self.startingNote = -1
 
         self.sounds = Sound() 
-        self.sounds.loadEffectSounds() # load success and error sounds
+
+        self.parent.btnSkip.configure( command=self.skip)
+        self.parent.btnListen.configure(command=self.toggleGlobalListen)
+
         self.melodies = Melody(self)
+
+    def toggleGlobalListen(self):
+        if self.globalIsListening == True:
+            self.globalIsListening = False
+            self.parent.btnListen.configure(text="ListenOFF")
+        else:
+            self.globalIsListening = True
+            self.parent.btnListen.configure(text="ListenON")
+
+    def skip(self):
+        self.parent.label2[ "text"] = "It was ;-)\n{}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
+        self.parent.label2["bg"] = "orange"
+        self.changeGameState("waitingUserInput") # if we gave the good answer, we want a new note
 
     def startGame(self):
         self.changeGameState("waitingUserInput")
@@ -115,6 +132,8 @@ class Game:
 
 
     def handleMIDIInput(self,msg):
+        if self.globalIsListening == False:
+            return
         # Needed because we still receive signals even if the class is destroyed
         if(self.isListening == False):
             print("[--] Ignoring queue message...", msg, self.isListening)
@@ -180,8 +199,11 @@ class Game:
                 self.changeGameState( "listen")
                 self.parent.label2["text"]= "incorrect"
                 self.parent.label2["bg"] = "red"
+
+                # TODO : is it ok to keep time.sleep ?
+                time.sleep(1)
                 self.melodies.playLooseMelody()
-                # TODO : must play sound victory
+                time.sleep(1)
 
                 for note in self.questionChord:
                     print("resetting a timer")
@@ -193,9 +215,6 @@ class Game:
                 self.canvasCounter = 0
                 self.isFirstTry= False
 
-
-
-
             else :
             # We won
                 self.parent.label2["text"] = "correct ;-)\n{}".format(self.chordName)
@@ -204,7 +223,11 @@ class Game:
                 if self.isFirstTry:
                     self.score = self.score + 1
                 self.changeGameState("waitingUserInput")
+
+                # TODO : is it ok to keep time.sleep ?
+                time.sleep(1)
                 self.melodies.playWinMelody()
+                time.sleep(1)
                 self.isListening= True
     #            self.sounds.play_sound_success() # play success sound
                 
