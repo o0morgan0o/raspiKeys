@@ -1,6 +1,7 @@
 import tkinter as tk 
 from games.demo3dir.demo3 import Game
-from games.utils.sounds import Sound
+
+
 
 class Demo3:
     def __init__(self,parent):
@@ -8,25 +9,34 @@ class Demo3:
         self.parent = parent
         self.parent.pack_propagate(0)
         
-        #self.parent.button1 = tk.Button(self.parent, text="game1", command=self)
-        #self.parent.button1.pack(side=tk.TOP)
 
-        # labels
-        # definition of sizes and fonts
-        self.btnPlay = tk.Button(text="play/Pause")
-        self.btnPlay.place(relx = .5, rely = .7,anchor=tk.CENTER)
+        self.btnPlay = tk.Button(text="play/Pause", width=14, height=5)
+        self.btnPlay.place(relx = .08, rely = .92,anchor=tk.SW)
 
-        self.btnRandom = tk.Button(text="random song")
-        self.btnRandom.place(relx=.5, rely= .4, anchor=tk.CENTER)
+        self.btnRandom = tk.Button(text="random song", width=14, height=5)
+        self.btnRandom.place(relx=.92, rely= .92, anchor=tk.SE)
 
-        self.game = Game(self.parent)
-        self.sound = Sound()
-        self.sound.loadBacktracks()
+        self.randTrack0 = tk.Button(text="", width=20 , height= 2)
+        self.randTrack0.place(relx=.5, rely=.1+ .1, anchor=tk.N)
+        self.randTrack1 = tk.Button(text="", width=20, height=2)
+        self.randTrack1.place(relx=.5, rely=.1+ 2*.1, anchor=tk.N)
+        self.randTrack2 = tk.Button(text="", width=20, height=2)
+        self.randTrack2.place(relx=.5, rely=.1+ 3*.1, anchor=tk.N)
+        self.randTrack3 = tk.Button(text="", width=20, height=2)
+        self.randTrack3.place(relx=.5, rely=.1+ 4*.1, anchor=tk.N)
+
+        self.labelCurrent= tk.Label(text="aaaa")
+        self.labelCurrent.place(relx = .5, rely = .62, anchor = tk.N)
+
+
+
+        self.game = Game(self)
+
+
 
         
 
     def update(self):
-        #self.parent.update()
         print("updating UI")
 
     def destroy(self):
