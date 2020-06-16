@@ -55,9 +55,9 @@ class MainApplication(tk.Frame):
         self.master.button2["command"] = lambda: self.toggleMode(1)
         self.master.button2.pack(side=tk.LEFT,)
         # ///////// btn
-        self.master.button3 =NavButton(self.master.toolbar, text="Metr")
-        self.master.button3["command"]=lambda: self.toggleMode(2)
-        self.master.button3.pack(side=tk.LEFT, )
+        # self.master.button3 =NavButton(self.master.toolbar, text="Metr")
+        # self.master.button3["command"]=lambda: self.toggleMode(2)
+        # self.master.button3.pack(side=tk.LEFT, )
         # ///////// btn
         self.master.button4=NavButton(self.master.toolbar , text= "BkTr")
         self.master.button4["command"]=lambda: self.toggleMode(3)
@@ -99,6 +99,11 @@ class MainApplication(tk.Frame):
 
         elif intMode == 3:
             self.app = Demo3(self.frame.gameFrame)
+
+        
+
+        else:
+            return
 
         self.frame.gameFrame.pack(expand=True , fill=tk.BOTH, padx=20, pady=20)
 

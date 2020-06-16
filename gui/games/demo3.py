@@ -8,7 +8,7 @@ class Demo3:
         print( "launching game 3 -------------- ")
         self.parent = parent
         self.parent.pack_propagate(0)
-        
+        self.parent.config(bg="black")
 
         self.btnPlay = tk.Button(text="play/Pause", width=14, height=5)
         self.btnPlay.place(relx = .08, rely = .92,anchor=tk.SW)
@@ -25,7 +25,7 @@ class Demo3:
         self.randTrack3 = tk.Button(text="", width=20, height=2)
         self.randTrack3.place(relx=.5, rely=.1+ 4*.1, anchor=tk.N)
 
-        self.labelCurrent= tk.Label(text="aaaa")
+        self.labelCurrent= tk.Label(text="")
         self.labelCurrent.place(relx = .5, rely = .62, anchor = tk.N)
 
 
