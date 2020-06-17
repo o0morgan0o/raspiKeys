@@ -57,3 +57,18 @@ class Melody:
         CustomNote(self.parent, 30,.3,.05)
 
 
+class CustomSignal:
+    def __init__(self, parent,noteType, note,delayOn):
+        self.parent =parent
+        print("CUSTOM SIGNAL")
+        if noteType == "note_on":
+            self.timer= Timer(delayOn/1000,lambda: self.parent.midiIO.sendOut("note_on", note))
+            self.timer.start()
+        elif noteType == "note_off": 
+            print("sending note off timer", delayOn/1000)
+            self.timer= Timer(delayOn/1000,lambda: self.parent.midiIO.sendOut("note_off", note))
+            self.timer.start()
+        else: 
+
+            print("note type unknown", note.type)
+

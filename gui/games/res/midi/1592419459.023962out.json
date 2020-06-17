@@ -1,0 +1,50 @@
+{
+    "bass": 76,
+    "notes": [
+        {
+            "type": "note_off",
+            "note": 76,
+            "time": 1
+        },
+        {
+            "type": "note_on",
+            "note": 66,
+            "time": 1183
+        },
+        {
+            "type": "note_off",
+            "note": 66,
+            "time": 1466
+        },
+        {
+            "type": "note_on",
+            "note": 70,
+            "time": 1475
+        },
+        {
+            "type": "note_off",
+            "note": 70,
+            "time": 1651
+        },
+        {
+            "type": "note_on",
+            "note": 60,
+            "time": 1711
+        },
+        {
+            "type": "note_off",
+            "note": 60,
+            "time": 2023
+        },
+        {
+            "type": "note_on",
+            "note": 66,
+            "time": 2052
+        },
+        {
+            "type": "note_off",
+            "note": 66,
+            "time": 2202
+        }
+    ]
+}

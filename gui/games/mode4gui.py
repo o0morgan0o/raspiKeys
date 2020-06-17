@@ -23,13 +23,9 @@ class Mode4:
         
         # Creation of the elements
         self.tree = ttk.Treeview()
-        self.tree.column("#0",  stretch=tk.NO)
-        self.tree.heading("#0",text="Name",anchor=tk.W)
-
-        self.lblMessage = LblDefault(text="there are x licks in the base")
         self.btnRecord = BtnDefault(text="record")
         self.btnStart = BtnDefault(text="startPractice")
-
+        self.lblMessage = LblDefault(text="there are x licks in the base")
 
         # placement
         self.tree.pack( fill=tk.X)

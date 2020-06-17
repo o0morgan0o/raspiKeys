@@ -1,0 +1,40 @@
+{
+    "bass": 76,
+    "notes": [
+        {
+            "type": "note_off",
+            "note": 76,
+            "time": 0
+        },
+        {
+            "type": "note_on",
+            "note": 83,
+            "time": 1097
+        },
+        {
+            "type": "note_off",
+            "note": 83,
+            "time": 1286
+        },
+        {
+            "type": "note_on",
+            "note": 78,
+            "time": 1300
+        },
+        {
+            "type": "note_on",
+            "note": 72,
+            "time": 1527
+        },
+        {
+            "type": "note_off",
+            "note": 78,
+            "time": 1532
+        },
+        {
+            "type": "note_off",
+            "note": 72,
+            "time": 1686
+        }
+    ]
+}

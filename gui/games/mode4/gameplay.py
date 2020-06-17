@@ -8,24 +8,24 @@ from games.utils.customElements import LblDefault
 import mido
 from games.utils.midiIO import MidiIO
 
+from games.utils.questionNote import CustomSignal
+
 
 
 class Game:
 
     def __init__(self, parent):
         self.parent=parent
-        print(self.parent)
 
+        # Default path
+        self.midiRepository = "/home/pi/raspiKeys/gui/games/res/midi/"
 
-
-
+        # Callbacks for buttons
         self.parent.btnRecord.config(command=self.startRecording)
         self.parent.btnStart.config(command=self.playLick) 
 
-
-
-        self.midiRepository = "/home/pi/raspiKeys/gui/games/res/midi/"
         self.midiFiles =[]
+        # Tree creation
         for filename in os.listdir(self.midiRepository):
             # get only json files
             if os.path.splitext(filename)[1] == ".json":
@@ -33,6 +33,8 @@ class Game:
                 mFile = os.path.join(self.midiRepository, filename)
                 self.midiFiles.append(mFile)
 
+        #self.parent.tree.selection_set(self.parent.tree.get_children()[0])
+        self.parent.tree.bind('<<TreeviewSelect>>', self.on_select)
 
 
 
@@ -45,22 +47,53 @@ class Game:
         self.startingTime = 0
         self.recordedNotes =[]
 
+        self.currentLick =None
+
         # TODO : il faut que le programme demande une basse
         # ensuite on joue le lick
         # en play: le programme joue la basse et donne en indice le premier interval
 
-    def loadExistingFiles(self):
-        pass
+    def reloadTree(self):
+        # update the window
+        # TODO : refactor this because we use it in init
+        for item in self.parent.tree.get_children():
+            self.parent.tree.delete(item)
+
+        for filename in os.listdir(self.midiRepository):
+            # get only json files
+            if os.path.splitext(filename)[1] == ".json":
+                self.parent.tree.insert("", 1, text=filename)
+                mFile = os.path.join(self.midiRepository, filename)
+                self.midiFiles.append(mFile)
+
+    # Return the details of the selected item
+    def on_select(self, selected):
+       print("slected trigger", selected)
+       selection = self.parent.tree.focus()
+       selection_details = self.parent.tree.item(selection)
+       print(selection_details['text'])
+       self.loadSelectedItem(selection_details['text'])
+       
+    def loadSelectedItem(self, name):
+        print("selected is: ", name)
+        outFile = os.path.join(self.midiRepository, name)
+        print(outFile)
+        self.loadFile( os.path.join(self.midiRepository, name))
+        print( "should be loaded")
+
+
+        
 
     def loadFile(self, mFile):
         with open(mFile, 'r') as f:
             datastore = json.load(f)
         print(datastore)
         msgStr="Current lick: "
-        msgStr+= "{} lick ".format(datastore["type"])
+        #msgStr+= "{} lick ".format(datastore["type"])
         # TODO format in order to show note name instead of midiCC
         msgStr+= "in {}".format(datastore["bass"])
         self.parent.lblMessage.config(text=msgStr)
+        self.currentLick = mFile
 
     def startRecording(self):
         self.recordingBassLick= True
@@ -83,16 +116,20 @@ class Game:
         # sauvegarde json dans un objet
 
         # TODO : Make try excerpt
-        outfile = os.path.join(self.midiRepository, "out.json")
+        outfile = os.path.join(self.midiRepository, str(time.time())+ "out.json")
+        # TODO : increase counter if file exists
         with open(outfile, "w+") as outfile:
             outfile.write(json_object)
         print("file saved") # TODO : maku user info for this
+        self.recordedNotes = []
+        self.startingTime = 0
+        self.recordingNotes = False
+        self.recordingBassLick = False
         self.alert.destroy() # close windwo
-        self.loadExistingFiles() # reload list
+        self.reloadTree()
 
 
     def playLick(self):
-        self.currentLick = self.midiFiles[0]
         print("trying to replay lick0", self.currentLick) 
         # we open the json
         with open(self.currentLick, "r") as jsonfile:
@@ -102,7 +139,13 @@ class Game:
         notes = jsonLick["notes"]
         self.parent.lblMessage.config(text="Key is"+ str(key))
         # now we loop in the array create notes obejcts with timers
-        print(notes)
+        for note in notes:
+            # create a new Note with timer
+
+            print(note)
+            #self.midiIO.sendOut("note_on", 60)
+            a= []
+            a.append(CustomSignal(self, note["type"], note["note"], note["time"]))
         
         
 

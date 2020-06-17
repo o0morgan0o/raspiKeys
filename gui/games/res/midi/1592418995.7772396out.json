@@ -1,0 +1,80 @@
+{
+    "bass": 50,
+    "notes": [
+        {
+            "type": "note_off",
+            "note": 50,
+            "time": 0
+        },
+        {
+            "type": "note_on",
+            "note": 51,
+            "time": 960
+        },
+        {
+            "type": "note_on",
+            "note": 55,
+            "time": 1230
+        },
+        {
+            "type": "note_off",
+            "note": 51,
+            "time": 1238
+        },
+        {
+            "type": "note_on",
+            "note": 58,
+            "time": 1402
+        },
+        {
+            "type": "note_off",
+            "note": 55,
+            "time": 1439
+        },
+        {
+            "type": "note_off",
+            "note": 58,
+            "time": 1668
+        },
+        {
+            "type": "note_on",
+            "note": 62,
+            "time": 1692
+        },
+        {
+            "type": "note_off",
+            "note": 62,
+            "time": 2255
+        },
+        {
+            "type": "note_on",
+            "note": 58,
+            "time": 2259
+        },
+        {
+            "type": "note_on",
+            "note": 62,
+            "time": 2431
+        },
+        {
+            "type": "note_off",
+            "note": 58,
+            "time": 2434
+        },
+        {
+            "type": "note_off",
+            "note": 62,
+            "time": 2695
+        },
+        {
+            "type": "note_on",
+            "note": 55,
+            "time": 2737
+        },
+        {
+            "type": "note_off",
+            "note": 55,
+            "time": 3181
+        }
+    ]
+}
