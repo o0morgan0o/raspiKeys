@@ -82,7 +82,7 @@ class MainApplication(tk.Frame):
         # initialization
         # determine the default game mode at the launch
         # TODO make a way to retrieve the last open tab (config file load at startup ? )
-        self.new_window(3)
+        self.new_window(4)
 
     
     # method to load a new game mode

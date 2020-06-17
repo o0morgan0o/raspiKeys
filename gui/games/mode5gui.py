@@ -1,6 +1,6 @@
 import tkinter as tk 
 from tkinter import ttk 
-from games.mode5.gameplay import Game
+from games.mode4.gameplay import Game
 import games.utils.tinkerStyles 
 
 from games.utils.customElements import BtnDefault
@@ -19,6 +19,7 @@ class Mode5:
         self.parent = parent
         self.parent.pack_propagate(0)
         self.parent.config(bg="black")
+
         self.game = Game(self.parent)
 
 
