@@ -22,7 +22,8 @@ class Game:
 
         # Callbacks for buttons
         self.parent.btnRecord.config(command=self.startRecording)
-        self.parent.btnStart.config(command=self.playLick) 
+        self.parent.btnPractiseLick.config(command=self.playLick) 
+        self.parent.btnPractiseAll.config(command=self.playAll) 
 
         self.midiFiles =[]
         # Tree creation
@@ -55,7 +56,7 @@ class Game:
 
     def reloadTree(self):
         # update the window
-        # TODO : refactor this because we use it in init
+       # TODO : refactor this because we use it in init
         for item in self.parent.tree.get_children():
             self.parent.tree.delete(item)
 
@@ -147,6 +148,9 @@ class Game:
             a= []
             a.append(CustomSignal(self, note["type"], note["note"], note["time"]))
         
+
+    def playAll(self):
+        pass
         
 
 

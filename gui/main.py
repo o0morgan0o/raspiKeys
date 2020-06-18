@@ -26,7 +26,7 @@ class MainApplication(tk.Frame):
         self.master.title("RaspyKeys")
         self.master.geometry("320x480")
         self.master["bg"]="black"
-        self.frame=tk.Frame(self.master)
+        self.frame=tk.Frame(self.master, bg="green")
         if(tag == "pi"): # to run at fullscreen if we get the "pi" tag
             self.master.attributes( "-fullscreen", True)
             self.master.buttonQuit = tk.Button(self.master, text="exit", command=lambda: self.master.quit())
@@ -82,12 +82,12 @@ class MainApplication(tk.Frame):
         # initialization
         # determine the default game mode at the launch
         # TODO make a way to retrieve the last open tab (config file load at startup ? )
-        self.new_window(4)
+        self.new_window(0)
 
     
     # method to load a new game mode
     def new_window(self, intMode):
-        self.frame.pack_propagate(0)
+        #self.frame.pack_propagate(0)
         self.frame.gameFrame = tk.Frame(self.master)
         if intMode == 0:
             self.app = Mode0(self.frame.gameFrame)

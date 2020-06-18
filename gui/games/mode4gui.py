@@ -22,18 +22,20 @@ class Mode4:
 
         
         # Creation of the elements
-        self.tree = ttk.Treeview()
-        self.btnRecord = BtnDefault(text="record")
-        self.btnStart = BtnDefault(text="startPractice")
-        self.lblMessage = LblDefault(text="there are x licks in the base")
+        self.parent.tree = ttk.Treeview()
+        self.parent.btnRecord = BtnDefault(text="record")
+        self.parent.btnPractiseLick = BtnDefault(text="Practise Lick")
+        self.parent.btnPractiseAll= BtnDefault(text="Practise All")
+        self.parent.lblMessage = LblDefault(text="there are x licks in the base")
 
         # placement
-        self.tree.pack( fill=tk.X)
-        self.lblMessage.pack()
-        self.btnRecord.pack()
-        self.btnStart.pack()
+        self.parent.tree.pack( fill=tk.X)
+        self.parent.lblMessage.pack()
+        self.parent.btnRecord.pack()
+        self.parent.btnPractiseLick.pack()
+        self.parent.btnPractiseAll.pack()
 
-        self.game = Game(self)
+        self.game = Game(self.parent)
 
 
 
@@ -45,10 +47,6 @@ class Mode4:
     def destroy(self):
         # TODO : should i do destory here ? would be better to destroy the frame but ici les elements ne sont pas dessin√s sur la frame
         self.game.destroy()
-        self.tree.pack_forget()
-        self.tree.destroy()
-
-        del self
 
     def __del__(self):
         print("trying destroy")
