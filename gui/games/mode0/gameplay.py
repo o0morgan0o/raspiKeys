@@ -48,7 +48,6 @@ class Game:
         self.sounds.loadEffectSounds() # load success and error sounds
 
         self.parent.btnSkip.configure( command=self.skip)
-        self.parent.btnListen.configure(command=self.toggleGlobalListen)
 
     def toggleGlobalListen(self):
         if self.globalIsListening == True:
@@ -65,15 +64,15 @@ class Game:
 
     def startGame(self):
         self.changeGameState("waitingUserInput")
-        self.parent["bg"] = "black"
-        self.changeAllBg("black")
+        #self.parent["bg"] = "black"
+        #self.changeAllBg("black")
         self.melodies = Melody(self)
 
     def destroy(self):
         print("destroy in class")
         self.isListening = False
         self.midiIO.destroy() # delete everything in midiIO class
-        del self.waitingNotes # delete WantingNotes
+        # del self.waitingNotes # delete WantingNotes
         del self
 
     def changeGameState(self, newstate):

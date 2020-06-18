@@ -14,39 +14,48 @@ from games.utils.customElements import LblCurrentPlaying
 
 
 class Mode4:
-    def __init__(self,parent):
+    def __init__(self,gameFrame):
         print( "launching game 4 -------------- ")
-        self.parent = parent
-        self.parent.pack_propagate(0)
-        self.parent.config(bg="black")
+        self.gameFrame = gameFrame
+        self.gameFrame.pack_propagate(0)
+        self.gameFrame.config(bg="yellow")
 
         
         # Creation of the elements
-        self.parent.tree = ttk.Treeview()
-        self.parent.btnRecord = BtnDefault(text="record")
-        self.parent.btnPractiseLick = BtnDefault(text="Practise Lick")
-        self.parent.btnPractiseAll= BtnDefault(text="Practise All")
-        self.parent.lblMessage = LblDefault(text="there are x licks in the base")
+        self.gameFrame.tree = ttk.Treeview(self.gameFrame)
+        self.gameFrame.btnRecord = BtnDefault(self.gameFrame, text="record")
+        self.gameFrame.btnPractiseLick = BtnDefault(self.gameFrame, text="Practise Lick")
+        self.gameFrame.btnPractiseAll= BtnDefault(self.gameFrame, text="Practise All")
+        self.gameFrame.lblMessage = LblDefault(self.gameFrame, text="there are x licks in the base")
 
         # placement
-        self.parent.tree.pack( fill=tk.X)
-        self.parent.lblMessage.pack()
-        self.parent.btnRecord.pack()
-        self.parent.btnPractiseLick.pack()
-        self.parent.btnPractiseAll.pack()
 
-        self.game = Game(self.parent)
+        self.placeElements()
+        self.game = Game(self.gameFrame)
+
+
+        
+    def placeElements(self):
+        self.gameFrame.rowconfigure((0,1,2,3), weight=1)
+        self.gameFrame.columnconfigure(0, weight=1)
+
+        self.gameFrame.tree.grid(row=0,column=0, columnspan=1, sticky="NSEW")
+        self.gameFrame.lblMessage.grid(row=1,column=0, columnspan=1, sticky="NSEW")
+        self.gameFrame.btnRecord.grid(row=2,column=0, columnspan=1, sticky="NSEW")
+        self.gameFrame.btnPractiseLick.grid(row=3,column=0, columnspan=1, sticky="NSEW")
+        self.gameFrame.btnPractiseAll.grid(row=4,column=0, columnspan=1, sticky="NSEW")
+
 
 
 
         
 
-    def update(self):
-        print("updating UI")
-
     def destroy(self):
+        pass
         # TODO : should i do destory here ? would be better to destroy the frame but ici les elements ne sont pas dessin√s sur la frame
-        self.game.destroy()
+#        print( "trying destroy frame 3")
+#        self.game.destroy()
+#        del self
 
     def __del__(self):
         print("trying destroy")

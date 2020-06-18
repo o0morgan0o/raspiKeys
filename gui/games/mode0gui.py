@@ -4,44 +4,42 @@ from games.mode0.gameplay import Game
 from games.utils.customElements import BtnDefault
 
 class Mode0:
-    def __init__(self,parent):
+    def __init__(self,gameFrame):
         print( "launching game 0 -------------- ")
-        self.parent = parent
-        self.parent.pack_propagate(0)
+        self.gameFrame = gameFrame
+        self.gameFrame.pack_propagate(0)
         
 
         # labels
         # definition of sizes and fonts
-        self.parent.label1 = tk.Label(self.parent,wraplength=200) # for user instructions
-        self.parent.label1.config(font=("Courier", 12))
-        self.parent.label2 = tk.Label(self.parent, padx=10, pady=10) # for "correct" or "incorrect"response
-        self.parent.label2.config(font=("Courier", 18))
-        self.parent.label2.configure(anchor= "center")
-        self.parent.label3 = tk.Label(self.parent) # for global score
-        self.parent.label3.config(font=("Courier", 30))
+        self.gameFrame.label1 = tk.Label(self.gameFrame,wraplength=200) # for user instructions
+        self.gameFrame.label1.config(font=("Courier", 12))
+        self.gameFrame.label2 = tk.Label(self.gameFrame, padx=10, pady=10) # for "correct" or "incorrect"response
+        self.gameFrame.label2.config(font=("Courier", 18))
+        self.gameFrame.label2.configure(anchor= "center")
+        self.gameFrame.label3 = tk.Label(self.gameFrame) # for global score
+        self.gameFrame.label3.config(font=("Courier", 30))
+        self.gameFrame.btnSkip = BtnDefault(self.gameFrame, text= "SKIP >")
 
         # placement of differents labels
         # TODO : may be there is a better way to center this
-        self.parent.label3.place(relx=.5, rely=.5, anchor=tk.CENTER)
-        self.parent.label1.place(relx=.5, rely= .2, anchor=tk.CENTER)
-        self.parent.label2.place(relx=.5, rely=.76, anchor=tk.CENTER)
+        self.placeElements()
 
-        self.parent.btnListen = BtnDefault(self.parent,text="ListenON")
-        self.parent.btnListen.place(relx=0, rely = 1, anchor=tk.SW)
+        self.game = Game(self.gameFrame)
 
-        self.parent.btnSkip = BtnDefault(self.parent, text= "SKIP >")
-        self.parent.btnSkip.place(relx=1, rely=1, anchor=tk.SE)
-
-
-        self.game = Game(self.parent)
         
+    def placeElements(self):
+        self.gameFrame.rowconfigure((0,1,2,3), weight=1)
+        self.gameFrame.columnconfigure(0, weight=1)
 
-    def update(self):
-        #self.parent.update()
-        print("updating UI")
 
-    def destroy(self):
-        self.game.destroy()
+        self.gameFrame.label1.grid(row=0,column=0, columnspan=1, sticky="NSEW")
+        self.gameFrame.label2.grid(row=1,column=0, columnspan=1, sticky="NSEW")
+        self.gameFrame.label3.grid(row=2,column=0, columnspan=1, sticky="NSEW")
+
+        self.gameFrame.btnSkip.grid(row=3,column=0, columnspan=1, sticky="NSEW")
+
+
 
     def __del__(self):
         print("trying destroy")

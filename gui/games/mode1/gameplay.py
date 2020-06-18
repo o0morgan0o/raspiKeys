@@ -47,7 +47,6 @@ class Game:
         self.sounds = Sound() 
 
         self.parent.btnSkip.configure( command=self.skip)
-        self.parent.btnListen.configure(command=self.toggleGlobalListen)
 
         self.melodies = Melody(self)
 

@@ -14,42 +14,40 @@ from games.utils.customElements import LblCurrentPlaying
 
 
 class Mode3:
-    def __init__(self,parent):
+    def __init__(self,gameFrame):
         print( "launching game 3 -------------- ")
-        self.parent = parent
-        self.parent.pack_propagate(0)
-        self.parent.config(bg="black")
+        self.gameFrame = gameFrame
+        self.gameFrame.pack_propagate(0)
+        self.gameFrame.config(bg="yellow")
 
-        self.btnPlay = BtnBigButton(text="play/Pause")
-        self.btnPlay.place(relx = .08, rely = .92,anchor=tk.SW)
+        self.gameFrame.btnPlay = BtnBigButton(self.gameFrame,text="play/Pause")
+        self.gameFrame.btnRandom = BtnBigButton(self.gameFrame,text="random song")
+        self.gameFrame.randTrack0 = BtnWavList(self.gameFrame,text="" , height= 2)
+        self.gameFrame.randTrack1 = BtnWavList(self.gameFrame,text="" , height=2)
+        self.gameFrame.randTrack2 = BtnWavList(self.gameFrame,text="" , height=2)
+        self.gameFrame.randTrack3 = BtnWavList(self.gameFrame,text="" , height=2)
+        self.gameFrame.labelCurrent= LblCurrentPlaying(self.gameFrame,text="")
 
-        self.btnRandom = BtnBigButton(text="random song")
-        self.btnRandom.place(relx=.92, rely= .92, anchor=tk.SE)
-
-
-        self.randTrack0 = BtnWavList(text="" , height= 2)
-        self.randTrack0.place(relx=.5, rely=.1+ .1, relwidth=.8,  anchor=tk.N)
-        self.randTrack1 = BtnWavList(text="" , height=2)
-        self.randTrack1.place(relx=.5, rely=.1+ 2*.1, relwidth=.8,  anchor=tk.N)
-        self.randTrack2 = BtnWavList(text="" , height=2)
-        self.randTrack2.place(relx=.5, rely=.1+ 3*.1, relwidth=.8,  anchor=tk.N)
-        self.randTrack3 = BtnWavList(text="" , height=2)
-        self.randTrack3.place(relx=.5, rely=.1+ 4*.1, relwidth=.8,  anchor=tk.N)
-       
-
-        self.labelCurrent= LblCurrentPlaying(text="")
-        self.labelCurrent.place(relx = .5, rely = .62, anchor = tk.N, relwidth = 1)
+        self.placeElements()
+        self.game = Game(self.gameFrame)
 
 
+    def placeElements(self):
+        self.gameFrame.rowconfigure((0,1,2,3,4,5,6,7,8), weight=1)
+        self.gameFrame.columnconfigure(0, weight=1)
 
-        self.game = Game(self)
+
+        self.gameFrame.randTrack0.grid(row=0,column=0, columnspan=1, sticky="NSEW")
+        self.gameFrame.randTrack1.grid(row=1,column=0, columnspan=1, sticky="NSEW")
+        self.gameFrame.randTrack2.grid(row=2,column=0, columnspan=1, sticky="NSEW")
+        self.gameFrame.randTrack3.grid(row=3,column=0, columnspan=1, sticky="NSEW")
+        self.gameFrame.labelCurrent.grid(row=4,column=0, columnspan=1, sticky="NSEW")
+        self.gameFrame.btnPlay.grid(row=6,column=0, columnspan=1, sticky="NSEW")
+        self.gameFrame.btnRandom.grid(row=7,column=0, columnspan=1, sticky="NSEW")
 
 
 
         
-
-    def update(self):
-        print("updating UI")
 
     def destroy(self):
         self.game.destroy()
