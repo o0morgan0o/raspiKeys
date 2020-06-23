@@ -11,7 +11,7 @@ class BtnDefault(tk.Button):
     def __init__(self, *args, **kwargs):
         super(BtnDefault, self).__init__(
             *args,
-            font=("Courier", 12),
+       #     font=("Courier", 12),
             **kwargs)
 
 
@@ -20,7 +20,7 @@ class LblDefault(tk.Label):
       super(LblDefault, self).__init__(
         *args,
         foreground="blue",
-        font=("Courier", 8),
+      #  font=("Courier", 8),
         **kwargs
       )
 
@@ -55,13 +55,13 @@ class BtnBigButton(tk.Button):
         *args,
         bg="steelBlue",
         fg="white",
-        width=8,
-        height=3,
-        wraplength=100,
-        bd=3,
-        relief=tk.GROOVE,
+#        width=8,
+#        height=3,
+#        wraplength=100,
+#        bd=3,
+#        relief=tk.GROOVE,
         foreground="black",
-        font=("Courier", 14),
+        #font=("Courier", 14),
         **kwargs
       )
 

@@ -12,6 +12,7 @@ from games.mode5gui import Mode5
 
 # import button styles
 from games.utils.customElements import BtnMenu
+from games.autoload import Autoload
 
 
 
@@ -78,7 +79,7 @@ class MainApplication(tk.Frame):
         self.master.footer.columnconfigure((0,1,2), weight=1)
         self.button6 = BtnMenu(self.master.footer, text="Opts")
         self.button6["command"]= lambda: self.new_window(5)
-        self.buttonMidiListen = BtnMenu(self.master.footer, text="MIDILis")
+        self.buttonMidiListen = BtnMenu(self.master.footer, text="MIDILis", command=self.toggleMidiListen)
         self.volumeSlider = tk.Scale(self.master.footer,  from_=0, to=1000, orient=tk.HORIZONTAL) 
 
         self.buttonMidiListen.grid(row=0, column=0, sticky="NSEW")
@@ -90,7 +91,7 @@ class MainApplication(tk.Frame):
 
         # initialization
         # Load default Screen
-        self.new_window(0)
+        self.new_window(5)
         # TODO make a way to retrieve the last open tab (config file load at startup ? )
 
         
@@ -98,9 +99,6 @@ class MainApplication(tk.Frame):
     
     # method to load a new game mode
     def new_window(self, intMode):
-        #self.frame.pack_propagate(0)
-        #self.frame.gameFrame = tk.Frame(self.master)
-        # TODO : make try catch
         try:
             pass
             self.master.body.destroy()
@@ -126,6 +124,18 @@ class MainApplication(tk.Frame):
             self.app = Mode5(self.master.body)
         else:
             return
+
+    
+    def toggleMidiListen(self):
+        print("toggle listen mode")
+        instance = Autoload().getInstance()
+        instance.panic()
+        instance.toggleListening()
+        if instance.isListening == True:
+            self.buttonMidiListen.config(text="MIDILis")
+        else:
+            self.buttonMidiListen.config(text="OFF")
+
 
 
 

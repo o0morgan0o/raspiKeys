@@ -31,14 +31,15 @@ class Mode1:
         self.game = Game(self.gameFrame)
 
     def placeElements(self):
-        self.gameFrame.rowconfigure((0,1,2,3), weight=1)
+        self.gameFrame.rowconfigure((0,1,2,3,4,5,6,7), weight=1)
         self.gameFrame.columnconfigure(0, weight=1)
 
-        self.gameFrame.label1.grid(row=0, column=0, columnspan=1, sticky="NSEW")
-        self.gameFrame.label2.grid(row=1, column=0, columnspan=1, sticky="NSEW")
+        self.gameFrame.label1.grid(row=1, column=0, columnspan=1, sticky="NSEW")
         self.gameFrame.label3.grid(row=2, column=0, columnspan=1, sticky="NSEW")
-        self.gameFrame.canvas.grid(row=3, column=0, columnspan=1, sticky="NSEW")
-        self.gameFrame.btnSkip.grid(row=4, column=0, columnspan=1, sticky="NSEW")
+        self.gameFrame.canvas.grid(row=3, rowspan=1, column=0, columnspan=1, sticky="NS")
+        self.gameFrame.label2.grid(row=4, column=0, columnspan=1, sticky="NSEW")
+
+        self.gameFrame.btnSkip.grid(row=6, column=0, columnspan=1, sticky="")
         
 
     def destroy(self):

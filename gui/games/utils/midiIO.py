@@ -9,6 +9,8 @@ class MidiIO:
         self.inport.callback = None
         self.inport.poll()
 
+        self.isListening = True
+
         #try to clear pending notes
         print("TRY TO CLEAR ==========")
         self.inport._queue._queue.mutex.acquire()
@@ -33,6 +35,18 @@ class MidiIO:
         print("==> Selected output is {}".format(self.outport))
         print(80*"=")
 
+    def getAllMidiInputs(self):
+        return mido.get_input_names()
+
+    def getAllMidiOutputs(self):
+        return mido.get_output_names()
+
+    def setMidiInput(self, _input):
+        self.inport = mido.open_input(_input)
+
+    def setMidiOutput(self,_output):
+        self.outport= mido.open_output(_output)
+
     def destroy(self):
         self.inport.callback = None
         self.outport.panic()
@@ -41,8 +55,8 @@ class MidiIO:
         self.inport.close()
         # print("is closed output? : ",self.outport.closed)
         # print("is closed input? : ",self.inport.closed)
-        del self.inport
-        del self.outport
+        #del self.inport
+        #del self.outport
 
     def setCallback(self, callback):
         self.inport.callback = callback
@@ -54,3 +68,10 @@ class MidiIO:
 
     def panic(self):
         self.outport.panic()
+
+    def toggleListening(self):
+        if self.isListening == True:
+            self.isListening=False
+        else:
+            self.isListening=True
+        print("isListening ? " , self.isListening)

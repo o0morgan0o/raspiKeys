@@ -1,4 +1,7 @@
 import tkinter as tk
+from games.utils.customElements import LblSettings
+from games.utils.customElements import BtnSettings
+from games.autoload import Autoload
 
 
 class Game:
@@ -6,47 +9,59 @@ class Game:
     def __init__(self, parent):
         self.parent = parent
 
-        self.parent.rowconfigure((0,1,2,3,4,5,6,7,8,9), weight = 1)
-
-        self.parent.columnconfigure(0, weight=2)
-        self.parent.columnconfigure(1, weight=1)
-        self.parent.columnconfigure(2, weight=2)
-
-        # SECTION 1 - Ear Training Note
-        self.parent.section1.grid(row=0, column=0, columnspan=3, sticky="EW")
-        self.parent.label1_1.grid(row=1,column=0, columnspan=1, sticky= "EWNS")
-        self.parent.slider1_1.grid(row=1,column=2, columnspan=2, sticky= "EW")
-        self.parent.label1_2.grid(row=2,column=0, columnspan=1, sticky= "EWNS")
-        self.parent.slider1_2.grid(row=2,column=2, columnspan=2, sticky= "EW")
-
-        # SECTION 2 - Practise licks
-        self.parent.section2.grid(row=3, column=0,columnspan=3, sticky="EW")
-        self.parent.label2_1.grid(row=4,column=0, columnspan=1, sticky= "EWNS")
-        self.parent.slider2_1.grid(row=4,column=2, columnspan=2, sticky= "EWNS")
-        self.parent.label2_2.grid(row=5,column=0, columnspan=1, sticky= "EWNS")
-        self.parent.slider2_2.grid(row=5,column=2, columnspan=2, sticky= "EWNS")
-
-        # SECTION 3 - bouttons
-        self.parent.btnSaveDefault.grid(row=8, column=0, columnspan=1, sticky="S")
-        self.parent.btnCancel.grid(row=8, column=2, columnspan=1, sticky="S")
+        self.parent.btnConfig.config(command= self.openMidiPanel)
 
 
-#        # Audio volume
-#        self.parent.label1.pack()
-#        self.parent.w.pack()
-#        # Interval Delay for ear training 
-#        self.parent.label2.pack()
-#        self.parent.w1.pack()
-#        self.parent.label1.pack()
-#        # interval types for earTraining chords
-#        self.parent.label3.pack()
-#        self.parent.btnChord1.pack()
-#        self.parent.label1.pack()
-#        # SaveConfig File
-#        self.parent.label4.pack()
-#        self.parent.btnChord2.pack()
-#        self.parent.label1.pack()
-#
+    def openMidiPanel(self):
+        print("opening settings" )
+        self.window = tk.Toplevel(self.parent)
+        label = LblSettings(self.window, text="click on your midi IN device:")
+        # label.grid(row=0, column=0)
+        label.pack()
+
+        # get all availables interface 
+        self.midiInstance = Autoload().getInstance()
+
+        #midiInstance.showIOPorts() # just to shoe in the console
+        midi_inputs = self.midiInstance.getAllMidiInputs()
+        midi_outputs= self.midiInstance.getAllMidiOutputs()
+        print(midi_inputs, midi_outputs)
+
+        counter = 0
+        
+        for mInput in midi_inputs:
+            btn = tk.Button(self.window, text=mInput)
+            btn.config(command= lambda mInput=mInput: self.setIn(mInput))
+            btn.pack()
+            counter+=1
+
+        label2 = LblSettings(self.window, text="click on your midi OUT device:")
+        # label2.grid(row=counter+1, column=0)
+        label2.pack()
+
+        for mOutput in midi_outputs:
+            btn = tk.Button(self.window, text=mOutput)
+            btn.config(command= lambda mOutput=mOutput: self.setOut(mOutput))
+            btn.pack()
+            counter+=1
+        
+        btnClose = BtnSettings(self.window, text="Close", command=self.quitConfig)
+        btnClose.pack()
+
+    def setIn(self, mInput):
+        print("input selected: " , mInput)
+        # TODO : check if it works
+        self.midiInstance.setMidiInput(mInput)
+
+    def setOut(self,mOutput):
+        # TODO : check if it works
+        print("output selected:" , mOutput)
+        self.midiInstance.setMidiInput(mOutput)
+
+    def quitConfig(self):
+        self.window.destroy()
+
+
 
 
     def destroy(self):

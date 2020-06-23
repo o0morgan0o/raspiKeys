@@ -10,6 +10,7 @@ from games.utils.questionNote import QuestionNote
 from games.utils.midiIO import MidiIO
 from games.utils.utilFunctions import formatOutputInterval
 from games.utils.sounds import Sound
+from games.autoload import Autoload
 
 from games.utils.questionNote import CustomNote
 from games.utils.questionNote import Melody
@@ -26,6 +27,7 @@ class Game:
         self.counter=0
         self.score=0
         self.globalIsListening = True
+        
 
         print( "launchin MIDI program... \n")
         debug=True
@@ -34,7 +36,7 @@ class Game:
         self.initMIDIArray(128)
 
         # TODO : in this MidiIo class, allow user to select between available usb ports
-        self.midiIO = MidiIO() # open connections and ports
+        self.midiIO = Autoload().getInstance()
         self.midiIO.setCallback(self.handleMIDIInput)
 
         # gamestate is used to know when the user is guessing
@@ -44,6 +46,7 @@ class Game:
         self.startGame()
         self.startingNote = -1
 
+        self.changeAllBg("black")
         self.sounds = Sound() 
         self.sounds.loadEffectSounds() # load success and error sounds
 
@@ -64,8 +67,6 @@ class Game:
 
     def startGame(self):
         self.changeGameState("waitingUserInput")
-        #self.parent["bg"] = "black"
-        #self.changeAllBg("black")
         self.melodies = Melody(self)
 
     def destroy(self):
@@ -86,9 +87,9 @@ class Game:
         elif newstate == "listen":
             #self.parent["bg"] = "orange"
             #self.changeAllBg("orange")
-            self.parent.label2["bg"]= "black"
             self.parent.label1["text"] = "Listen ..."
             self.parent.label2["text"] = ""
+            self.parent.label2["bg"]= "black"
             self.gameState = "listen"
             self.isListening = False
         elif newstate == "waitingUserAnswer":
@@ -124,6 +125,8 @@ class Game:
 
     def handleMIDIInput(self,msg):
         # used for the midiListening button
+        if Autoload().getInstance().isListening == False: # check if user has midi  listen
+            return
         if(self.globalIsListening == False) : 
             return 
         # Needed because we still receive signals even if the class is destroyed
@@ -162,7 +165,7 @@ class Game:
             time.sleep(1)
             self.changeGameState("waitingUserInput") # if we gave the good answer, we want a new note
         else:
-            self.parent.label2["text"]= "incorrect\nA: {}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
+            # self.parent.label2["text"]= "incorrect\nA: {}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
             self.questionNote.isFirstTry= False
             self.parent.label2["bg"] = "red"
 
@@ -174,6 +177,8 @@ class Game:
             self.replayNote = QuestionNote(self.startingNote, self, .2) # i want to replay both notes
             self.replayNote = QuestionNote(self.questionNote.note, self, .8) # i want to replay both notes
             self.changeGameState("listen")
+        
+        self.midiIO.panic()
 
     def pickNewNote(self, startingNote):
         self.counter = self.counter+1

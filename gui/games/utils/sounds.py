@@ -1,4 +1,5 @@
 import simpleaudio as sa
+import soundfile
 from pydub import AudioSegment
 import os
 import pygame
@@ -54,7 +55,8 @@ class Sound:
     def simplePlay(self, filename):
         file = filename
         pygame.init()
-        pygame.mixer.init()
+#        pygame.mixer.pre_init(44100, 16, 2, 4096)
+        pygame.mixer.init(44100, 32, 2, 2116)
         pygame.mixer.music.load(file)
         pygame.mixer.music.play(loops=-1, fade_ms=200)
 

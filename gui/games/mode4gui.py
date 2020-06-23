@@ -18,7 +18,7 @@ class Mode4:
         print( "launching game 4 -------------- ")
         self.gameFrame = gameFrame
         self.gameFrame.pack_propagate(0)
-        self.gameFrame.config(bg="yellow")
+        self.gameFrame.config(bg="black")
 
         
         # Creation of the elements
@@ -27,6 +27,7 @@ class Mode4:
         self.gameFrame.btnPractiseLick = BtnDefault(self.gameFrame, text="Practise Lick")
         self.gameFrame.btnPractiseAll= BtnDefault(self.gameFrame, text="Practise All")
         self.gameFrame.lblMessage = LblDefault(self.gameFrame, text="there are x licks in the base")
+        self.gameFrame.lblStatic1 = LblDefault(self.gameFrame, text="licks found: ")
 
         # placement
 
@@ -36,14 +37,21 @@ class Mode4:
 
         
     def placeElements(self):
-        self.gameFrame.rowconfigure((0,1,2,3), weight=1)
-        self.gameFrame.columnconfigure(0, weight=1)
+        self.gameFrame.rowconfigure(0, weight=1)
+        self.gameFrame.rowconfigure(1, weight=1)
+        self.gameFrame.rowconfigure(2, weight=1)
+        self.gameFrame.rowconfigure(3, weight=1)
+        self.gameFrame.rowconfigure(4, weight=1)
 
-        self.gameFrame.tree.grid(row=0,column=0, columnspan=1, sticky="NSEW")
-        self.gameFrame.lblMessage.grid(row=1,column=0, columnspan=1, sticky="NSEW")
-        self.gameFrame.btnRecord.grid(row=2,column=0, columnspan=1, sticky="NSEW")
-        self.gameFrame.btnPractiseLick.grid(row=3,column=0, columnspan=1, sticky="NSEW")
-        self.gameFrame.btnPractiseAll.grid(row=4,column=0, columnspan=1, sticky="NSEW")
+        self.gameFrame.columnconfigure((0,1,2), weight=1)
+
+
+        #self.gameFrame.lblStatic1.grid(row=0, column=0, columnspan=3, sticky="EW")
+        self.gameFrame.tree.grid(row=1,column=0, columnspan=3, sticky="NEW")
+        self.gameFrame.lblMessage.grid(row=2,column=0, columnspan=3, sticky="EW")
+        self.gameFrame.btnRecord.grid(row=3,column=0, columnspan=1, sticky="NSEW")
+        self.gameFrame.btnPractiseLick.grid(row=3,column=1, columnspan=1, sticky="NSEW")
+        self.gameFrame.btnPractiseAll.grid(row=3,column=2, columnspan=1, sticky="NSEW")
 
 
 

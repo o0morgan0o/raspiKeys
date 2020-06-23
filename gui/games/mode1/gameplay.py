@@ -14,6 +14,8 @@ from games.utils.midiChords import MidiChords
 from games.utils.questionNote import CustomNote
 from games.utils.questionNote import Melody
 
+from games.autoload import Autoload
+
 """ the mode 1 is for eartraining on a CHORD INTERVAL
 """
 class Game:
@@ -34,7 +36,7 @@ class Game:
         self.initMIDIArray(128)
 
         # TODO : in this MidiIo class, allow user to select between available usb ports
-        self.midiIO = MidiIO() # open connections and ports
+        self.midiIO = Autoload().getInstance() # open connections and ports
         self.midiIO.setCallback(self.handleMIDIInput)
 
         # gamestate is used to know when the user is guessing
@@ -229,6 +231,9 @@ class Game:
                 time.sleep(1)
                 self.isListening= True
     #            self.sounds.play_sound_success() # play success sound
+
+            
+            self.midiIO.panic() # TODO : there is still a bug with first note ringing
                 
             # affichage score
             self.parent
