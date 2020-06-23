@@ -19,7 +19,9 @@ from autoload import Autoload
 """
 class Game:
 
-    def __init__(self, parent):
+    def __init__(self, parent, config):
+        self.config= config
+        self.delay=float(config["question_delay"])/100
         self.parent = parent
         self.isListening = False
 
@@ -34,7 +36,6 @@ class Game:
         self.waitingNotes= []
         self.initMIDIArray(128)
 
-        # TODO : in this MidiIo class, allow user to select between available usb ports
         self.midiIO = Autoload().getInstance() # open connections and ports
         self.midiIO.setCallback(self.handleMIDIInput)
 
@@ -152,7 +153,7 @@ class Game:
                 counter = 1
                 for note in self.questionArray:
                     # TODO : make a way to custom the harmonic delay between notes
-                    arr.append(QuestionNote(note,self, .8* counter))
+                    arr.append(QuestionNote(note,self, .0 + self.delay* counter))
                     counter = counter + 1 
                 self.allIsCorrect = True # var to know if we make a mistake in the answrs
                 self.isFirstTry = True

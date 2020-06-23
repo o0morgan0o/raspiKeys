@@ -20,8 +20,10 @@ from utils.questionNote import Melody
 """
 class Game:
 
-    def __init__(self, parent):
+    def __init__(self, parent,config):
         self.parent = parent
+        print("config mode 0 ",config)
+        self.delay = float(config["question_delay"])/100
         self.isListening = False
 
         # variable for user score
@@ -143,7 +145,7 @@ class Game:
                 self.startingNote = msg.note
                 #pick a random note
                 questionNote = self.pickNewNote(self.startingNote)
-                self.questionNote = QuestionNote(questionNote, self, .8)
+                self.questionNote = QuestionNote(questionNote, self, self.delay)
                 self.changeGameState("listen")
 
             elif self.gameState == "waitingUserAnswer":
@@ -176,7 +178,7 @@ class Game:
             time.sleep(1)
             # we replay the interval if the user didnt find the correct answer
             self.replayNote = QuestionNote(self.startingNote, self, .2) # i want to replay both notes
-            self.replayNote = QuestionNote(self.questionNote.note, self, .8) # i want to replay both notes
+            self.replayNote = QuestionNote(self.questionNote.note, self, .2+self.delay) # i want to replay both notes
             self.changeGameState("listen")
         
         self.midiIO.panic()

@@ -4,7 +4,7 @@ from mode1.gameplay import Game
 from utils.customElements import BtnDefault
 
 class Mode1:
-    def __init__(self,gameFrame):
+    def __init__(self,gameFrame,config):
         print( "launching game 1 -------------- ")
         self.gameFrame = gameFrame
         self.gameFrame.pack_propagate(0)
@@ -29,7 +29,7 @@ class Mode1:
         # placement of differents labels
         self.placeElements()
 
-        self.game = Game(self.gameFrame)
+        self.game = Game(self.gameFrame, config)
 
     def placeElements(self):
         self.gameFrame.rowconfigure((0,1,2,3,4,5,6,7), weight=1)

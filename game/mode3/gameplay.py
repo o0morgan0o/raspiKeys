@@ -15,7 +15,8 @@ import env
 
 class Game:
 
-    def __init__(self, parent):
+    def __init__(self, parent,config):
+        self.config= config
         self.parent=parent
 
         # Default path

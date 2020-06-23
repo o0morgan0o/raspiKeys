@@ -3,7 +3,7 @@ from mode0.gameplay import Game
 from utils.customElements import BtnDefault
 
 class Mode0:
-    def __init__(self,gameFrame):
+    def __init__(self,gameFrame, config):
         print( "launching game 0 -------------- ")
         self.gameFrame = gameFrame
         self.gameFrame.pack_propagate(0)
@@ -24,7 +24,7 @@ class Mode0:
         # placement of differents labels
         self.placeElements()
 
-        self.game = Game(self.gameFrame)
+        self.game = Game(self.gameFrame, config)
         
 
     def placeElements(self):

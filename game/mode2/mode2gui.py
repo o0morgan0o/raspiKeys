@@ -15,7 +15,7 @@ import env
 
 
 class Mode2:
-    def __init__(self,gameFrame):
+    def __init__(self,gameFrame, config):
         print( "launching game 3 -------------- ")
         self.gameFrame = gameFrame
         self.gameFrame.pack_propagate(0)
@@ -31,7 +31,7 @@ class Mode2:
         self.gameFrame.labelCurrent= LblCurrentPlaying(self.gameFrame,text="")
 
         self.placeElements()
-        self.game = Game(self.gameFrame)
+        self.game = Game(self.gameFrame, config)
 
 
     def placeElements(self):

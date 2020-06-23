@@ -20,51 +20,13 @@ import env
 
 class MainApplication(tk.Frame):
     # definition de la fenetre g)lobale
-    def loadConfig(self):
-        print("trying to load config")
-    # location of config file
-        # DEFAULT CONFIGURATION IF LOADING OF FILE FAILED
-        default_config = {}
-        default_config["default_mode"] = 0
-        default_config["question_delay"] = 50
-        default_config["difficulty"]=50
-        default_config["times_each_transpose"]=4
-        default_config["nb_of_transpose_before_change"]=4
-        default_config["MIDI_interface"]=""
-        default_config["midi_hotkey"]=50
-
-
-        configFile = env.CONFIG_FILE
-        configLabels=default_config.keys()
-        print(configLabels)
-        try:
-            config={}
-            with open(configFile, 'r') as file:
-                for line in file:
-                    for param in configLabels:
-                        if line.find(param) != -1:
-                            paramVal = line.split("=")[1].replace("\n","")
-                            config[param]= paramVal
-            print(config)
-
-                    # maybe should test values
-                    # loading in a dictionnary
-                    # audio config trying to laod
-
-        except:
-            print("No config file found")
-        
-        return True
-
-
-
-
 
     def __init__(self, master, tag=""):
         # self.config = self.loadConfig()
         self.config=self.loadConfig()
+        print("config: " , self.config)
 
-        self.gameMode=0
+        self.gameMode=int(self.config["default_mode"])
         self.master=master
         
         # Main Frame
@@ -125,6 +87,11 @@ class MainApplication(tk.Frame):
         self.button5["command"]= lambda: self.new_window(4)
         self.buttonMidiListen = BtnMenu(self.master.footer, text="MIDILis", command=self.toggleMidiListen)
         self.volumeSlider = tk.Scale(self.master.footer,  from_=0, to=100, orient=tk.HORIZONTAL,command=self.sliderMoved) 
+        # load default volume
+        volume = int(self.config["volume"])
+        print(" vol", volume)
+        self.volumeSlider.set(volume)
+
 
         self.buttonMidiListen.grid(row=0, column=0, sticky="NSEW")
         self.volumeSlider.grid(row=0, column=1, sticky="NSEW")
@@ -135,13 +102,48 @@ class MainApplication(tk.Frame):
 
         # initialization
         # Load default Screen
-        self.new_window(0)
+        self.new_window(self.gameMode)
         # TODO make a way to retrieve the last open tab (config file load at startup ? )
 
     def sliderMoved(self, value):
         print("silder moved", value)
         mSound = Sound.setVolume(value) 
         
+
+    def loadConfig(self):
+        print("trying to load config")
+    # location of config file
+        # DEFAULT CONFIGURATION IF LOADING OF FILE FAILED
+        default_config = {}
+        default_config["volume"]= 80
+        default_config["default_mode"] = 0
+        default_config["question_delay"] = 50
+        default_config["difficulty"]=50
+        default_config["times_each_transpose"]=4
+        default_config["nb_of_transpose_before_change"]=4
+        default_config["MIDI_interface"]=""
+        default_config["midi_hotkey"]=50
+
+
+        configFile = env.CONFIG_FILE
+        configLabels=default_config.keys()
+        print("before loading -----", configLabels)
+        config={}
+        try:
+            with open(configFile, 'r') as file:
+                for line in file:
+                    for param in configLabels:
+                        if line.find(param) != -1:
+                            paramVal = line.split("=")[1].replace("\n","")
+                            config[param]= paramVal
+                    # maybe should test values
+        except:
+            print("No config file found")
+        print("loaded config is " , config)
+        return config
+
+
+
 
     
     # method to load a new game mode
@@ -157,18 +159,18 @@ class MainApplication(tk.Frame):
         self.master.body.pack(side=tk.TOP, expand=True, fill=tk.BOTH)
 
         if intMode == 0:
-            self.app= Mode0(self.master.body)
+            self.app= Mode0(self.master.body, self.config)
             # specific to mode0 bc in order to skip all midi notes during another mode
             self.app.activateListening()
         elif intMode == 1:
-            self.app = Mode1(self.master.body)
+            self.app = Mode1(self.master.body, self.config)
             self.app.activateListening()
         elif intMode == 2:
-            self.app = Mode2(self.master.body)
+            self.app = Mode2(self.master.body,self.config)
         elif intMode == 3:
-            self.app = Mode3(self.master.body)
+            self.app = Mode3(self.master.body,self.config)
         elif intMode == 4:
-            self.app = Mode4(self.master.body)
+            self.app = Mode4(self.master.body,self.config)
         else:
             return
 

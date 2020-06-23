@@ -27,7 +27,7 @@ class Sound:
         print(self.user_waveDir)
         for filename in os.listdir(self.user_waveDir):
             filenameFull = os.path.join(self.user_waveDir, filename)
-            print("will tyr to convert " , filenameFull)
+            # print("will tyr to convert " , filenameFull)
             try:
                 data , samplerate = soundfile.read(filenameFull)
                 outfile = os.path.join(self.processed_waveDir, filename)
@@ -42,10 +42,10 @@ class Sound:
         print("trying to load backtracks")
         tracks = []
         for filename in os.listdir(self.processed_waveDir):
-            print(filename)
+            # print(filename)
             tracks.append(os.path.join(self.processed_waveDir, filename))
             
-        print(tracks)
+        # print(tracks)
         return tracks
 
     def simplePlay(self, filename):

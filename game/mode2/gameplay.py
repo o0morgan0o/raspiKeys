@@ -17,7 +17,8 @@ from autoload import Autoload
 
 class Game:
 
-    def __init__(self, parent):
+    def __init__(self, parent,config):
+        self.config = config
         self.parent = parent
         self.sound = Autoload().getInstanceAudio()
         self.parent.btnPlay.config(command=self.toggleBacktrack)
