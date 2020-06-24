@@ -1,15 +1,21 @@
+import datetime
 import os
 import time
 import tkinter as tk
 import json
 from tkinter import ttk as ttk
 from utils.customElements import BtnDefault
+from utils.customElements import BtnSettings
 from utils.customElements import LblDefault
+from utils.customElements import LblSettings
 import mido
 from utils.midiIO import MidiIO
 
 from utils.questionNote import CustomSignal
 import env
+from utils.midiToNotenames import noteName
+
+from autoload import Autoload
 
 
 
@@ -28,13 +34,14 @@ class Game:
         self.parent.btnPractiseAll.config(command=self.playAll) 
 
         self.midiFiles =[]
-        # Tree creation
-        for filename in os.listdir(self.midiRepository):
-            # get only json files
-            if os.path.splitext(filename)[1] == ".json":
-                self.parent.tree.insert("", 1, text=filename)
-                mFile = os.path.join(self.midiRepository, filename)
-                self.midiFiles.append(mFile)
+#        # Tree creation
+#        for filename in os.listdir(self.midiRepository):
+#            # get only json files
+#            if os.path.splitext(filename)[1] == ".json":
+#                self.parent.tree.insert("", 1, text=filename)
+#                mFile = os.path.join(self.midiRepository, filename)
+#                self.midiFiles.append(mFile)
+        self.reloadTree()
 
         #self.parent.tree.selection_set(self.parent.tree.get_children()[0])
         self.parent.tree.bind('<<TreeviewSelect>>', self.on_select)
@@ -42,13 +49,15 @@ class Game:
 
 
         #self.loadFile(self.midiFiles[0])
-        self.midiIO = MidiIO()
+        self.midiIO = Autoload().getInstance()
         self.midiIO.setCallback(self.handleMIDIInput)
 
         self.recordingBassLick = False
         self.recordingNotes = False
         self.startingTime = 0
         self.recordedNotes =[]
+        self.bassNote=0
+        self.chordQuality="-"
 
         self.currentLick =None
 
@@ -62,12 +71,18 @@ class Game:
         for item in self.parent.tree.get_children():
             self.parent.tree.delete(item)
 
+        counter=0
         for filename in os.listdir(self.midiRepository):
             # get only json files
             if os.path.splitext(filename)[1] == ".json":
-                self.parent.tree.insert("", 1, text=filename)
+                self.parent.tree.insert("", 1,iid="Row {}".format(str(counter)), text=filename)
                 mFile = os.path.join(self.midiRepository, filename)
                 self.midiFiles.append(mFile)
+                counter+=1
+#        self.parent.tree.selection_set("Row 0")
+
+        self.parent.lblMessage.config(text="there are {} licks in the base".format(counter))
+
 
     # Return the details of the selected item
     def on_select(self, selected):
@@ -99,8 +114,57 @@ class Game:
         self.currentLick = mFile
 
     def startRecording(self):
+        self.recordWindow = tk.Toplevel(self.parent)
+        self.bassNote=0 # reinitilisation of the bassnote
+        self.recordWindow.attributes('-topmost', True)
+        self.recordWindow.geometry("320x480")
+            # creation of 2 labels and 2 buttons
+        self.recordWindow.lbl1= LblSettings(self.recordWindow,text="Recording...\nInsert only the bass note...")
+        self.recordWindow.lbl1.pack()
+        # show window the detected bass
+        self.recordWindow.lbl2 =LblSettings(self.recordWindow,text="")
+        self.recordWindow.lbl2.pack()
+        # lable which show the bass entered by the user
+        self.recordWindow.lblBass = tk.Label(self.recordWindow, text="-")
+        self.recordWindow.lblBass.pack()
+        # buttons minor and major
+        self.recordWindow.btnMinor = BtnSettings(self.recordWindow, text="Minor")
+        self.recordWindow.btnMinor.config(command=lambda:self.setChordQuality("minor"))
+        self.recordWindow.btnMinor.pack()
+        self.recordWindow.btnMajor = BtnSettings(self.recordWindow, text="Major")
+        self.recordWindow.btnMajor.config(command=lambda:self.setChordQuality("major"))
+        self.recordWindow.btnMajor.pack()
+        # Etiquette
+        self.recordWindow.lbl3 =LblSettings(self.recordWindow, text="Choosen Key : {} {}".format(str(self.bassNote), str(self.chordQuality)))
+        self.recordWindow.lbl3.pack()
+        # Button cancel
+        self.recordWindow.btnCancel = BtnSettings(self.recordWindow, text="Cancel")
+        self.recordWindow.btnCancel.config(command=self.recordWindow.destroy)
+        self.recordWindow.btnCancel.pack()
+        # Button save
+
         self.recordingBassLick= True
         self.parent.lblMessage.configure(text="Recording... Insert Bass Note")
+
+    
+    def validateBeforeShowingWindow(self):
+        if self.bassNote == 0 or self.chordQuality == "-": # check if user done the inputs
+            self.recordWindow.lbl3.configure(text="Error, you need a valid bass note and valid chord quality!")
+        else:
+            # we close the bass record window and open the note record window
+            self.recordingBassLick=False # desactivate the listen of user Bass
+            self.recordWindow.destroy()
+            self.showRecordWindow(self.bassNote)
+
+
+    def setChordQuality(self,quality):
+        if quality == "minor":
+            self.chordQuality="minor"
+        else:
+            self.chordQuality="major"
+        self.recordWindow.lbl3.config(text="Choosen Key : {} {}".format(str(self.bassNote), str(self.chordQuality)))
+
+        self.validateBeforeShowingWindow()
          
 
     def saveMidi(self, bassNote, recordedNotes):
@@ -119,7 +183,10 @@ class Game:
         # sauvegarde json dans un objet
 
         # TODO : Make try excerpt
-        outfile = os.path.join(self.midiRepository, str(time.time())+ "out.json")
+        now = datetime.datetime.now()
+        now_string = now.strftime("Lick_saved:%Y-%m-%d::%H:%M:%S-")
+        now_string+="Lick_in_" + str(bassNote)
+        outfile = os.path.join(self.midiRepository, now_string+".json")
         # TODO : increase counter if file exists
         with open(outfile, "w+") as outfile:
             outfile.write(json_object)
@@ -160,15 +227,17 @@ class Game:
 
 
     def showRecordWindow(self, bassNote):
-        self.alert = tk.Toplevel(self.parent.parent)
+        self.alert = tk.Toplevel(self.parent)
         self.alert.attributes('-topmost', True)
-        self.alert.lbl1 = tk.Label(self.alert, text="Please record now... Choosen Bass is : "+ str(bassNote))
-        self.alert.lbl2 = tk.Label(self.alert, text="Notes : ")
+        self.alert.geometry("320x480")
+
+        self.alert.lbl1 = tk.Label(self.alert, text="Please record now... Choosen Bass is : "+ noteName(self.bassNote))
+        self.stringNotes=""
+        self.alert.lbl2 = tk.Label(self.alert, text="Notes :\n" + self.stringNotes)
 
         # Buttons
-        self.alert.btnCancel = tk.Button(self.alert, text="Cancel")
-        self.alert.btnRetry = tk.Button(self.alert,text="Retry")
-        self.bassNote = bassNote
+        self.alert.btnCancel = tk.Button(self.alert, text="Cancel", command=self.cancel)
+        self.alert.btnRetry = tk.Button(self.alert,text="Retry", command= self.retry)
         self.alert.btnSave = tk.Button(self.alert, text="Save", command=lambda: self.saveMidi(self.bassNote, self.recordedNotes))
 
         self.recordingNotes = True
@@ -182,15 +251,27 @@ class Game:
         self.alert.btnRetry.pack()
         self.alert.btnSave.pack()
 
+    def cancel(self):
+        self.alert.destroy()
+        self.reloadTree()
+
+    def retry(self):
+        self.startingTime=0
+        self.recordedNotes=[]
+        self.stringNotes =""
+        self.alert.lbl2.config(text="Notes :\n" + self.stringNotes)
+
+
+
     def handleMIDIInput(self, msg):
         print( "receiving MIDI input, ", msg)
         if self.recordingBassLick == True: # case : recording of bass
             if msg.type == "note_on":
-                self.recordingBassLick=False
                 bassNote = msg.note
+                self.bassNote= msg.note
+                self.recordWindow.lblBass.config(text=noteName(self.bassNote))
+                self.recordWindow.lbl3.config(text="Choosen Key : {} {}".format( noteName(self.bassNote), str(self.chordQuality)))
                 print(bassNote)
-                # Open new window
-                self.showRecordWindow(bassNote) #On passe la bassnote a la fenetre
 
         elif self.recordingNotes == True:
             if self.startingTime == 0: # it means it is the first played note
@@ -199,7 +280,7 @@ class Game:
             #TODO pass recordingNotes to False when one of the button is clicked
             mTime = self.getTimeFromStart()
             self.insertNoteAtTimeInJson(msg, mTime)
-            pass
+            self.alert.lbl2.config(text="Notes :\n" +self.stringNotes)
             
 
 
@@ -213,7 +294,9 @@ class Game:
                 "time": time
                 }
         self.recordedNotes.append(dictionnary)
-
+        # we also put the note in a string in order to show the user the notes
+        if msg.type == "note_on":
+            self.stringNotes += noteName(msg.note)
 
     def destroy(self):
         print("trying destroy")

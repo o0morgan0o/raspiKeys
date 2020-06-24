@@ -21,7 +21,7 @@ class Mode2:
         self.gameFrame.pack_propagate(0)
         self.gameFrame.config(bg=env.COL_BG)
 
-        self.gameFrame.lblStatic1 = LblDefault(self.gameFrame,text="randomBeats:")
+        self.gameFrame.lblStatic1 = LblDefault(self.gameFrame,text="Random beats selected:\n(Click on one of these to change beat)")
         self.gameFrame.btnPlay = BtnBigButton(self.gameFrame,text="play/Pause")
         self.gameFrame.btnRandom = BtnBigButton(self.gameFrame,text="Randoms")
         self.gameFrame.randTrack0 = BtnWavList(self.gameFrame,text="" )

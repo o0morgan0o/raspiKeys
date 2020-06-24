@@ -2,49 +2,49 @@
     "bass": 48,
     "notes": [
         {
-            "type": "note_on",
-            "note": 51,
+            "type": "note_off",
+            "note": 48,
             "time": 0
         },
         {
+            "type": "note_on",
+            "note": 63,
+            "time": 1950
+        },
+        {
             "type": "note_off",
-            "note": 48,
-            "time": 1
+            "note": 63,
+            "time": 2204
         },
         {
             "type": "note_on",
-            "note": 55,
-            "time": 303
+            "note": 67,
+            "time": 2321
         },
         {
             "type": "note_off",
-            "note": 51,
-            "time": 304
-        },
-        {
-            "type": "note_off",
-            "note": 55,
-            "time": 604
+            "note": 67,
+            "time": 2594
         },
         {
             "type": "note_on",
-            "note": 60,
-            "time": 651
+            "note": 72,
+            "time": 2719
         },
         {
             "type": "note_off",
-            "note": 60,
-            "time": 869
+            "note": 72,
+            "time": 3004
         },
         {
             "type": "note_on",
-            "note": 51,
-            "time": 987
+            "note": 65,
+            "time": 3155
         },
         {
             "type": "note_off",
-            "note": 51,
-            "time": 1245
+            "note": 65,
+            "time": 3532
         }
     ]
 }

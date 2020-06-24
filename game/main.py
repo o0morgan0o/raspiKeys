@@ -26,6 +26,7 @@ class MainApplication(tk.Frame):
         self.config=self.loadConfig()
         print("config: " , self.config)
 
+
         self.gameMode=int(self.config["default_mode"])
         self.master=master
         
@@ -121,7 +122,8 @@ class MainApplication(tk.Frame):
         default_config["difficulty"]=50
         default_config["times_each_transpose"]=4
         default_config["nb_of_transpose_before_change"]=4
-        default_config["MIDI_interface"]=""
+        default_config["MIDI_interface_in"]=""
+        default_config["MIDI_interface_out"]=""
         default_config["midi_hotkey"]=50
 
 
@@ -141,9 +143,6 @@ class MainApplication(tk.Frame):
             print("No config file found")
         print("loaded config is " , config)
         return config
-
-
-
 
     
     # method to load a new game mode
@@ -185,9 +184,6 @@ class MainApplication(tk.Frame):
         else:
             self.buttonMidiListen.config(text="OFF")
 
-
-
-
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         tag= sys.argv[1].split("=")[1]
@@ -198,6 +194,3 @@ if __name__ == "__main__":
     root.config(cursor="dot")
     MainApplication(root, tag)
     root.mainloop()
-
-
-

@@ -27,7 +27,7 @@ class Game:
         self.midiIO.setCallback(self.handleMIDIInput)
 
         self.parent.btnRandom.config(command=self.playRandom)
-        self.isPlaying = False
+#        self.isPlaying = False
 
         #for filename in self.tracksMp3:
         #    self.sound.convertToWav(filename)
@@ -38,7 +38,7 @@ class Game:
         self.currentTrack = self.activeSamples[0]
 
         self.showRandomTracks()
-        if self.isPlaying == False:
+        if self.sound.isPlaying == False:
             self.playBacktrack()
 
 
@@ -72,7 +72,7 @@ class Game:
         self.currentTrack = self.activeSamples[index]
         self.playBacktrack()
         self.showCurrentPlayingInLabel()
-        self.isPlaying = True
+        self.sound.isPlaying = True
         counter = 0
 
         self.parent.randTrack0.config(fg=env.COL_GREY)
@@ -100,22 +100,22 @@ class Game:
     def playRandom(self):
         self.activeSamples = self.pickRandomSamples()
         self.showRandomTracks()
-        if self.isPlaying == True:
+        if self.sound.isPlaying == True:
             self.sound.stopPlay()
         
         self.currentTrack = self.activeSamples[0]
         self.parent.randTrack0.config(fg=env.COL_SEC)
         self.showCurrentPlayingInLabel()
-        self.isPlaying =False
+        self.sound.isPlaying =False
         self.playBacktrack()
-        self.isPlaying= True
+        self.sound.isPlaying= True
 
     def toggleBacktrack(self):
-        if self.isPlaying == True:
-            self.isPlaying= False
+        if self.sound.isPlaying == True:
+            self.sound.isPlaying= False
             self.stopBacktrack()
         else :
-            self.isPlaying = True
+            self.sound.isPlaying = True
             self.playBacktrack()
 
     def stopBacktrack(self):
@@ -123,7 +123,7 @@ class Game:
         self.parent.btnPlay.config(text="Play")
 
     def playBacktrack(self):
-        self.isPlaying=True
+        self.sound.isPlaying=True
         self.sound.simplePlay(self.currentTrack)
         self.parent.btnPlay.config(text="Stop")
         
