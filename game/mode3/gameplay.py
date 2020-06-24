@@ -1,4 +1,5 @@
 import datetime
+import random
 import os
 import time
 import tkinter as tk
@@ -10,10 +11,13 @@ from utils.customElements import LblDefault
 from utils.customElements import LblSettings
 import mido
 from utils.midiIO import MidiIO
+from threading import Timer
+
 
 from utils.questionNote import CustomSignal
 import env
 from utils.midiToNotenames import noteName
+
 
 from autoload import Autoload
 
@@ -30,25 +34,16 @@ class Game:
 
         # Callbacks for buttons
         self.parent.btnRecord.config(command=self.startRecording)
-        self.parent.btnPractiseLick.config(command=self.playLick) 
+        self.parent.btnPractiseLick.config(command=self.playOneLick) 
         self.parent.btnPractiseAll.config(command=self.playAll) 
+        self.parent.btnDeleteSelected.config(command=self.deleteLick)
 
         self.midiFiles =[]
-#        # Tree creation
-#        for filename in os.listdir(self.midiRepository):
-#            # get only json files
-#            if os.path.splitext(filename)[1] == ".json":
-#                self.parent.tree.insert("", 1, text=filename)
-#                mFile = os.path.join(self.midiRepository, filename)
-#                self.midiFiles.append(mFile)
         self.reloadTree()
+        self.fileIndex=0
 
-        #self.parent.tree.selection_set(self.parent.tree.get_children()[0])
         self.parent.tree.bind('<<TreeviewSelect>>', self.on_select)
 
-
-
-        #self.loadFile(self.midiFiles[0])
         self.midiIO = Autoload().getInstance()
         self.midiIO.setCallback(self.handleMIDIInput)
 
@@ -58,16 +53,21 @@ class Game:
         self.recordedNotes =[]
         self.bassNote=0
         self.chordQuality="-"
+        self.transpose=0
+        self.activeCustomSignals=[]
 
+        self.currentLickIndex=0
         self.currentLick =None
+
+        self.practiseAllLicks = False
+
+        self.loadSelectedItem(self.midiFiles[0])
 
         # TODO : il faut que le programme demande une basse
         # ensuite on joue le lick
         # en play: le programme joue la basse et donne en indice le premier interval
 
     def reloadTree(self):
-        # update the window
-       # TODO : refactor this because we use it in init
         for item in self.parent.tree.get_children():
             self.parent.tree.delete(item)
 
@@ -79,18 +79,26 @@ class Game:
                 mFile = os.path.join(self.midiRepository, filename)
                 self.midiFiles.append(mFile)
                 counter+=1
-#        self.parent.tree.selection_set("Row 0")
+        self.parent.tree.selection_set("Row 0")
 
         self.parent.lblMessage.config(text="there are {} licks in the base".format(counter))
 
 
     # Return the details of the selected item
     def on_select(self, selected):
-       print("slected trigger", selected)
        selection = self.parent.tree.focus()
        selection_details = self.parent.tree.item(selection)
-       print(selection_details['text'])
        self.loadSelectedItem(selection_details['text'])
+       # we must find the index of the selected item
+       counter= 0
+       print("starting loop")
+       for lick in self.midiFiles:
+           search = os.path.join(self.midiRepository, selection_details["text"])
+           if lick == search:
+               print("FOUND")
+               self.currentLickIndex=counter
+           counter+=1
+       print("index Lick selected :", self.currentLickIndex)
        
     def loadSelectedItem(self, name):
         print("selected is: ", name)
@@ -106,7 +114,15 @@ class Game:
         with open(mFile, 'r') as f:
             datastore = json.load(f)
         print(datastore)
-        msgStr="Current lick: "
+        msgStr="Current lick: " 
+        bass = datastore["bass"]
+        self.userMessage = "{} {} ({}ms)->".format(noteName(bass), datastore["type"], str(datastore["duration"])) # user Message is construct in order to show the notes of the lick to the user
+        notes=datastore["notes"]
+        for note in notes:
+            print(note)
+            if note["type"]=="note_on":
+                self.userMessage += " "+noteName(note["note"])
+        self.parent.lblUserIndication.config(text=self.userMessage)
         #msgStr+= "{} lick ".format(datastore["type"])
         # TODO format in order to show note name instead of midiCC
         msgStr+= "in {}".format(datastore["bass"])
@@ -118,7 +134,7 @@ class Game:
         self.bassNote=0 # reinitilisation of the bassnote
         self.recordWindow.attributes('-topmost', True)
         self.recordWindow.geometry("320x480")
-            # creation of 2 labels and 2 buttons
+        # creation of 2 labels and 2 buttons
         self.recordWindow.lbl1= LblSettings(self.recordWindow,text="Recording...\nInsert only the bass note...")
         self.recordWindow.lbl1.pack()
         # show window the detected bass
@@ -141,7 +157,6 @@ class Game:
         self.recordWindow.btnCancel = BtnSettings(self.recordWindow, text="Cancel")
         self.recordWindow.btnCancel.config(command=self.recordWindow.destroy)
         self.recordWindow.btnCancel.pack()
-        # Button save
 
         self.recordingBassLick= True
         self.parent.lblMessage.configure(text="Recording... Insert Bass Note")
@@ -172,9 +187,12 @@ class Game:
         
 
     def createJson(self, bassNote, recordedNotes):
+        mTime = self.getTimeFromStart()
         obj = {
                 "bass": bassNote,
+                "type": self.chordQuality,
                 "notes": recordedNotes,
+                "duration":mTime
                 }
         # creation d'un objet json
         json_object = json.dumps(obj, indent=4)
@@ -185,7 +203,7 @@ class Game:
         # TODO : Make try excerpt
         now = datetime.datetime.now()
         now_string = now.strftime("Lick_saved:%Y-%m-%d::%H:%M:%S-")
-        now_string+="Lick_in_" + str(bassNote)
+        now_string+="Lick_in_" + str(bassNote) + " duration: " + str(mTime)+ " ms"
         outfile = os.path.join(self.midiRepository, now_string+".json")
         # TODO : increase counter if file exists
         with open(outfile, "w+") as outfile:
@@ -199,29 +217,84 @@ class Game:
         self.reloadTree()
 
 
-    def playLick(self):
+    def playLick(self, transpose=0):
+        self.cancelThreads()
         print("trying to replay lick0", self.currentLick) 
         # we open the json
         with open(self.currentLick, "r") as jsonfile:
             jsonLick = json.load(jsonfile)
         
-        key = jsonLick["bass"]
+        key = jsonLick["bass"]+transpose
         notes = jsonLick["notes"]
-        self.parent.lblMessage.config(text="Key is"+ str(key))
+        duration=jsonLick["duration"]
+        self.parent.lblMessage.config(text="Key is"+ str(key+transpose))
+        delay=1000 #Needed because we want to hear the bass first
+        bassPlay=CustomSignal(self,"note_on", key,0)
         # now we loop in the array create notes obejcts with timers
+        self.userMessage = "{} {}->".format(noteName(key), jsonLick["type"]) # user Message is construct in order to show the notes of the lick to the user
+        self.activeCustomSignals=[]
         for note in notes:
             # create a new Note with timer
 
             print(note)
             #self.midiIO.sendOut("note_on", 60)
-            a= []
-            a.append(CustomSignal(self, note["type"], note["note"], note["time"]))
+            self.activeCustomSignals.append(CustomSignal(self, note["type"], note["note"]+transpose, note["time"]+delay))
+            if note["type"]=="note_on":
+                self.userMessage += " {}".format(noteName(note["note"] + transpose))
+
+        self.parent.lblUserIndication.config(text=self.userMessage)
+        # we want the lick to replay and loop so we make a thread to midi_off all the notes
+        delayEnd= (duration+delay)/1000
+        print("delay" , delayEnd)
+        self.nextLoopTimer = Timer(delayEnd, lambda: self.prepareNewLoop(delayEnd))
+        self.nextLoopTimer.start()
         
+    def prepareNewLoop(self, delay):
+        # if we practise all licks we must choose a new lick
+        # i can't get the selection of tree so we have to reload a nextFile
+        if self.practiseAllLicks == True:
+            num = random.randint(0,len(self.midiFiles)-1)
+            # TODO: resolve the case where there is only 1 lick !!!!
+            while num == self.currentLickIndex:
+                num =random.randint(0,len(self.midiFiles)-1)
+            nextFile = self.midiFiles[num]
+            self.parent.tree.selection_set("Row " + str(num))
+            selection = self.parent.tree.focus()
+            self.loadSelectedItem(nextFile)
+        
+        # modulation is done here
+        # TODO set up the number of repetititons before transpose
+        print("SEND PANIC AND WAIT ===================================================")
+        self.midiIO.panic()
+        # we pick a random transpose between -5 et 6 semitones
+        num = random.randint(-5,6)
+        while num ==0:
+            num =random.randint(-5,6)
+        self.transpose=num
+        # TODO: This timer must be cancel if user click on something
+        self.silenceIntervalTimer = Timer(delay,lambda: self.playLick(self.transpose))
+        self.silenceIntervalTimer.start()
+        
+
+
+
+
+    def playOneLick(self):
+        self.practiseAllLicks= False
+        self.playLick()
 
     def playAll(self):
-        pass
+        self.practiseAllLicks= True
+        self.playLick()
         
 
+    def deleteLick(self):
+        try:
+            print("-->try to delete lick :", self.currentLick)
+            os.remove(self.currentLick)
+            self.reloadTree()
+        except:
+            print("Error trying to delete lick", self.currentLick)
 
 
 
@@ -298,6 +371,23 @@ class Game:
         if msg.type == "note_on":
             self.stringNotes += noteName(msg.note)
 
+
+    def cancelThreads(self):
+        try:
+            self.nextLoopTimer.cancel()
+        except:
+            print("no threads to cancel")
+        try:
+            self.silenceIntervalTimer.cancel()
+        except:
+            print("no threads to cancel")
+        # we try to kill all notes no already played
+        for signal in self.activeCustomSignals:
+            signal.timer.cancel()
+        self.midiIO.panic()
+
+
     def destroy(self):
+        self.cancelThreads()
         print("trying destroy")
         del self

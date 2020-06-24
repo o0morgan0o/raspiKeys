@@ -15,6 +15,8 @@ from utils.questionNote import Melody
 
 from autoload import Autoload
 
+from utils.midiToNotenames import noteNameFull
+
 """ the mode 1 is for eartraining on a CHORD INTERVAL
 """
 class Game:
@@ -60,9 +62,12 @@ class Game:
             self.parent.btnListen.configure(text="ListenON")
 
     def skip(self):
-        self.parent.label2[ "text"] = "It was ;-)\n{}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
-        self.parent.label2["bg"] = "orange"
-        self.changeGameState("waitingUserInput") # if we gave the good answer, we want a new note
+        try:
+            self.parent.label2[ "text"] = "It was ;-)\n{}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
+            self.parent.label2["bg"] = "orange"
+            self.changeGameState("waitingUserInput") # if we gave the good answer, we want a new note
+        except :
+            print("Impossible to skip question")
 
     def startGame(self):
         self.changeGameState("waitingUserInput")
@@ -146,6 +151,7 @@ class Game:
             if self.gameState == "waitingUserInput":
                 self.isListening = False # we will reactivate listening after all notes have been played
                 self.startingNote = msg.note
+                self.parent.lblNote["text"] = noteNameFull(self.startingNote)
                 #pick a random chord intervals
                 self.questionArray = self.pickNewChord(self.startingNote)
                 # we want a array of QuestionNots
@@ -177,6 +183,25 @@ class Game:
                 self.checkAnswer(msg.note, correctNote) # we check the answer
                 self.answerIndex = self.answerIndex + 1
 
+    def resetQuestion(self):
+        print("should reset question")
+        self.changeGameState( "listen")
+        self.parent.label2["text"]= "incorrect"
+        self.parent.label2["bg"] = "red"
+        for note in self.questionChord:
+            print("resetting a timer")
+            note.resetTimer()
+        self.answerBools = []
+        self.allIsCorrect= True
+        self.parent.canvas.delete("all") 
+        self.answerIndex=-1
+        self.canvasCounter = 0
+        self.isFirstTry= False
+        self.midiIO.panic() # TODO : there is still a bug with first note ringing
+        # affichage score
+        self.parent
+        self.parent.canvas.delete("all") 
+
     def checkAnswer(self, userAnswer, correctAnswer):
 
         #print(answer, self.questionNote.note)
@@ -186,9 +211,11 @@ class Game:
             self.answerBools.append(True)
             self.parent.canvas.create_rectangle(  rw+ self.answerIndex*rw , 0 , rw+  self.answerIndex*rw + rw/2 , 40, fill="green") 
         else:
+            # we made a mistake on one note
             self.answerBools.append(False)
             self.allIsCorrect = False
             self.parent.canvas.create_rectangle(  rw+ self.answerIndex*rw , 0 , rw+  self.answerIndex*rw + rw/2 , 40, fill="red") 
+            self.resetQuestion()
 
         if self.answerIndex == len(self.questionChord) -1:
             
@@ -196,45 +223,38 @@ class Game:
             print("WE CAN RETURN")
             print("WIN ? ", self.allIsCorrect)
             if self.allIsCorrect == False:
-                self.changeGameState( "listen")
-                self.parent.label2["text"]= "incorrect"
-                self.parent.label2["bg"] = "red"
-
-                # TODO : is it ok to keep time.sleep ?
-                time.sleep(1)
-                self.melodies.playLooseMelody()
-                time.sleep(1)
-
-                for note in self.questionChord:
-                    print("resetting a timer")
-                    note.resetTimer()
-                self.answerBools = []
-                self.allIsCorrect= True
-                self.parent.canvas.delete("all") 
-                self.answerIndex=-1
-                self.canvasCounter = 0
-                self.isFirstTry= False
-
+                pass
+#                self.changeGameState( "listen")
+#                self.parent.label2["text"]= "incorrect"
+#                self.parent.label2["bg"] = "red"
+#
+#
+#                for note in self.questionChord:
+#                    print("resetting a timer")
+#                    note.resetTimer()
+#                self.answerBools = []
+#                self.allIsCorrect= True
+#                self.parent.canvas.delete("all") 
+#                self.answerIndex=-1
+#                self.canvasCounter = 0
+#                self.isFirstTry= False
+#
             else :
             # We won
-                self.parent.label2["text"] = "correct ;-)\n{}".format(self.chordName)
-                self.parent.label2["bg"] = "green"
+                self.parent.lblNote["text"] = "correct ;-)\n{}".format(self.chordName)
+                self.parent.lblNote["bg"] = "green"
                 print("first try" , self.isFirstTry)
                 if self.isFirstTry:
                     self.score = self.score + 1
                 self.changeGameState("waitingUserInput")
 
-                # TODO : is it ok to keep time.sleep ?
                 time.sleep(1)
                 self.melodies.playWinMelody()
                 time.sleep(1)
                 self.isListening= True
-    #            self.sounds.play_sound_success() # play success sound
 
 
             self.midiIO.panic() # TODO : there is still a bug with first note ringing
-                
-            # affichage score
             self.parent
             self.parent.canvas.delete("all") 
 
@@ -257,7 +277,7 @@ class Game:
     def pickNewNote(self, startingNote):
         self.counter = self.counter+1
         #TODO : make the max interval customizable
-        maxInterval = 14
+        maxInterval = 18
         offset = 0
         while offset == 0: # we dont want the same note than the starting note
             offset = random.randint(-maxInterval, maxInterval)

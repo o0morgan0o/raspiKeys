@@ -24,7 +24,16 @@ class LblDefault(tk.Label):
         **kwargs
       )
 
-
+# -------------------MODE 0 ----------------------
+class LblMode0(tk.Label):
+    def __init__(self,*args, **kwargs):
+        super(LblMode0, self).__init__(
+                *args,
+                foreground="white",
+                font=("Courier", 28),
+                background="black",
+                **kwargs
+                )
 
 
 # -------------------MODE 3 -----------------------

@@ -15,6 +15,9 @@ from utils.audio import Sound
 
 from utils.questionNote import CustomNote
 from utils.questionNote import Melody
+from utils.midiToNotenames  import noteName
+from utils.midiToNotenames  import noteNameFull
+
 
 """ the mode 0 is for eartraining on a SINGLE INTERVAL
 """
@@ -64,9 +67,12 @@ class Game:
             self.parent.btnListen.configure(text="ListenON")
 
     def skip(self):
-        self.parent.label2[ "text"] = "It was ;-)\n{}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
-        self.parent.label2["bg"] = "orange"
-        self.changeGameState("waitingUserInput") # if we gave the good answer, we want a new note
+        try:
+            self.parent.label2[ "text"] = "It was ;-)\n{}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
+            self.parent.label2["bg"] = "orange"
+            self.changeGameState("waitingUserInput") # if we gave the good answer, we want a new note
+        except:
+            print("impossible to skip question")
 
     def startGame(self):
         self.changeGameState("waitingUserInput")
@@ -93,6 +99,7 @@ class Game:
             self.parent.label1["text"] = "Listen ..."
             self.parent.label2["text"] = ""
             self.parent.label2["bg"]= "black"
+            self.parent.lblNoteUser["text"] = ""
             self.gameState = "listen"
             self.isListening = False
         elif newstate == "waitingUserAnswer":
@@ -147,6 +154,9 @@ class Game:
                 questionNote = self.pickNewNote(self.startingNote)
                 self.questionNote = QuestionNote(questionNote, self, self.delay)
                 self.changeGameState("listen")
+                #show the note on the ui
+                self.lblUserShow = noteNameFull(self.startingNote)+" -> "
+                self.parent.lblNote.config(text=self.lblUserShow)
 
             elif self.gameState == "waitingUserAnswer":
                 if msg.note == self.startingNote:
@@ -159,6 +169,8 @@ class Game:
         if answer == self.questionNote.note:
             self.parent.label2[ "text"] = "correct ;-)\n{}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
             self.parent.label2["bg"] = "green"
+            self.parent.lblNoteUser["text"]=noteNameFull(answer)
+            self.parent.lblNoteUser["fg"]="green"
             if self.questionNote.isFirstTry:
                 self.score = self.score + 1
 
@@ -168,11 +180,12 @@ class Game:
             time.sleep(1)
             self.changeGameState("waitingUserInput") # if we gave the good answer, we want a new note
         else:
-            # self.parent.label2["text"]= "incorrect\nA: {}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
+            self.parent.label2["text"]= "incorrect\nA: {}".format(formatOutputInterval(answer - self.startingNote))
             self.questionNote.isFirstTry= False
             self.parent.label2["bg"] = "red"
+            self.parent.lblNoteUser["text"]=noteNameFull(answer)
+            self.parent.lblNoteUser["fg"]="red"
 
-            # TODO : is it really the best way to do time.sleep here ?
             time.sleep(1)
             self.melodies.playLooseMelody()
             time.sleep(1)
@@ -199,6 +212,8 @@ class Game:
         self.parent.label1["bg"] = newColor
         self.parent.label2["bg"] = newColor
         self.parent.label3["bg"] = newColor
+        self.parent.lblNote["bg"] = newColor
+        self.parent.lblNote["fg"] = "white"
         self.parent.label1["fg"] = "white"
         self.parent.label2["fg"] = "white"
         self.parent.label3["fg"] = "white"

@@ -51,52 +51,60 @@ class MainApplication(tk.Frame):
 
 
         # toolbar
-        self.master.toolbar = tk.Frame(self.master, bg=env.COL_TOOLBG, padx=10, pady=10)
-        self.master.toolbar.pack(side=tk.TOP, fill=tk.X)
+        self.master.toolbar = tk.Frame(self.master, bg=env.COL_TOOLBG, )
+        self.master.toolbar.place(x=0,y=0,width=320,height=60)
+#        self.master.toolbar.pack(side=tk.TOP, fill=tk.X)
 
         self.master.body = tk.Frame(self.master, bg="orange")
-        self.master.body.pack(expand=True, side=tk.TOP, fill=tk.BOTH)
+#        self.master.body.pack(expand=True, side=tk.TOP, fill=tk.BOTH)
 
-        self.master.footer = tk.Frame(self.master, bg="grey")
-        self.master.footer.pack(side=tk.BOTTOM, fill=tk.X) 
+        self.master.footer = tk.Frame(self.master, bg="yellow")
+        self.master.footer.place(x=0,y=430,width=320,height=50)
+#        self.master.footer.pack(side=tk.BOTTOM, fill=tk.X) 
         
 
         # TODO: make a way to load last settigns. save automatically each time a change
         # toolbar buttons
-        self.master.toolbar.columnconfigure((0,1,2,3), weight=1)
         # ///////// btn
         self.button1 = BtnMenu(self.master.toolbar, text="EarN")
         self.button1["command"] = lambda: self.new_window(0)
-        self.button1.grid(row=0,column=0, columnspan=1, sticky="NSEW")
+        self.button1.place(x=0,y=0,width=80, height=60)
+        self.original_background = self.button1.cget("background") # get original background color
         # ///////// btn
         self.button2 = BtnMenu(self.master.toolbar, text="EarC")
         self.button2["command"] = lambda: self.new_window(1)
-        self.button2.grid(row=0,column=1, columnspan=1, sticky="NSEW")
+        self.button2.place(x=80,y=0,width=80, height=60)
         # ///////// btn
         self.button3=BtnMenu(self.master.toolbar , text= "BkTr")
         self.button3["command"]=lambda: self.new_window(2)
-        self.button3.grid(row=0,column=2, columnspan=1, sticky="NSEW")
+        self.button3.place(x=160,y=0,width=80, height=60)
         # ///////// btn
         self.button4 = BtnMenu(self.master.toolbar, text="Lick")
         self.button4["command"]= lambda: self.new_window(3)
-        self.button4.grid(row=0,column=3, columnspan=1, sticky="NSEW")
+        self.button4.place(x=240,y=0,width=80, height=60)
 
         
 
         self.master.footer.columnconfigure((0,1,2), weight=1)
         self.button5 = BtnMenu(self.master.footer, text="Opts")
         self.button5["command"]= lambda: self.new_window(4)
+        self.button5.place(x=240,y=0, width=80, height=50)
+
         self.buttonMidiListen = BtnMenu(self.master.footer, text="MIDILis", command=self.toggleMidiListen)
+        self.buttonMidiListen.place(x=0,y=0, width=80, height=50)
+
         self.volumeSlider = tk.Scale(self.master.footer,  from_=0, to=100, orient=tk.HORIZONTAL,command=self.sliderMoved) 
+        self.volumeSlider.place(x=80,y=0, width=160, height=50)
+
         # load default volume
         volume = int(self.config["volume"])
         print(" vol", volume)
         self.volumeSlider.set(volume)
 
 
-        self.buttonMidiListen.grid(row=0, column=0, sticky="NSEW")
-        self.volumeSlider.grid(row=0, column=1, sticky="NSEW")
-        self.button5.grid(row=0, column=2, sticky="NSEW")
+#        self.buttonMidiListen.grid(row=0, column=0, sticky="NSEW")
+#        self.volumeSlider.grid(row=0, column=1, sticky="NSEW")
+#        self.button5.grid(row=0, column=2, sticky="NSEW")
 
         # storage of the current Game Classe
         self.currentGameClass = None
@@ -155,7 +163,8 @@ class MainApplication(tk.Frame):
         print("new window")
         # recreation of the body frame (middle frame)
         self.master.body=tk.Frame(self.master, bg="green")
-        self.master.body.pack(side=tk.TOP, expand=True, fill=tk.BOTH)
+#        self.master.body.pack(side=tk.TOP, expand=True, fill=tk.BOTH)
+        self.master.body.place(x=0,y=60,width=320,height=370)
 
         if intMode == 0:
             self.app= Mode0(self.master.body, self.config)
@@ -173,6 +182,32 @@ class MainApplication(tk.Frame):
         else:
             return
 
+        self.highLightActiveMode(intMode)
+
+    def highLightActiveMode(self, intMode):
+        print("highlighting ...")
+        self.button1.configure(background=self.original_background)
+        self.button2.configure(background=self.original_background)
+        self.button3.configure(background=self.original_background)
+        self.button4.configure(background=self.original_background)
+        self.button1["fg"] ="black"
+        self.button2["fg"] ="black"
+        self.button3["fg"] ="black"
+        self.button4["fg"] ="black"
+        if intMode ==0:
+            self.button1["bg"] ="black"
+            self.button1["fg"] ="white"
+        elif intMode==1:
+            self.button2["bg"]="black"
+            self.button2["fg"] ="white"
+        elif intMode==2:
+            self.button3["bg"]="black"
+            self.button3["fg"] ="white"
+        elif intMode==3:
+            self.button4["bg"]="black"
+            self.button4["fg"] ="white"
+
+        
     
     def toggleMidiListen(self):
         print("toggle listen mode")

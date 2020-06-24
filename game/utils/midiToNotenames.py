@@ -25,3 +25,9 @@ def noteName(midiNum):
         return "A#"
     elif num==11:
         return "B"
+
+def noteNameFull(midiNum):
+    entier = int(midiNum/12)
+    print(entier)
+    key = noteName(midiNum)
+    return "{}{}".format(key,str(entier))
