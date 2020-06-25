@@ -12,6 +12,7 @@ class Sound:
         self.user_waveDir = env.USER_WAV_FOLDER
         self.user_mp3Dir = env.USER_MP3_FOLDER
         self.processed_waveDir =env.PROCESSED_WAV_FOLDER
+        self.metroTick = env.METRO_TICK_FILE
         pygame.init()
 #        pygame.mixer.pre_init(44100, 16, 2, 4096)
         pygame.mixer.init()
@@ -38,6 +39,12 @@ class Sound:
             except:
                 print("error during conversion" , filename)
 
+
+    def loadTick(self):
+        pygame.mixer.music.load(self.metroTick)
+    
+    def playTick(self):
+        pygame.mixer.music.play()
 
 
     def loadBacktracksWav(self):

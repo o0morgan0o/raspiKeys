@@ -1,0 +1,239 @@
+{
+    "bass": 48,
+    "type": "minor",
+    "chord_notes": [
+        {
+            "type": "note_on",
+            "note": 55,
+            "time": 0
+        },
+        {
+            "type": "note_on",
+            "note": 60,
+            "time": 13
+        },
+        {
+            "type": "note_on",
+            "note": 51,
+            "time": 19
+        },
+        {
+            "type": "note_on",
+            "note": 48,
+            "time": 21
+        },
+        {
+            "type": "note_off",
+            "note": 55,
+            "time": 1588
+        },
+        {
+            "type": "note_off",
+            "note": 48,
+            "time": 1612
+        },
+        {
+            "type": "note_off",
+            "note": 51,
+            "time": 1628
+        },
+        {
+            "type": "note_off",
+            "note": 60,
+            "time": 1673
+        },
+        {
+            "type": "note_on",
+            "note": 56,
+            "time": 2207
+        },
+        {
+            "type": "note_on",
+            "note": 60,
+            "time": 2211
+        },
+        {
+            "type": "note_on",
+            "note": 65,
+            "time": 2220
+        },
+        {
+            "type": "note_on",
+            "note": 53,
+            "time": 2237
+        },
+        {
+            "type": "note_off",
+            "note": 65,
+            "time": 3641
+        },
+        {
+            "type": "note_off",
+            "note": 60,
+            "time": 3655
+        },
+        {
+            "type": "note_off",
+            "note": 53,
+            "time": 3743
+        },
+        {
+            "type": "note_off",
+            "note": 56,
+            "time": 3754
+        },
+        {
+            "type": "note_on",
+            "note": 55,
+            "time": 4345
+        },
+        {
+            "type": "note_on",
+            "note": 60,
+            "time": 4346
+        },
+        {
+            "type": "note_on",
+            "note": 48,
+            "time": 4349
+        },
+        {
+            "type": "note_on",
+            "note": 51,
+            "time": 4354
+        },
+        {
+            "type": "note_off",
+            "note": 48,
+            "time": 6134
+        },
+        {
+            "type": "note_off",
+            "note": 60,
+            "time": 6144
+        },
+        {
+            "type": "note_off",
+            "note": 55,
+            "time": 6173
+        },
+        {
+            "type": "note_off",
+            "note": 51,
+            "time": 6175
+        },
+        {
+            "type": "note_on",
+            "note": 60,
+            "time": 6570
+        },
+        {
+            "type": "note_on",
+            "note": 55,
+            "time": 6573
+        },
+        {
+            "type": "note_on",
+            "note": 51,
+            "time": 6575
+        },
+        {
+            "type": "note_on",
+            "note": 48,
+            "time": 6587
+        },
+        {
+            "type": "note_off",
+            "note": 48,
+            "time": 8347
+        },
+        {
+            "type": "note_off",
+            "note": 51,
+            "time": 8364
+        },
+        {
+            "type": "note_off",
+            "note": 55,
+            "time": 8381
+        },
+        {
+            "type": "note_off",
+            "note": 60,
+            "time": 8416
+        }
+    ],
+    "notes": [
+        {
+            "type": "note_on",
+            "note": 65,
+            "time": 2072
+        },
+        {
+            "type": "note_on",
+            "note": 68,
+            "time": 3056
+        },
+        {
+            "type": "note_off",
+            "note": 65,
+            "time": 3092
+        },
+        {
+            "type": "note_off",
+            "note": 68,
+            "time": 3240
+        },
+        {
+            "type": "note_on",
+            "note": 70,
+            "time": 3290
+        },
+        {
+            "type": "note_off",
+            "note": 70,
+            "time": 3566
+        },
+        {
+            "type": "note_on",
+            "note": 72,
+            "time": 3618
+        },
+        {
+            "type": "note_on",
+            "note": 65,
+            "time": 3861
+        },
+        {
+            "type": "note_off",
+            "note": 72,
+            "time": 3943
+        },
+        {
+            "type": "note_off",
+            "note": 65,
+            "time": 4157
+        },
+        {
+            "type": "note_on",
+            "note": 63,
+            "time": 4192
+        },
+        {
+            "type": "note_off",
+            "note": 63,
+            "time": 4379
+        },
+        {
+            "type": "note_on",
+            "note": 67,
+            "time": 4392
+        },
+        {
+            "type": "note_off",
+            "note": 67,
+            "time": 6435
+        }
+    ],
+    "duration": 8749
+}

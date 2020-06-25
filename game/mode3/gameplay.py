@@ -1,4 +1,6 @@
 import datetime
+from utils.bpm import Bpm
+from threading import Timer
 import random
 import os
 import time
@@ -40,6 +42,8 @@ class Game:
 
         # Default path
         self.midiRepository =env.MIDI_FOLDER
+        self.recordBpm = 90
+
 
         # Callbacks for buttons
         self.parent.btnRecord.config(command=self.startRecording)
@@ -60,14 +64,17 @@ class Game:
 
         self.recordingBassLick = False
         self.recordingNotes = False
+        self.recordingCustomChords=False
         self.startingTime = 0
         self.recordedNotes =[]
+        self.recordedCustomChords=[]
         self.bassNote=0
         self.chordQuality="-"
         self.transpose=0
         self.activeCustomSignals=[]
         self.lickRepetitionCounter=1
         self.lickMaxRepetition=2
+        self.playOnlyChord= False
 
         self.currentLickIndex=0
         self.currentLick =None
@@ -154,6 +161,8 @@ class Game:
             return
 
     def startRecording(self):
+        self.cancelThreads()
+        self.startingTime=0
         self.recordWindow = tk.Toplevel(self.parent)
         self.bassNote=0 # reinitilisation of the bassnote
         self.recordWindow.geometry("320x480")
@@ -171,16 +180,17 @@ class Game:
         self.recordWindow.btnMinor.config(command=lambda:self.setChordQuality("minor"))
         self.recordWindow.btnMajor = BtnBlack12(self.recordWindow, text="Major")
         self.recordWindow.btnMajor.config(command=lambda:self.setChordQuality("major"))
-        self.recordWindow.btnMinor7 = BtnBlack12(self.recordWindow, text="Minor7")
-        self.recordWindow.btnMinor7.config(command=lambda:self.setChordQuality("min7"))
-        self.recordWindow.btnMajor7 = BtnBlack12(self.recordWindow, text="Major7")
-        self.recordWindow.btnMajor7.config(command=lambda:self.setChordQuality("maj7"))
         self.recordWindow.btndom7 = BtnBlack12(self.recordWindow, text="Dom7")
         self.recordWindow.btndom7.config(command=lambda:self.setChordQuality("dom7"))
-        self.recordWindow.btnmin7b5 = BtnBlack12(self.recordWindow, text="Min7b5")
-        self.recordWindow.btnmin7b5.config(command=lambda:self.setChordQuality("min7b5"))
+        # slider
+        self.recordWindow.bpmScale=tk.Scale(self.recordWindow, from_=40, to=140, resolution=1, orient=tk.HORIZONTAL )
+        self.recordWindow.bpmScale.config(command=self.updateBpmValue, label="BPM", font=("Courier", 20, "bold"))
+        self.recordWindow.bpmScale.config(background="black", foreground="white", sliderlength=80, width=70,bd=0)
+        self.recordWindow.bpmScale.set(60) # default value for bpm record
+        #custom progression
+        self.recordWindow.btnCustom=BtnBlack12(self.recordWindow, text="Record BackChord")
+        self.recordWindow.btnCustom.config(command=self.validateBeforeShowingWindow)
         # Button cancel
-        self.recordWindow.btnOK = BtnBlack20(self.recordWindow, text="OK")
         self.recordWindow.btnCancel = BtnBlack12(self.recordWindow, text="Cancel")
         self.recordWindow.btnCancel.config(command=self.recordWindow.destroy)
 
@@ -189,28 +199,31 @@ class Game:
         self.recordWindow.lblBass.place(x=0,y=50, width=320, height=60)
         self.recordWindow.lbl2.place(x=0, y=120, width=320,height=30)
 
-        self.recordWindow.btnMinor.place(x=30, y=180, width=130, height=60)
-        self.recordWindow.btnMinor7.place(x=30, y=240, width=130, height=60)
-        self.recordWindow.btnmin7b5.place(x=30, y=300, width=130, height=60)
-        self.recordWindow.btnMajor.place(x=160, y=180, width=130, height=60)
-        self.recordWindow.btnMajor7.place(x=160, y=240, width=130, height=60)
-        self.recordWindow.btndom7.place(x=160, y=300, width=130, height=60)
+        self.recordWindow.btnMinor.place(x=25, y=180, width=90, height=60)
+        self.recordWindow.btnMajor.place(x=115, y=180, width=90, height=60)
+        self.recordWindow.btndom7.place(x=205, y=180, width=90, height=60)
+        self.recordWindow.bpmScale.place(x=40, y=280, width=240, height=100)
 
-        self.recordWindow.btnOK.place(x=160, y=400, width=130, height=60)
-        self.recordWindow.btnOK.config(command=self.validateBeforeShowingWindow)
+        self.recordWindow.btnCustom.place(x=160, y=400, width=130, height=60)
         self.recordWindow.btnCancel.place(x=30, y=400, width=130, height=60)
 
         self.recordingBassLick= True
 
+    def updateBpmValue(self, value):
+        print(value)
+        self.recordBpm=value
+        print(self.recordBpm)
+
     
     def validateBeforeShowingWindow(self):
         if self.bassNote == 0 or self.chordQuality == "-": # check if user done the inputs
+            self.recordWindow.lbl1.configure(foreground="red")
             self.recordWindow.lbl1.configure(text="Error, you need a valid bass note and valid chord quality!")
+        
         else:
-            # we close the bass record window and open the note record window
             self.recordingBassLick=False # desactivate the listen of user Bass
             self.recordWindow.destroy()
-            self.showRecordWindow(self.bassNote)
+            self.showRecordCustomChordWindow(self.bassNote)
 
 
     def setChordQuality(self,quality):
@@ -231,6 +244,7 @@ class Game:
         obj = {
                 "bass": bassNote,
                 "type": self.chordQuality,
+                "chord_notes": self.recordedCustomChords,
                 "notes": recordedNotes,
                 "duration":mTime
                 }
@@ -262,7 +276,7 @@ class Game:
         # self.reloadTree()
 
 
-    def playLick(self, transpose=0):
+    def playLick(self, transpose=0, playOnlyChord=False):
         self.cancelThreads()
         # if there is no file, we return imediately
         if len(self.midiFiles) == 0:
@@ -273,20 +287,19 @@ class Game:
         key = self.jsonLick["bass"]+transpose
         mType= self.jsonLick["type"]
         notes = self.jsonLick["notes"]
+        chord_notes= self.jsonLick["chord_notes"]
         duration=self.jsonLick["duration"]
-        delay=1000 #Needed because we want to hear the bass first
-        # first we play the chord:
         self.showUserInfo(self.jsonLick["bass"],mType,notes, transpose)
-        self.playChord(key,self.jsonLick["type"]) # used to play a diffrent chord type
-    #        bassPlay=CustomSignal(self,"note_on", key,0)
-        # now we loop in the array create notes obejcts with timers
         self.activeCustomSignals=[]
-        for note in notes:
-            # create a new Note with timer
-            self.activeCustomSignals.append(CustomSignal(self, note["type"], note["note"]+transpose, note["time"]+delay))
+        if playOnlyChord==False:
+            for note in notes:
+                # create a new Note with timer
+                self.activeCustomSignals.append(CustomSignal(self, note["type"], note["note"]+transpose, note["time"]))
+        for note in chord_notes:
+            self.activeCustomSignals.append(CustomSignal(self, note["type"], note["note"]+transpose, note["time"]))
 
         # we want the lick to replay and loop so we make a thread to midi_off all the notes
-        delayEnd= (duration+delay)/1000
+        delayEnd= (duration)/1000
         print("delay" , delayEnd)
         self.nextLoopTimer = Timer(delayEnd, lambda: self.prepareNewLoop(delayEnd))
         self.nextLoopTimer.start()
@@ -325,9 +338,13 @@ class Game:
             self.parent.lblNotes.config(text="({})".format( formatOutputInterval(self.transpose-self.lastTranspose)))
             self.parent.lblNotes.config(foreground="red")
             self.lastTranspose=self.transpose
-        # TODO: This timer must be cancel if user click on something
-        self.silenceIntervalTimer = Timer(delay,lambda: self.playLick(self.transpose))
-        self.silenceIntervalTimer.start()
+            self.lickRepetitionCounter=0
+
+        if self.lickRepetitionCounter ==0 :
+            self.playLick(self.transpose)
+        else:
+        # TODO : find a rule here i think play melody one time each transpose is OK
+            self.playLick(self.transpose, playOnlyChord=True)
         
     
     def previousLick(self):
@@ -404,6 +421,65 @@ class Game:
         self.alert.btnRetry.place(x=120,y=360,width=80,height=80)
         self.alert.btnSave.place(x=220,y=360,width=80,height=80)
 
+
+        # self.precountTimer= Timer(3, lambda: self.activateRecordingNotes())
+        # self.precountTimer.start()
+        self.precountTimer = Bpm(self.recordBpm, lambda: self.activateRecordingNotes())
+
+    def showRecordCustomChordWindow(self, bassNote):
+        self.recordedCustomChords=[]
+        self.customChordNotes=[]
+        self.customChordWindow=tk.Toplevel(self.parent)
+        self.customChordWindow.attributes('-fullscreen', True)
+        self.customChordWindow.geometry("320x480")
+        self.customChordWindow["bg"]="black"
+        self.customChordWindow.lblMessage = MyLabel18(self.customChordWindow, text="Record your progression,\nRecord start when you press a key...")
+        self.customChordWindow.lblBass =MyLabel40(self.customChordWindow, text="Key")
+        self.customChordWindow.btnRetry=BtnBlack12(self.customChordWindow, text="Retry")
+        self.customChordWindow.btnCancel=BtnBlack12(self.customChordWindow, text="Cancel")
+        self.customChordWindow.btnOK=BtnBlack12(self.customChordWindow, text="OK")
+        self.customChordWindow.btnOK.config(command=self.customChordSave)
+
+        # placement
+        self.customChordWindow.lblMessage.place(x=0, y=20, width=320, height=50)
+        self.customChordWindow.lblBass.place(x=0, y=80, width=320, height=50)
+        self.customChordWindow.btnCancel.place(x=20, y=360, width=80, height=80)
+        self.customChordWindow.btnRetry.place(x=120, y=360, width=80, height=80)
+        self.customChordWindow.btnOK.place(x=220, y=360, width=80, height=80)
+
+        # we want to launch a thread, it will activate recording after count-in
+        self.precountTimer = Bpm(self.recordBpm, lambda: self.activateRecordingChords())
+
+    def activateRecordingNotes(self):
+        self.startingTime = int(round(time.time()*1000))
+        self.playChord(self.bassNote, self.chordQuality) # in order to play the chord when the user record
+        self.alert["bg"]="red"
+
+    def activateRecordingChords(self):
+        self.startingTime=0 # in order to start at the first note
+        self.customChordWindow["bg"]="red"
+        self.recordingCustomChords=True
+
+
+
+
+    def customChordSave(self):
+        print(self.recordedCustomChords)
+        self.recordingCustomChords=False
+        self.customChordWindow.destroy()
+        self.showRecordWindow(self.bassNote)
+
+    def customChordRetry(self):
+        self.startingTime=0
+        self.recordedCustomChords=[]
+    
+    def customChordCancel(self):
+        self.recordingCustomChords=False
+        self.customChordWindow.destroy()
+
+
+
+
     def cancel(self):
         self.alert.destroy()
         self.reloadMidiFiles()
@@ -413,16 +489,16 @@ class Game:
         self.recordedNotes=[]
         self.stringNotes =""
         self.alert.lbl3.config(text="Notes :\n" + self.stringNotes)
+        self.precountTimer = Bpm(self.recordBpm, lambda: self.activateRecordingNotes())
 
     def playChord(self, bass, mType):
-        chordTones=getChordInterval(mType)
-        for chordTone in chordTones:
-            CustomSignal(self, "note_on", bass + chordTone,0)
+        for note in self.recordedCustomChords:
+            CustomSignal(self,note["type"], note["note"],note["time"])
+        print(self.recordedCustomChords)
 
 
         
 
-    #        bassPlay=CustomSignal(self,"note_on", key,0)
 
     def handleMIDIInput(self, msg):
         print( "receiving MIDI input, ", msg)
@@ -436,13 +512,22 @@ class Game:
                 print(bassNote)
 
         elif self.recordingNotes == True:
-            if self.startingTime == 0: # it means it is the first played note
-                self.startingTime = int(round(time.time()*1000))
+            # if self.startingTime == 0: # it means it is the first played note
+                # self.startingTime = int(round(time.time()*1000))
 
             #TODO pass recordingNotes to False when one of the button is clicked
             mTime = self.getTimeFromStart()
             self.insertNoteAtTimeInJson(msg, mTime)
             self.alert.lbl3.config(text="Notes :\n\n" +self.stringNotes)
+
+        if self.recordingCustomChords == True:
+            if self.startingTime==0:
+                self.startingTime=int(round(time.time()*1000))
+                print("first starting TIme trigger", self.startingTime)
+            mTime =self.getTimeFromStart()
+            self.insertNoteAtTimeInJsonCustomChords(msg,mTime)
+            # TODO  : Le mieux est aussi d'enregistrer le backtrack dans le json
+
             
 
 
@@ -459,6 +544,17 @@ class Game:
         # we also put the note in a string in order to show the user the notes
         if msg.type == "note_on":
             self.stringNotes += noteName(msg.note)
+    
+    def insertNoteAtTimeInJsonCustomChords(self,msg,time):
+        dictionnary =  { 
+                "type": msg.type,
+                "note": msg.note,
+                "time": time
+                }
+        self.recordedCustomChords.append(dictionnary)
+
+
+    
 
 
     def cancelThreads(self):

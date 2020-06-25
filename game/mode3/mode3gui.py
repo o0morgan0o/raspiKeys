@@ -52,11 +52,8 @@ class Mode3:
         self.gameFrame.btnPrev = BtnBlack12(self.gameFrame, text="<")
         self.gameFrame.btnPrev.config(font=("Courier", 12, "bold"))
 
-        # self.gameFrame.lblUserIndication = LblMode3(self.gameFrame, text="aaaaa")
-
 
         # placement
-
         self.placeElements()
         self.game = Game(self.gameFrame, config)
 
@@ -65,10 +62,6 @@ class Mode3:
     def placeElements(self):
 
         self.gameFrame.lblMessage.place(x=0, y=10, width=320, height=20)
-        # self.gameFrame.lblUserIndication.place(x=0,y=20,width=320,height=50)
-        # self.gameFrame.scrollBar.place(x=10,y=70,width=30,height=280)
-        # self.gameFrame.tree.place(x=40,y=70, width=180, height=250)
-        # self.gameFrame.scrollBarHor.place(x=40,y=320,width=180,height=30)
 
         self.gameFrame.lblKey.place(x=0,y=60, width=320, height=40)
         self.gameFrame.lblNotes.place(x=0, y=120, width=320, height=50)
