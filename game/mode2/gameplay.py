@@ -41,6 +41,11 @@ class Game:
         if self.sound.isPlaying == False:
             self.playBacktrack()
 
+        # we want to show the number of tracks
+        nbTracksStr = "Random beat:\nThere are {} beats in the base.".format(str(len(self.tracksWav)))
+        self.parent.lblStatic1.config(text=nbTracksStr)
+
+
 
     # def destroy(self):
     #     self.sound.unloadAudio()
@@ -48,15 +53,6 @@ class Game:
     #     del self
 
     def showRandomTracks(self):
-            name = os.path.basename(self.activeSamples[0])
-            self.parent.randTrack0.config(text=name, command=lambda: self.changeTrack(0), fg=env.COL_SEC)
-            name = os.path.basename(self.activeSamples[1])
-            self.parent.randTrack1.config(text=name, command=lambda: self.changeTrack(1), fg=env.COL_GREY)
-            name = os.path.basename(self.activeSamples[2])
-            self.parent.randTrack2.config(text=name, command=lambda: self.changeTrack(2), fg=env.COL_GREY)
-            name = os.path.basename(self.activeSamples[3])
-            self.parent.randTrack3.config(text=name, command=lambda: self.changeTrack(3), fg=env.COL_GREY)
-
             self.showCurrentPlayingInLabel()
 
     def showCurrentPlayingInLabel(self):
@@ -73,24 +69,6 @@ class Game:
         self.playBacktrack()
         self.showCurrentPlayingInLabel()
         self.sound.isPlaying = True
-        counter = 0
-
-        self.parent.randTrack0.config(fg=env.COL_GREY)
-        self.parent.randTrack1.config(fg=env.COL_GREY)
-        self.parent.randTrack2.config(fg=env.COL_GREY)
-        self.parent.randTrack3.config(fg=env.COL_GREY)
-        if index == 0:
-            self.parent.randTrack0.config(fg=env.COL_SEC)
-        elif index == 1:
-            self.parent.randTrack1.config(fg=env.COL_SEC)
-        elif index == 2:
-            self.parent.randTrack2.config(fg=env.COL_SEC)
-        elif index == 3:
-            self.parent.randTrack3.config(fg=env.COL_SEC)
-
-        # for track in self.activeSamples:
-            
-
 
     def pickRandomSamples(self):
         return  random.sample(self.tracksWav, 4)
@@ -104,7 +82,6 @@ class Game:
             self.sound.stopPlay()
         
         self.currentTrack = self.activeSamples[0]
-        self.parent.randTrack0.config(fg=env.COL_SEC)
         self.showCurrentPlayingInLabel()
         self.sound.isPlaying =False
         self.playBacktrack()

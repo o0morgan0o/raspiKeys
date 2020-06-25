@@ -11,6 +11,13 @@ from utils.customElements import LblCurrentPlaying
 
 from utils.customElements import LblMode3
 
+from utils.customElements import MyLabel8
+from utils.customElements import MyLabel12
+from utils.customElements import MyLabel18
+from utils.customElements import MyLabel30
+from utils.customElements import MyLabel40
+from utils.customElements import BtnBlack20
+
 
         
 
@@ -27,14 +34,21 @@ class Mode3:
         self.gameFrame.tree = ttk.Treeview(self.gameFrame)
         self.gameFrame.scrollBar = ttk.Scrollbar(self.gameFrame,orient="vertical",command=self.gameFrame.tree.yview)
         self.gameFrame.scrollBarHor = ttk.Scrollbar(self.gameFrame,orient="horizontal",command=self.gameFrame.tree.xview)
-        self.gameFrame.btnRecord = BtnDefault(self.gameFrame, text="record")
-        self.gameFrame.btnDeleteSelected = BtnDefault(self.gameFrame, text="Delete lick")
-        self.gameFrame.btnPractiseLick = BtnDefault(self.gameFrame, text="Practise Lick")
-        self.gameFrame.btnPractiseAll= BtnDefault(self.gameFrame, text="Practise All")
-        self.gameFrame.lblMessage = LblMode3(self.gameFrame, text="there are x licks in the base")
-        self.gameFrame.lblStatic1 = LblMode3(self.gameFrame, text="licks found: ")
+        self.gameFrame.btnRecord = BtnBlack20(self.gameFrame, text="record")
+        self.gameFrame.btnDeleteSelected = BtnBlack20(self.gameFrame, text="Delete lick")
+        self.gameFrame.btnPractiseLick = BtnBlack20(self.gameFrame, text="Practise Lick")
+        self.gameFrame.btnPractiseAll= BtnBlack20(self.gameFrame, text="Practise All")
+        self.gameFrame.lblMessage = MyLabel12(self.gameFrame, text="there are no licks in the base")
+        self.gameFrame.lblStatic1 = MyLabel12(self.gameFrame, text="licks found: ")
 
-        self.gameFrame.lblUserIndication = LblMode3(self.gameFrame, text="aaaaa")
+        self.gameFrame.lblKey = MyLabel30(self.gameFrame, text="KEY")
+        self.gameFrame.lblNotes = MyLabel12(self.gameFrame, text="notes....")
+        self.gameFrame.lblFollowing = MyLabel8(self.gameFrame, text="next...")
+
+        self.gameFrame.btnNext = BtnBlack20(self.gameFrame, text=">")
+        self.gameFrame.btnPrev = BtnBlack20(self.gameFrame, text="<")
+
+        # self.gameFrame.lblUserIndication = LblMode3(self.gameFrame, text="aaaaa")
 
 
         # placement
@@ -47,14 +61,23 @@ class Mode3:
     def placeElements(self):
 
         self.gameFrame.lblMessage.place(x=0, y=0, width=320, height=20)
-        self.gameFrame.lblUserIndication.place(x=0,y=20,width=320,height=50)
-        self.gameFrame.scrollBar.place(x=10,y=70,width=30,height=280)
-        self.gameFrame.tree.place(x=40,y=70, width=180, height=250)
-        self.gameFrame.scrollBarHor.place(x=40,y=320,width=180,height=30)
-        self.gameFrame.btnRecord.place(x=230, y=70, width=90, height=70)
-        self.gameFrame.btnDeleteSelected.place(x=230, y=140, width=90, height=70)
-        self.gameFrame.btnPractiseLick.place(x=230, y=210, width=90,height=70)
-        self.gameFrame.btnPractiseAll.place(x=230,y=280,width=90,height=70)
+        # self.gameFrame.lblUserIndication.place(x=0,y=20,width=320,height=50)
+        # self.gameFrame.scrollBar.place(x=10,y=70,width=30,height=280)
+        # self.gameFrame.tree.place(x=40,y=70, width=180, height=250)
+        # self.gameFrame.scrollBarHor.place(x=40,y=320,width=180,height=30)
+
+        self.gameFrame.lblKey.place(x=0,y=80, width=320, height=40)
+        self.gameFrame.lblNotes.place(x=0, y=120, width=320, height=50)
+        self.gameFrame.lblFollowing.place(x=0, y=180, width=320, height=30)
+
+        self.gameFrame.btnPrev.place(x=0,y=120, width=40,height=50)
+        self.gameFrame.btnNext.place(x=280,y=120, width=40,height=50)
+
+
+        self.gameFrame.btnRecord.place(x=45, y=300, width=85, height=50)
+        self.gameFrame.btnDeleteSelected.place(x=190, y=300, width=85, height=50)
+        self.gameFrame.btnPractiseLick.place(x=30, y=210, width=115,height=70)
+        self.gameFrame.btnPractiseAll.place(x=175,y=210,width=115,height=70)
 
 
 

@@ -3,6 +3,14 @@ from mode1.gameplay import Game
 
 from utils.customElements import BtnDefault
 
+from utils.customElements import MyLabel8
+from utils.customElements import MyLabel12
+from utils.customElements import MyLabel18
+from utils.customElements import MyLabel30
+from utils.customElements import MyLabel40
+from utils.customElements import BtnBlack20
+
+
 class Mode1:
     def __init__(self,gameFrame,config):
         print( "launching game 1 -------------- ")
@@ -12,17 +20,12 @@ class Mode1:
 
         # labels
         # definition of sizes and fonts
-        self.gameFrame.label1 = tk.Label(self.gameFrame,wraplength=200) # for user instructions
-        self.gameFrame.label1.config(font=("Courier", 12))
-        self.gameFrame.label2 = tk.Label(self.gameFrame, padx=10, pady=10) # for "correct" or "incorrect"response
-        self.gameFrame.label2.config(font=("Courier", 18))
+        self.gameFrame.label1 = MyLabel12(self.gameFrame,wraplength=200) # for user instructions
+        self.gameFrame.label2 = MyLabel18(self.gameFrame, padx=10, pady=10) # for "correct" or "incorrect"response
         self.gameFrame.label2.configure(anchor= "center")
-        self.gameFrame.label3 = tk.Label(self.gameFrame) # for global score
-        self.gameFrame.label3.config(font=("Courier", 30))
-        self.gameFrame.btnSkip = BtnDefault(self.gameFrame, text= "SKIP >")
-        self.gameFrame.btnSkip.config(bg="black", fg="white")
-        self.gameFrame.lblNote= tk.Label(self.gameFrame, text="")
-        self.gameFrame.lblNote.config(font=("Courier", 30), bg="black", fg="white")
+        self.gameFrame.label3 = MyLabel30(self.gameFrame) # for global score
+        self.gameFrame.btnSkip = BtnBlack20(self.gameFrame, text= "SKIP >")
+        self.gameFrame.lblNote= MyLabel30(self.gameFrame, text="")
         # canvas
         self.gameFrame.canvas = tk.Canvas(self.gameFrame, bg="black", width=200, height=70, highlightthickness=0)
         
@@ -32,13 +35,6 @@ class Mode1:
         self.game = Game(self.gameFrame, config)
 
     def placeElements(self):
-
-#        self.gameFrame.label1.grid(row=1, column=0, columnspan=1, sticky="NSEW")
-#        self.gameFrame.label3.grid(row=2, column=0, columnspan=1, sticky="NSEW")
-#        self.gameFrame.canvas.grid(row=3, rowspan=1, column=0, columnspan=1, sticky="NS")
-#        self.gameFrame.label2.grid(row=4, column=0, columnspan=1, sticky="NSEW")
-#
-#        self.gameFrame.btnSkip.grid(row=6, column=0, columnspan=1, sticky="")
 
         self.gameFrame.label1.place(x=0, y=10, width=320,height=50)
         self.gameFrame.label3.place(x=0,y=65,width=320,height=50)

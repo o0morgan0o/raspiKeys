@@ -1,5 +1,39 @@
 import tkinter as tk
 
+myfont="Courier"
+
+# labels in each size
+class MyLabel8(tk.Label):
+  def __init__(self,*args, **kwargs):
+      super(MyLabel8, self).__init__( *args, foreground="white", font=(myfont, 8), background="black", **kwargs)
+
+class MyLabel12(tk.Label):
+  def __init__(self,*args, **kwargs):
+      super(MyLabel12, self).__init__( *args, foreground="white", font=(myfont, 12), background="black", **kwargs)
+
+class MyLabel18(tk.Label):
+  def __init__(self,*args, **kwargs):
+      super(MyLabel18, self).__init__( *args, foreground="white", font=(myfont, 18), background="black", **kwargs)
+
+class MyLabel30(tk.Label):
+  def __init__(self,*args, **kwargs):
+      super(MyLabel30, self).__init__( *args, foreground="white", font=(myfont, 30), background="black", **kwargs)
+
+class MyLabel40(tk.Label):
+  def __init__(self,*args, **kwargs):
+      super(MyLabel40, self).__init__( *args, foreground="white", font=(myfont, 40), background="black", **kwargs)
+
+
+
+# buttons 
+class BtnBlack12(tk.Button):
+  def __init__(self, *args, **kwargs):
+    super(BtnBlack12, self).__init__( *args, font=(myfont, 12), **kwargs, background="black", foreground="white")
+class BtnBlack20(tk.Button):
+  def __init__(self, *args, **kwargs):
+    super(BtnBlack20, self).__init__( *args, font=(myfont, 20), **kwargs, background="black", foreground="white")
+
+
 class BtnMenu(tk.Button):
     def __init__(self, *args, **kwargs):
         super(BtnMenu, self).__init__(
