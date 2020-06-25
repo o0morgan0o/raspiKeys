@@ -29,9 +29,9 @@ class Mode2:
         self.gameFrame.pack_propagate(0)
         self.gameFrame.config(bg=env.COL_BG)
 
-        self.gameFrame.lblStatic1 = MyLabel18(self.gameFrame,text="Random beats selected:\n(Click on one of these to change beat)")
+        self.gameFrame.lblStatic1 = MyLabel12(self.gameFrame,text="")
         self.gameFrame.btnPlay = BtnBlack20(self.gameFrame,text="play/Pause")
-        self.gameFrame.btnRandom = BtnBlack20(self.gameFrame,text="Randoms")
+        self.gameFrame.btnRandom = BtnBlack20(self.gameFrame,text="Random")
         self.gameFrame.labelCurrent= MyLabel12(self.gameFrame,text="",borderwidth=2, relief="groove")
 
         self.placeElements()

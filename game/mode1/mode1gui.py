@@ -20,12 +20,12 @@ class Mode1:
 
         # labels
         # definition of sizes and fonts
-        self.gameFrame.label1 = MyLabel12(self.gameFrame,wraplength=200) # for user instructions
+        self.gameFrame.label1 = MyLabel18(self.gameFrame) # for user instructions
         self.gameFrame.label2 = MyLabel18(self.gameFrame, padx=10, pady=10) # for "correct" or "incorrect"response
-        self.gameFrame.label2.configure(anchor= "center")
         self.gameFrame.label3 = MyLabel30(self.gameFrame) # for global score
         self.gameFrame.btnSkip = BtnBlack20(self.gameFrame, text= "SKIP >")
         self.gameFrame.lblNote= MyLabel30(self.gameFrame, text="")
+        self.gameFrame.lblNote.config(font=("Courier", 40, "bold"))
         # canvas
         self.gameFrame.canvas = tk.Canvas(self.gameFrame, bg="black", width=200, height=70, highlightthickness=0)
         

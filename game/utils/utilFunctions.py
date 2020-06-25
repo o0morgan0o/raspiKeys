@@ -3,7 +3,8 @@ def formatOutputInterval(mInterval):
     #TODO: Extend to other responses
     # interval = abs(mInterval)
     interval=mInterval
-    if interval == 1: return "+min 2nd"
+    if interval ==0 : return "unisson"
+    elif interval == 1: return "+min 2nd"
     elif interval == 2: return "+maj 2nd"
     elif interval == 3 : return "+min 3rd"
     elif interval == 4: return "+maj 3rd"

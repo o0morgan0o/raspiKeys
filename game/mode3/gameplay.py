@@ -24,6 +24,7 @@ from autoload import Autoload
 from utils.customElements import MyLabel8
 from utils.customElements import MyLabel12
 from utils.customElements import MyLabel18
+from utils.customElements import MyLabel24
 from utils.customElements import MyLabel30
 from utils.customElements import MyLabel40
 from utils.customElements import BtnBlack12
@@ -72,6 +73,7 @@ class Game:
         self.currentLick =None
 
         self.practiseAllLicks = False
+        self.lastTranspose=0
 
         # we need the number of licks in order to show the user
         nbOfSamples = len(self.midiFiles) 
@@ -128,7 +130,9 @@ class Game:
             print(note)
             if note["type"]=="note_on":
                 self.userMessage += noteName(note["note"]+transpose)+" "
+        self.parent.lblKey.config(foreground="white")
         self.parent.lblKey.config(text="{} {}".format(noteName(bass+transpose), mType))
+        self.parent.lblNotes.config(foreground="white")
         self.parent.lblNotes.config(text=self.userMessage)
         print("updateing , " , len(self.midiFiles))
         self.parent.lblMessage.config(text="Lick {} / {} loaded.".format(self.currentLickIndex+1,len(self.midiFiles)))
@@ -156,11 +160,11 @@ class Game:
         self.recordWindow.attributes('-fullscreen', True)
         self.recordWindow["bg"]="black"
         # creation of 2 labels and 2 buttons
-        self.recordWindow.lbl1= MyLabel12(self.recordWindow,text="Recording...\nInsert only the bass note...")
+        self.recordWindow.lbl1= MyLabel12(self.recordWindow,text="Recording...\nInsert Bass note and click on chord type.")
         # show window the detected bass
         self.recordWindow.lbl2 =MyLabel30(self.recordWindow,text="")
         # lable which show the bass entered by the user
-        self.recordWindow.lblBass = MyLabel30(self.recordWindow, text="Listening key...")
+        self.recordWindow.lblBass = MyLabel18(self.recordWindow, text="Listening key...")
         self.recordWindow.lblBass.config(foreground="red")
         # buttons minor and major
         self.recordWindow.btnMinor = BtnBlack12(self.recordWindow, text="Minor")
@@ -251,6 +255,9 @@ class Game:
         self.recordingNotes = False
         self.recordingBassLick = False
         self.reloadMidiFiles()
+        self.currentLickIndex=len(self.midiFiles)-1
+        self.currentLick=self.midiFiles[self.currentLickIndex]
+        self.loadSelectedItem(self.currentLick)
         self.alert.destroy() # close windwo
         # self.reloadTree()
 
@@ -308,12 +315,16 @@ class Game:
             num = random.randint(-5,6)
             while num ==0:
                 num =random.randint(-5,6)
+                
             self.transpose=num
             self.lickRepetitionCounter=1
             self.parent.lblFollowing.config(text="will transpose")
             newKey = noteName(self.jsonLick["bass"] + self.transpose)
-            self.parent.lblKey.config(text="=> {} {}".format(newKey, self.jsonLick["type"]))
-            self.parent.lblNotes.config(text="({})".format( formatOutputInterval(self.transpose)))
+            self.parent.lblKey.config(foreground="red")
+            self.parent.lblKey.config(text="=>{}{}".format(newKey, self.jsonLick["type"]))
+            self.parent.lblNotes.config(text="({})".format( formatOutputInterval(self.transpose-self.lastTranspose)))
+            self.parent.lblNotes.config(foreground="red")
+            self.lastTranspose=self.transpose
         # TODO: This timer must be cancel if user click on something
         self.silenceIntervalTimer = Timer(delay,lambda: self.playLick(self.transpose))
         self.silenceIntervalTimer.start()
@@ -373,8 +384,8 @@ class Game:
 
         self.alert.lbl1 = MyLabel18(self.alert, text="Please record now...")
         self.stringNotes=""
-        self.alert.lbl2=MyLabel18(self.alert,text="{} {}".format(noteName(self.bassNote), self.chordQuality))
-        self.alert.lbl3 = MyLabel18(self.alert, text="Notes :\n" + self.stringNotes)
+        self.alert.lbl2=MyLabel40(self.alert,text="{} {}".format(noteName(self.bassNote), self.chordQuality))
+        self.alert.lbl3 = MyLabel24(self.alert, text="Notes :\n\n" + self.stringNotes)
 
         # Buttons
         self.alert.btnCancel = BtnBlack12(self.alert, text="Cancel", command=self.cancel)
@@ -420,6 +431,7 @@ class Game:
                 bassNote = msg.note
                 self.bassNote= msg.note
                 self.recordWindow.lblBass.config(text=noteName(self.bassNote), foreground="white")
+                self.recordWindow.lblBass.config(font=("Courier", 40, "bold"))
                 # self.recordWindow.lbl2.config(text="Choosen Key : {} {}".format( noteName(self.bassNote), str(self.chordQuality)))
                 print(bassNote)
 
@@ -430,7 +442,7 @@ class Game:
             #TODO pass recordingNotes to False when one of the button is clicked
             mTime = self.getTimeFromStart()
             self.insertNoteAtTimeInJson(msg, mTime)
-            self.alert.lbl3.config(text="Notes :\n" +self.stringNotes)
+            self.alert.lbl3.config(text="Notes :\n\n" +self.stringNotes)
             
 
 

@@ -15,6 +15,9 @@ class MyLabel18(tk.Label):
   def __init__(self,*args, **kwargs):
       super(MyLabel18, self).__init__( *args, foreground="white", font=(myfont, 18), background="black", **kwargs)
 
+class MyLabel24(tk.Label):
+  def __init__(self,*args, **kwargs):
+      super(MyLabel24, self).__init__( *args, foreground="white", font=(myfont, 24), background="black", **kwargs)
 class MyLabel30(tk.Label):
   def __init__(self,*args, **kwargs):
       super(MyLabel30, self).__init__( *args, foreground="white", font=(myfont, 30), background="black", **kwargs)

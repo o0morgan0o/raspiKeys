@@ -39,8 +39,8 @@ class MainApplication(tk.Frame):
         # print(self.config)
 
 
-        if(tag == "pi"): # to run at fullscreen if we get the "pi" tag
-             self.master.attributes( "-fullscreen", True)
+        # if(tag == "pi"): # to run at fullscreen if we get the "pi" tag
+        self.master.attributes( "-fullscreen", True)
         #     self.master.buttonQuit = tk.Button(self.master, text="exit", command=lambda: self.master.quit())
         #     self.master.buttonQuit.pack(side=tk.BOTTOM, pady=(0,40))
 
