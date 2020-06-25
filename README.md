@@ -14,6 +14,9 @@ Exec=/home/pi/raspiKeys/runPi.sh
 NotShowIn=GNOME;KDE;XFCE;
 ```
 
+TODO: make separate screens in mode 2 and 3
+TOOD : implement recording with the backgroundChord
+
 
 ## Modes:
 

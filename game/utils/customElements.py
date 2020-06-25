@@ -73,6 +73,17 @@ class BtnBigButton(tk.Button):
         #font=("Courier", 14),
         **kwargs
       )
+class LblMode3(tk.Label):
+    def __init__(self,*args, **kwargs):
+        super(LblMode3, self).__init__(
+                *args,
+                foreground="white",
+                font=("Courier", 14),
+                background="black",
+                **kwargs
+                )
+
+
 
 # ------------------ MODE 4 ------------------------
 # ------------------ MODE 5 ------------------------

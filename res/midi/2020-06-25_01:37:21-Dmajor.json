@@ -1,0 +1,37 @@
+{
+    "bass": 62,
+    "type": "major",
+    "notes": [
+        {
+            "type": "note_on",
+            "note": 62,
+            "time": 0
+        },
+        {
+            "type": "note_on",
+            "note": 65,
+            "time": 138
+        },
+        {
+            "type": "note_off",
+            "note": 62,
+            "time": 196
+        },
+        {
+            "type": "note_on",
+            "note": 72,
+            "time": 338
+        },
+        {
+            "type": "note_off",
+            "note": 65,
+            "time": 339
+        },
+        {
+            "type": "note_off",
+            "note": 72,
+            "time": 520
+        }
+    ],
+    "duration": 963
+}

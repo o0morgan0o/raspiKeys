@@ -20,3 +20,18 @@ def formatOutputInterval(mInterval):
     elif interval == 16: return "maj 10th"
     elif interval == 17: return "perf 11th"
     else: return ""
+
+def getChordInterval(type):
+    if type == "minor":
+        return [0,3,7]
+    elif type == "major":
+        return [0,4,7]
+    elif type=="min7":
+        return [0,3,7,10]
+    elif type =="maj7":
+        return [0,4,7,11]
+    elif type=="min7b5":
+        return [0,3,6,10]
+    elif type=="dom7":
+        return [0,4,10]
+

@@ -1,0 +1,87 @@
+{
+    "bass": 60,
+    "type": "minor",
+    "notes": [
+        {
+            "type": "note_on",
+            "note": 71,
+            "time": 0
+        },
+        {
+            "type": "note_off",
+            "note": 71,
+            "time": 179
+        },
+        {
+            "type": "note_on",
+            "note": 65,
+            "time": 199
+        },
+        {
+            "type": "note_off",
+            "note": 65,
+            "time": 420
+        },
+        {
+            "type": "note_on",
+            "note": 63,
+            "time": 494
+        },
+        {
+            "type": "note_off",
+            "note": 63,
+            "time": 685
+        },
+        {
+            "type": "note_on",
+            "note": 61,
+            "time": 708
+        },
+        {
+            "type": "note_off",
+            "note": 61,
+            "time": 904
+        },
+        {
+            "type": "note_on",
+            "note": 60,
+            "time": 981
+        },
+        {
+            "type": "note_off",
+            "note": 60,
+            "time": 1155
+        },
+        {
+            "type": "note_on",
+            "note": 65,
+            "time": 2336
+        },
+        {
+            "type": "note_off",
+            "note": 65,
+            "time": 2523
+        },
+        {
+            "type": "note_on",
+            "note": 71,
+            "time": 2609
+        },
+        {
+            "type": "note_off",
+            "note": 71,
+            "time": 2842
+        },
+        {
+            "type": "note_on",
+            "note": 66,
+            "time": 3021
+        },
+        {
+            "type": "note_off",
+            "note": 66,
+            "time": 3247
+        }
+    ],
+    "duration": 3912
+}

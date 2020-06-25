@@ -1,0 +1,32 @@
+{
+    "bass": 67,
+    "type": "minor",
+    "notes": [
+        {
+            "type": "note_on",
+            "note": 62,
+            "time": 0
+        },
+        {
+            "type": "note_on",
+            "note": 67,
+            "time": 194
+        },
+        {
+            "type": "note_off",
+            "note": 67,
+            "time": 336
+        },
+        {
+            "type": "note_on",
+            "note": 67,
+            "time": 789
+        },
+        {
+            "type": "note_off",
+            "note": 67,
+            "time": 912
+        }
+    ],
+    "duration": 1065
+}

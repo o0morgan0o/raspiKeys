@@ -13,14 +13,11 @@ import mido
 from utils.midiIO import MidiIO
 from threading import Timer
 
-
 from utils.questionNote import CustomSignal
 import env
 from utils.midiToNotenames import noteName
-
-
+from utils.utilFunctions import getChordInterval
 from autoload import Autoload
-
 
 
 class Game:
@@ -60,12 +57,11 @@ class Game:
         self.currentLick =None
 
         self.practiseAllLicks = False
+        try:
+            self.loadSelectedItem(self.midiFiles[0])
+        except:
+            print("can't load initial item...")
 
-        self.loadSelectedItem(self.midiFiles[0])
-
-        # TODO : il faut que le programme demande une basse
-        # ensuite on joue le lick
-        # en play: le programme joue la basse et donne en indice le premier interval
 
     def reloadTree(self):
         for item in self.parent.tree.get_children():
@@ -79,7 +75,10 @@ class Game:
                 mFile = os.path.join(self.midiRepository, filename)
                 self.midiFiles.append(mFile)
                 counter+=1
-        self.parent.tree.selection_set("Row 0")
+        try:
+            self.parent.tree.selection_set("Row 0")
+        except:
+            print("can't load initial item...")
 
         self.parent.lblMessage.config(text="there are {} licks in the base".format(counter))
 
@@ -111,9 +110,12 @@ class Game:
         
 
     def loadFile(self, mFile):
-        with open(mFile, 'r') as f:
-            datastore = json.load(f)
-        print(datastore)
+        try:
+            with open(mFile, 'r') as f:
+                datastore = json.load(f)
+        except:
+            print("problem loading file :", mFile)
+            return
         msgStr="Current lick: " 
         bass = datastore["bass"]
         self.userMessage = "{} {} ({}ms)->".format(noteName(bass), datastore["type"], str(datastore["duration"])) # user Message is construct in order to show the notes of the lick to the user
@@ -150,6 +152,18 @@ class Game:
         self.recordWindow.btnMajor = BtnSettings(self.recordWindow, text="Major")
         self.recordWindow.btnMajor.config(command=lambda:self.setChordQuality("major"))
         self.recordWindow.btnMajor.pack()
+        self.recordWindow.btnMinor7 = BtnSettings(self.recordWindow, text="Minor7")
+        self.recordWindow.btnMinor7.config(command=lambda:self.setChordQuality("min7"))
+        self.recordWindow.btnMinor7.pack()
+        self.recordWindow.btnMajor7 = BtnSettings(self.recordWindow, text="Major7")
+        self.recordWindow.btnMajor7.config(command=lambda:self.setChordQuality("maj7"))
+        self.recordWindow.btnMajor7.pack()
+        self.recordWindow.btndom7 = BtnSettings(self.recordWindow, text="Dom7")
+        self.recordWindow.btndom7.config(command=lambda:self.setChordQuality("dom7"))
+        self.recordWindow.btndom7.pack()
+        self.recordWindow.btnmin7b5 = BtnSettings(self.recordWindow, text="Min7b5")
+        self.recordWindow.btnmin7b5.config(command=lambda:self.setChordQuality("min7b5"))
+        self.recordWindow.btnmin7b5.pack()
         # Etiquette
         self.recordWindow.lbl3 =LblSettings(self.recordWindow, text="Choosen Key : {} {}".format(str(self.bassNote), str(self.chordQuality)))
         self.recordWindow.lbl3.pack()
@@ -173,12 +187,8 @@ class Game:
 
 
     def setChordQuality(self,quality):
-        if quality == "minor":
-            self.chordQuality="minor"
-        else:
-            self.chordQuality="major"
+        self.chordQuality=quality
         self.recordWindow.lbl3.config(text="Choosen Key : {} {}".format(str(self.bassNote), str(self.chordQuality)))
-
         self.validateBeforeShowingWindow()
          
 
@@ -202,8 +212,9 @@ class Game:
 
         # TODO : Make try excerpt
         now = datetime.datetime.now()
-        now_string = now.strftime("Lick_saved:%Y-%m-%d::%H:%M:%S-")
-        now_string+="Lick_in_" + str(bassNote) + " duration: " + str(mTime)+ " ms"
+        now_string = now.strftime("%Y-%m-%d_%H:%M:%S-")
+        now_string+=noteName(bassNote)
+        now_string+=self.chordQuality
         outfile = os.path.join(self.midiRepository, now_string+".json")
         # TODO : increase counter if file exists
         with open(outfile, "w+") as outfile:
@@ -229,15 +240,14 @@ class Game:
         duration=jsonLick["duration"]
         self.parent.lblMessage.config(text="Key is"+ str(key+transpose))
         delay=1000 #Needed because we want to hear the bass first
-        bassPlay=CustomSignal(self,"note_on", key,0)
+        # first we play the chord:
+        self.playChord(key,jsonLick["type"]) # used to play a diffrent chord type
+    #        bassPlay=CustomSignal(self,"note_on", key,0)
         # now we loop in the array create notes obejcts with timers
         self.userMessage = "{} {}->".format(noteName(key), jsonLick["type"]) # user Message is construct in order to show the notes of the lick to the user
         self.activeCustomSignals=[]
         for note in notes:
             # create a new Note with timer
-
-            print(note)
-            #self.midiIO.sendOut("note_on", 60)
             self.activeCustomSignals.append(CustomSignal(self, note["type"], note["note"]+transpose, note["time"]+delay))
             if note["type"]=="note_on":
                 self.userMessage += " {}".format(noteName(note["note"] + transpose))
@@ -334,7 +344,15 @@ class Game:
         self.stringNotes =""
         self.alert.lbl2.config(text="Notes :\n" + self.stringNotes)
 
+    def playChord(self, bass, mType):
+        chordTones=getChordInterval(mType)
+        for chordTone in chordTones:
+            CustomSignal(self, "note_on", bass + chordTone,0)
 
+
+        
+
+    #        bassPlay=CustomSignal(self,"note_on", key,0)
 
     def handleMIDIInput(self, msg):
         print( "receiving MIDI input, ", msg)
