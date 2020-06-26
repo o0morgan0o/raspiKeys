@@ -16,6 +16,7 @@ from utils.customElements import MyLabel12
 from utils.customElements import MyLabel18
 from utils.customElements import MyLabel30
 from utils.customElements import MyLabel40
+from utils.customElements import BtnBlack10
 from utils.customElements import BtnBlack12
 from utils.customElements import BtnBlack20
 
@@ -35,15 +36,15 @@ class Mode3:
         self.gameFrame.tree = ttk.Treeview(self.gameFrame)
         self.gameFrame.scrollBar = ttk.Scrollbar(self.gameFrame,orient="vertical",command=self.gameFrame.tree.yview)
         self.gameFrame.scrollBarHor = ttk.Scrollbar(self.gameFrame,orient="horizontal",command=self.gameFrame.tree.xview)
-        self.gameFrame.btnRecord = BtnBlack12(self.gameFrame, text="record")
-        self.gameFrame.btnDeleteSelected = BtnBlack12(self.gameFrame, text="Delete lick")
-        self.gameFrame.btnPractiseLick = BtnBlack12(self.gameFrame, text="Practise Lick")
-        self.gameFrame.btnPractiseAll= BtnBlack12(self.gameFrame, text="Practise All")
+        self.gameFrame.btnRecord = BtnBlack10(self.gameFrame, text="record")
+        self.gameFrame.btnDeleteSelected = BtnBlack10(self.gameFrame, text="Delete lick")
+        self.gameFrame.btnPractiseLick = BtnBlack10(self.gameFrame, text="Practise Lick")
+        self.gameFrame.btnPractiseAll= BtnBlack10(self.gameFrame, text="Practise All")
         self.gameFrame.lblMessage = MyLabel12(self.gameFrame, text="there are no licks in the base")
         self.gameFrame.lblStatic1 = MyLabel12(self.gameFrame, text="licks found: ")
 
-        self.gameFrame.lblKey = MyLabel40(self.gameFrame, text="KEY")
-        self.gameFrame.lblKey.config(font=("Courier", 40, "bold"))
+        self.gameFrame.lblKey = MyLabel30(self.gameFrame, text="KEY")
+        self.gameFrame.lblKey.config(font=("Courier", 30, "bold"))
         self.gameFrame.lblNotes = MyLabel18(self.gameFrame, text="notes....", wraplength=180 )
         self.gameFrame.lblFollowing = MyLabel8(self.gameFrame, text="next...")
 

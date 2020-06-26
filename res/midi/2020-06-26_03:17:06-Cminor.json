@@ -1,0 +1,585 @@
+{
+    "bass": 48,
+    "type": "minor",
+    "chord_notes": [
+        {
+            "type": "note_on",
+            "note": 48,
+            "velocity": 57,
+            "time": 0
+        },
+        {
+            "type": "note_on",
+            "note": 55,
+            "velocity": 49,
+            "time": 21
+        },
+        {
+            "type": "note_on",
+            "note": 55,
+            "velocity": 49,
+            "time": 23
+        },
+        {
+            "type": "note_on",
+            "note": 58,
+            "velocity": 40,
+            "time": 23
+        },
+        {
+            "type": "note_on",
+            "note": 58,
+            "velocity": 40,
+            "time": 25
+        },
+        {
+            "type": "note_on",
+            "note": 51,
+            "velocity": 45,
+            "time": 43
+        },
+        {
+            "type": "note_off",
+            "note": 55,
+            "velocity": 85,
+            "time": 1880
+        },
+        {
+            "type": "note_off",
+            "note": 55,
+            "velocity": 85,
+            "time": 1881
+        },
+        {
+            "type": "note_off",
+            "note": 58,
+            "velocity": 83,
+            "time": 1948
+        },
+        {
+            "type": "note_off",
+            "note": 58,
+            "velocity": 83,
+            "time": 1948
+        },
+        {
+            "type": "note_off",
+            "note": 51,
+            "velocity": 57,
+            "time": 2016
+        },
+        {
+            "type": "note_off",
+            "note": 48,
+            "velocity": 64,
+            "time": 2020
+        },
+        {
+            "type": "note_on",
+            "note": 51,
+            "velocity": 59,
+            "time": 2254
+        },
+        {
+            "type": "note_on",
+            "note": 57,
+            "velocity": 66,
+            "time": 2256
+        },
+        {
+            "type": "note_on",
+            "note": 57,
+            "velocity": 66,
+            "time": 2256
+        },
+        {
+            "type": "note_on",
+            "note": 53,
+            "velocity": 64,
+            "time": 2272
+        },
+        {
+            "type": "note_on",
+            "note": 48,
+            "velocity": 47,
+            "time": 2278
+        },
+        {
+            "type": "note_off",
+            "note": 53,
+            "velocity": 85,
+            "time": 4077
+        },
+        {
+            "type": "note_off",
+            "note": 57,
+            "velocity": 83,
+            "time": 4097
+        },
+        {
+            "type": "note_off",
+            "note": 57,
+            "velocity": 83,
+            "time": 4098
+        },
+        {
+            "type": "note_off",
+            "note": 51,
+            "velocity": 74,
+            "time": 4171
+        },
+        {
+            "type": "note_off",
+            "note": 48,
+            "velocity": 59,
+            "time": 4242
+        },
+        {
+            "type": "note_on",
+            "note": 51,
+            "velocity": 60,
+            "time": 4398
+        },
+        {
+            "type": "note_on",
+            "note": 48,
+            "velocity": 50,
+            "time": 4402
+        },
+        {
+            "type": "note_on",
+            "note": 58,
+            "velocity": 55,
+            "time": 4406
+        },
+        {
+            "type": "note_on",
+            "note": 58,
+            "velocity": 55,
+            "time": 4406
+        },
+        {
+            "type": "note_on",
+            "note": 55,
+            "velocity": 45,
+            "time": 4432
+        },
+        {
+            "type": "note_on",
+            "note": 55,
+            "velocity": 45,
+            "time": 4432
+        },
+        {
+            "type": "note_off",
+            "note": 55,
+            "velocity": 76,
+            "time": 6138
+        },
+        {
+            "type": "note_off",
+            "note": 55,
+            "velocity": 76,
+            "time": 6138
+        },
+        {
+            "type": "note_off",
+            "note": 58,
+            "velocity": 62,
+            "time": 6173
+        },
+        {
+            "type": "note_off",
+            "note": 58,
+            "velocity": 62,
+            "time": 6175
+        },
+        {
+            "type": "note_off",
+            "note": 48,
+            "velocity": 53,
+            "time": 6194
+        },
+        {
+            "type": "note_off",
+            "note": 51,
+            "velocity": 47,
+            "time": 6286
+        },
+        {
+            "type": "note_on",
+            "note": 51,
+            "velocity": 39,
+            "time": 6527
+        },
+        {
+            "type": "note_on",
+            "note": 57,
+            "velocity": 64,
+            "time": 6551
+        },
+        {
+            "type": "note_on",
+            "note": 57,
+            "velocity": 64,
+            "time": 6553
+        },
+        {
+            "type": "note_on",
+            "note": 53,
+            "velocity": 65,
+            "time": 6553
+        },
+        {
+            "type": "note_on",
+            "note": 48,
+            "velocity": 37,
+            "time": 6610
+        },
+        {
+            "type": "note_off",
+            "note": 53,
+            "velocity": 94,
+            "time": 8303
+        },
+        {
+            "type": "note_off",
+            "note": 57,
+            "velocity": 72,
+            "time": 8336
+        },
+        {
+            "type": "note_off",
+            "note": 57,
+            "velocity": 72,
+            "time": 8337
+        },
+        {
+            "type": "note_off",
+            "note": 51,
+            "velocity": 83,
+            "time": 8348
+        },
+        {
+            "type": "note_off",
+            "note": 48,
+            "velocity": 82,
+            "time": 8364
+        }
+    ],
+    "notes": [
+        {
+            "type": "note_on",
+            "note": 79,
+            "velocity": 94,
+            "time": 258
+        },
+        {
+            "type": "note_on",
+            "note": 77,
+            "velocity": 71,
+            "time": 483
+        },
+        {
+            "type": "note_off",
+            "note": 79,
+            "velocity": 97,
+            "time": 489
+        },
+        {
+            "type": "note_off",
+            "note": 77,
+            "velocity": 58,
+            "time": 633
+        },
+        {
+            "type": "note_on",
+            "note": 78,
+            "velocity": 84,
+            "time": 638
+        },
+        {
+            "type": "note_off",
+            "note": 78,
+            "velocity": 80,
+            "time": 864
+        },
+        {
+            "type": "note_on",
+            "note": 76,
+            "velocity": 54,
+            "time": 875
+        },
+        {
+            "type": "note_off",
+            "note": 76,
+            "velocity": 77,
+            "time": 1039
+        },
+        {
+            "type": "note_on",
+            "note": 77,
+            "velocity": 60,
+            "time": 1050
+        },
+        {
+            "type": "note_on",
+            "note": 76,
+            "velocity": 50,
+            "time": 1187
+        },
+        {
+            "type": "note_off",
+            "note": 77,
+            "velocity": 80,
+            "time": 1220
+        },
+        {
+            "type": "note_on",
+            "note": 75,
+            "velocity": 56,
+            "time": 1303
+        },
+        {
+            "type": "note_off",
+            "note": 76,
+            "velocity": 74,
+            "time": 1336
+        },
+        {
+            "type": "note_on",
+            "note": 74,
+            "velocity": 71,
+            "time": 1498
+        },
+        {
+            "type": "note_off",
+            "note": 75,
+            "velocity": 83,
+            "time": 1544
+        },
+        {
+            "type": "note_off",
+            "note": 74,
+            "velocity": 53,
+            "time": 1888
+        },
+        {
+            "type": "note_on",
+            "note": 77,
+            "velocity": 69,
+            "time": 1905
+        },
+        {
+            "type": "note_off",
+            "note": 77,
+            "velocity": 85,
+            "time": 2105
+        },
+        {
+            "type": "note_on",
+            "note": 75,
+            "velocity": 67,
+            "time": 2168
+        },
+        {
+            "type": "note_off",
+            "note": 75,
+            "velocity": 71,
+            "time": 2336
+        },
+        {
+            "type": "note_on",
+            "note": 79,
+            "velocity": 51,
+            "time": 2597
+        },
+        {
+            "type": "note_on",
+            "note": 82,
+            "velocity": 47,
+            "time": 2777
+        },
+        {
+            "type": "note_off",
+            "note": 79,
+            "velocity": 64,
+            "time": 2834
+        },
+        {
+            "type": "note_off",
+            "note": 82,
+            "velocity": 94,
+            "time": 3014
+        },
+        {
+            "type": "note_on",
+            "note": 86,
+            "velocity": 90,
+            "time": 3148
+        },
+        {
+            "type": "note_off",
+            "note": 86,
+            "velocity": 82,
+            "time": 3780
+        },
+        {
+            "type": "note_on",
+            "note": 79,
+            "velocity": 80,
+            "time": 4485
+        },
+        {
+            "type": "note_off",
+            "note": 79,
+            "velocity": 90,
+            "time": 4787
+        },
+        {
+            "type": "note_on",
+            "note": 77,
+            "velocity": 53,
+            "time": 4819
+        },
+        {
+            "type": "note_off",
+            "note": 77,
+            "velocity": 38,
+            "time": 4973
+        },
+        {
+            "type": "note_on",
+            "note": 78,
+            "velocity": 75,
+            "time": 4982
+        },
+        {
+            "type": "note_on",
+            "note": 76,
+            "velocity": 64,
+            "time": 5330
+        },
+        {
+            "type": "note_off",
+            "note": 78,
+            "velocity": 81,
+            "time": 5358
+        },
+        {
+            "type": "note_on",
+            "note": 77,
+            "velocity": 68,
+            "time": 5508
+        },
+        {
+            "type": "note_off",
+            "note": 76,
+            "velocity": 66,
+            "time": 5512
+        },
+        {
+            "type": "note_on",
+            "note": 76,
+            "velocity": 54,
+            "time": 5672
+        },
+        {
+            "type": "note_off",
+            "note": 77,
+            "velocity": 65,
+            "time": 5722
+        },
+        {
+            "type": "note_on",
+            "note": 75,
+            "velocity": 56,
+            "time": 5802
+        },
+        {
+            "type": "note_off",
+            "note": 76,
+            "velocity": 61,
+            "time": 5840
+        },
+        {
+            "type": "note_on",
+            "note": 74,
+            "velocity": 54,
+            "time": 5983
+        },
+        {
+            "type": "note_off",
+            "note": 75,
+            "velocity": 78,
+            "time": 6016
+        },
+        {
+            "type": "note_off",
+            "note": 74,
+            "velocity": 50,
+            "time": 6238
+        },
+        {
+            "type": "note_on",
+            "note": 77,
+            "velocity": 64,
+            "time": 6334
+        },
+        {
+            "type": "note_on",
+            "note": 75,
+            "velocity": 53,
+            "time": 6497
+        },
+        {
+            "type": "note_off",
+            "note": 77,
+            "velocity": 85,
+            "time": 6499
+        },
+        {
+            "type": "note_off",
+            "note": 75,
+            "velocity": 76,
+            "time": 6724
+        },
+        {
+            "type": "note_on",
+            "note": 79,
+            "velocity": 65,
+            "time": 6878
+        },
+        {
+            "type": "note_on",
+            "note": 82,
+            "velocity": 55,
+            "time": 7095
+        },
+        {
+            "type": "note_off",
+            "note": 79,
+            "velocity": 57,
+            "time": 7122
+        },
+        {
+            "type": "note_off",
+            "note": 82,
+            "velocity": 89,
+            "time": 7298
+        },
+        {
+            "type": "note_on",
+            "note": 86,
+            "velocity": 84,
+            "time": 7441
+        },
+        {
+            "type": "note_off",
+            "note": 86,
+            "velocity": 85,
+            "time": 8303
+        }
+    ],
+    "duration": 9402
+}

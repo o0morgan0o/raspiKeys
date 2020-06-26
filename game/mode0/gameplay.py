@@ -155,7 +155,7 @@ class Game:
                 self.questionNote = QuestionNote(questionNote, self, self.delay)
                 self.changeGameState("listen")
                 #show the note on the ui
-                self.lblUserShow = noteNameFull(self.startingNote)+" -> "
+                self.lblUserShow = noteNameFull(self.startingNote)+"-> "
                 self.parent.lblNote.config(text=self.lblUserShow)
 
             elif self.gameState == "waitingUserAnswer":
@@ -186,9 +186,9 @@ class Game:
             self.parent.lblNoteUser["text"]=noteNameFull(answer)
             self.parent.lblNoteUser["fg"]="red"
 
-            time.sleep(1)
-            self.melodies.playLooseMelody()
-            time.sleep(1)
+            # time.sleep(1)
+            # self.melodies.playLooseMelody()
+            # time.sleep(1)
             # we replay the interval if the user didnt find the correct answer
             self.replayNote = QuestionNote(self.startingNote, self, .2) # i want to replay both notes
             self.replayNote = QuestionNote(self.questionNote.note, self, .2+self.delay) # i want to replay both notes

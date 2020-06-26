@@ -14,6 +14,14 @@ Exec=/home/pi/raspiKeys/runPi.sh
 NotShowIn=GNOME;KDE;XFCE;
 ```
 
+TODO : make documentation, and tutorial
+TODO : solve bug order of licks loaded
+TODO:  solve gui problems and fixes
+TODO : improve on hover , etc, (read tkinter doc about that)
+TODO : better handle of midi inputs and audio
+TODO: choice of midi interface
+TODO: option menu
+
 TODO: make separate screens in mode 2 and 3
 TOOD : implement recording with the backgroundChord
 

@@ -69,6 +69,7 @@ class Game:
             for note in self.questionArray:
                 notesAnswer += noteName(note) + "-"
             print(notesAnswer)
+            self.parent.lblNote.config(font=("Courier", 18, "bold"))
             self.parent.lblNote[ "text"] = "It was\n{}".format(notesAnswer)
             # .format(formatOutputInterval(self.questionNote.note - self.startingNote))
             self.parent.lblNote["bg"] = "orange"
@@ -162,6 +163,7 @@ class Game:
                 self.isListening = False # we will reactivate listening after all notes have been played
                 self.startingNote = msg.note
                 self.parent.lblNote["bg"]="black"
+                self.parent.lblNote.config(font=("Courier", 30, "bold"))
                 self.parent.lblNote["text"] = noteNameFull(self.startingNote)
                 #pick a random chord intervals
                 self.questionArray = self.pickNewChord(self.startingNote)
@@ -252,6 +254,7 @@ class Game:
 #
             else :
             # We won
+                self.parent.lblNote.config(font=("Courier", 18, "bold"))
                 self.parent.lblNote["text"] = "correct ;-)\n{}".format(self.chordName)
                 self.parent.lblNote["bg"] = "green"
                 print("first try" , self.isFirstTry)

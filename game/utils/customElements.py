@@ -32,6 +32,9 @@ class MyLabel40(tk.Label):
 
 
 # buttons 
+class BtnBlack10(tk.Button):
+  def __init__(self, *args, **kwargs):
+    super(BtnBlack10, self).__init__( *args, font=(myfont, 10), **kwargs, background="black", foreground="white")
 class BtnBlack12(tk.Button):
   def __init__(self, *args, **kwargs):
     super(BtnBlack12, self).__init__( *args, font=(myfont, 12), **kwargs, background="black", foreground="white")

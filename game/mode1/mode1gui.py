@@ -25,8 +25,8 @@ class Mode1:
         self.gameFrame.label2 = MyLabel18(self.gameFrame, padx=10, pady=10) # for "correct" or "incorrect"response
         self.gameFrame.label3 = MyLabel30(self.gameFrame) # for global score
         self.gameFrame.btnSkip = BtnBlack20(self.gameFrame, text= "SKIP >")
-        self.gameFrame.lblNote= MyLabel40(self.gameFrame, text="")
-        self.gameFrame.lblNote.config(font=("Courier", 40, "bold"))
+        self.gameFrame.lblNote= MyLabel18(self.gameFrame, text="")
+        self.gameFrame.lblNote.config(font=("Courier", 18, "bold"))
         # canvas
         self.gameFrame.canvas = tk.Canvas(self.gameFrame, bg="black", width=200, height=70, highlightthickness=0)
         

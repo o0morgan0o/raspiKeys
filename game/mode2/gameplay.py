@@ -42,7 +42,7 @@ class Game:
             self.playBacktrack()
 
         # we want to show the number of tracks
-        nbTracksStr = "Random beat:\nThere are {} beats in the base.".format(str(len(self.tracksWav)))
+        nbTracksStr = "Random beat:\n{} beats in the base.".format(str(len(self.tracksWav)))
         self.parent.lblStatic1.config(text=nbTracksStr)
 
 
