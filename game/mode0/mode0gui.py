@@ -21,7 +21,8 @@ class Mode0:
         # TODO : make custom fonts
         # definition of sizes and fonts
         self.gameFrame.label1 = MyLabel18(self.gameFrame) # for user instructions
-        self.gameFrame.label2 = MyLabel18(self.gameFrame,padx=10, pady=10) # for "correct" or "incorrect"response
+        self.gameFrame.label2 = MyLabel30(self.gameFrame,padx=10, pady=10) # for "correct" or "incorrect"response
+        self.gameFrame.label2.config(font=("Courier", 30, "bold"))
         self.gameFrame.label3 = MyLabel30(self.gameFrame,) # for global score
         self.gameFrame.btnSkip = BtnBlack20(self.gameFrame,text= "SKIP >")
         self.gameFrame.lblNote = MyLabel40(self.gameFrame)

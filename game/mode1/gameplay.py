@@ -16,12 +16,14 @@ from utils.questionNote import Melody
 from autoload import Autoload
 
 from utils.midiToNotenames import noteNameFull
+from utils.midiToNotenames import noteName
 
 """ the mode 1 is for eartraining on a CHORD INTERVAL
 """
 class Game:
 
     def __init__(self, parent, config):
+        self.questionArray = []
         self.config= config
         self.delay=float(config["question_delay"])/100
         self.parent = parent
@@ -63,11 +65,17 @@ class Game:
 
     def skip(self):
         try:
-            self.parent.label2[ "text"] = "It was ;-)\n{}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
-            self.parent.label2["bg"] = "orange"
+            notesAnswer = ""
+            for note in self.questionArray:
+                notesAnswer += noteName(note) + "-"
+            print(notesAnswer)
+            self.parent.lblNote[ "text"] = "It was\n{}".format(notesAnswer)
+            # .format(formatOutputInterval(self.questionNote.note - self.startingNote))
+            self.parent.lblNote["bg"] = "orange"
             self.changeGameState("waitingUserInput") # if we gave the good answer, we want a new note
-        except :
+        except Exception as e :
             print("Impossible to skip question")
+            print(e)
 
     def startGame(self):
         self.changeGameState("waitingUserInput")
@@ -137,6 +145,8 @@ class Game:
 
 
     def handleMIDIInput(self,msg):
+        if Autoload().getInstance().isListening== False:
+            return
         if self.globalIsListening == False:
             return
         # Needed because we still receive signals even if the class is destroyed
@@ -151,6 +161,7 @@ class Game:
             if self.gameState == "waitingUserInput":
                 self.isListening = False # we will reactivate listening after all notes have been played
                 self.startingNote = msg.note
+                self.parent.lblNote["bg"]="black"
                 self.parent.lblNote["text"] = noteNameFull(self.startingNote)
                 #pick a random chord intervals
                 self.questionArray = self.pickNewChord(self.startingNote)

@@ -6,6 +6,9 @@ myfont="Courier"
 class MyLabel8(tk.Label):
   def __init__(self,*args, **kwargs):
       super(MyLabel8, self).__init__( *args, foreground="white", font=(myfont, 8), background="black", **kwargs)
+class MyLabel10(tk.Label):
+  def __init__(self,*args, **kwargs):
+      super(MyLabel10, self).__init__( *args, foreground="white", font=(myfont, 10), background="black", **kwargs)
 
 class MyLabel12(tk.Label):
   def __init__(self,*args, **kwargs):
@@ -152,3 +155,16 @@ class BtnSettings(tk.Button):
         **kwargs
       )
 
+
+class SettingsScale(tk.Scale):
+    def __init__(self, *args, **kwargs):
+      super(SettingsScale, self).__init__(
+        *args,
+        bd=0,
+        # bg="black",
+        # fg="white",
+        font=("Courier", 12),
+        width=30,
+        sliderlength=40,
+        **kwargs
+      )

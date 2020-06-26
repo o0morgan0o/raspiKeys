@@ -44,7 +44,7 @@ class Mode3:
 
         self.gameFrame.lblKey = MyLabel40(self.gameFrame, text="KEY")
         self.gameFrame.lblKey.config(font=("Courier", 40, "bold"))
-        self.gameFrame.lblNotes = MyLabel18(self.gameFrame, text="notes....")
+        self.gameFrame.lblNotes = MyLabel18(self.gameFrame, text="notes....", wraplength=180 )
         self.gameFrame.lblFollowing = MyLabel8(self.gameFrame, text="next...")
 
         self.gameFrame.btnNext = BtnBlack12(self.gameFrame, text=">")
@@ -63,7 +63,7 @@ class Mode3:
 
         self.gameFrame.lblMessage.place(x=0, y=10, width=320, height=20)
 
-        self.gameFrame.lblKey.place(x=0,y=60, width=320, height=40)
+        self.gameFrame.lblKey.place(x=20,y=60, width=280, height=40)
         self.gameFrame.lblNotes.place(x=0, y=120, width=320, height=50)
         self.gameFrame.lblFollowing.place(x=0, y=180, width=320, height=30)
 
@@ -84,6 +84,8 @@ class Mode3:
         
 
     def destroy(self):
+        self.game.destroy()
+        del self
         pass
         # TODO : should i do destory here ? would be better to destroy the frame but ici les elements ne sont pas dessin�s sur la frame
 #        print( "trying destroy frame 3")
@@ -91,7 +93,7 @@ class Mode3:
 #        del self
 
     def __del__(self):
-        print("trying destroy")
+        self.destroy()
 
         
 

@@ -6,6 +6,7 @@ from utils.customElements import BtnDefault
 from utils.customElements import MyLabel8
 from utils.customElements import MyLabel12
 from utils.customElements import MyLabel18
+from utils.customElements import MyLabel24
 from utils.customElements import MyLabel30
 from utils.customElements import MyLabel40
 from utils.customElements import BtnBlack20
@@ -24,7 +25,7 @@ class Mode1:
         self.gameFrame.label2 = MyLabel18(self.gameFrame, padx=10, pady=10) # for "correct" or "incorrect"response
         self.gameFrame.label3 = MyLabel30(self.gameFrame) # for global score
         self.gameFrame.btnSkip = BtnBlack20(self.gameFrame, text= "SKIP >")
-        self.gameFrame.lblNote= MyLabel30(self.gameFrame, text="")
+        self.gameFrame.lblNote= MyLabel40(self.gameFrame, text="")
         self.gameFrame.lblNote.config(font=("Courier", 40, "bold"))
         # canvas
         self.gameFrame.canvas = tk.Canvas(self.gameFrame, bg="black", width=200, height=70, highlightthickness=0)

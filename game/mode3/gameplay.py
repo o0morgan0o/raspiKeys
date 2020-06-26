@@ -118,32 +118,32 @@ class Game:
        for lick in self.midiFiles:
            search = os.path.join(self.midiRepository, selection_details["text"])
            if lick == search:
-               print("FOUND")
+            #    print("FOUND")
                self.currentLickIndex=counter
            counter+=1
-       print("index Lick selected :", self.currentLickIndex)
+    #    print("index Lick selected :", self.currentLickIndex)
        
     def loadSelectedItem(self, name):
-        print("selected is: ", name)
+        # print("selected is: ", name)
         outFile = os.path.join(self.midiRepository, name)
-        print(outFile)
+        # print(outFile)
         self.loadFile( os.path.join(self.midiRepository, name))
-        print( "should be loaded")
+        # print( "should be loaded")
 
 
     def showUserInfo(self,bass,mType,notes, transpose=0):
         self.userMessage=""
         for note in notes:
-            print(note)
+            # print(note)
             if note["type"]=="note_on":
                 self.userMessage += noteName(note["note"]+transpose)+" "
         self.parent.lblKey.config(foreground="white")
         self.parent.lblKey.config(text="{} {}".format(noteName(bass+transpose), mType))
         self.parent.lblNotes.config(foreground="white")
         self.parent.lblNotes.config(text=self.userMessage)
-        print("updateing , " , len(self.midiFiles))
+        # print("updateing , " , len(self.midiFiles))
         self.parent.lblMessage.config(text="Lick {} / {} loaded.".format(self.currentLickIndex+1,len(self.midiFiles)))
-        self.parent.lblFollowing.config(text="{} / {} before transpose...".format(self.lickRepetitionCounter, self.lickMaxRepetition))
+        self.parent.lblFollowing.config(text="{} / {} before transpose...".format(self.lickRepetitionCounter, self.lickMaxRepetition), foreground="white")
 
         
 
@@ -157,7 +157,7 @@ class Game:
                 mType = datastore["type"]
                 self.showUserInfo(bass,mType,notes)
         except Exception as e:
-            print("problem loading file :", mFile, e)
+            # print("problem loading file :", mFile, e)
             return
 
     def startRecording(self):
@@ -210,9 +210,9 @@ class Game:
         self.recordingBassLick= True
 
     def updateBpmValue(self, value):
-        print(value)
+        # print(value)
         self.recordBpm=value
-        print(self.recordBpm)
+        # print(self.recordBpm)
 
     
     def validateBeforeShowingWindow(self):
@@ -250,7 +250,7 @@ class Game:
                 }
         # creation d'un objet json
         json_object = json.dumps(obj, indent=4)
-        print(json_object)
+        # print(json_object)
 
         # sauvegarde json dans un objet
 
@@ -263,7 +263,7 @@ class Game:
         # TODO : increase counter if file exists
         with open(outfile, "w+") as outfile:
             outfile.write(json_object)
-        print("file saved") # TODO : maku user info for this
+        # print("file saved") # TODO : maku user info for this
         self.recordedNotes = []
         self.startingTime = 0
         self.recordingNotes = False
@@ -276,11 +276,11 @@ class Game:
         # self.reloadTree()
 
 
-    def playLick(self, transpose=0, playOnlyChord=False):
+    def playLick(self, transpose=0, playOnlyChord=False, lastBeforeTranspose=False, lastBeforeLickChange=False):
         self.cancelThreads()
         # if there is no file, we return imediately
         if len(self.midiFiles) == 0:
-            print("no file to load...")
+            # print("no file to load...")
             return
         with open(self.currentLick, "r") as jsonfile:
             self.jsonLick = json.load(jsonfile)
@@ -289,62 +289,91 @@ class Game:
         notes = self.jsonLick["notes"]
         chord_notes= self.jsonLick["chord_notes"]
         duration=self.jsonLick["duration"]
-        self.showUserInfo(self.jsonLick["bass"],mType,notes, transpose)
+        if lastBeforeTranspose== False and lastBeforeLickChange==False:
+            self.showUserInfo(self.jsonLick["bass"],mType,notes, transpose)
         self.activeCustomSignals=[]
         if playOnlyChord==False:
             for note in notes:
                 # create a new Note with timer
-                self.activeCustomSignals.append(CustomSignal(self, note["type"], note["note"]+transpose, note["time"]))
+                self.activeCustomSignals.append(CustomSignal(self, note["type"], note["note"]+transpose, note["velocity"], note["time"]))
         for note in chord_notes:
-            self.activeCustomSignals.append(CustomSignal(self, note["type"], note["note"]+transpose, note["time"]))
+            self.activeCustomSignals.append(CustomSignal(self, note["type"], note["note"]+transpose, note["velocity"],note["time"]))
 
         # we want the lick to replay and loop so we make a thread to midi_off all the notes
         delayEnd= (duration)/1000
-        print("delay" , delayEnd)
+        # print("delay" , delayEnd)
         self.nextLoopTimer = Timer(delayEnd, lambda: self.prepareNewLoop(delayEnd))
         self.nextLoopTimer.start()
         
     def prepareNewLoop(self, delay):
-        self.lickRepetitionCounter +=1
-        # if we practise all licks we must choose a new lick
-        # i can't get the selection of tree so we have to reload a nextFile
-        if self.practiseAllLicks == True:
-            nextFile=""
-            num = random.randint(0,len(self.midiFiles)-1)
-            # TODO: resolve the case where there is only 1 lick !!!!
-            if len(self.midiFiles) > 1:
-                while num == self.currentLickIndex:
-                    num =random.randint(0,len(self.midiFiles)-1)
-                nextFile = self.midiFiles[num]
-            else:
-                nextFile = self.midiFiles[0]
-            self.loadSelectedItem(nextFile)
-        
-        # modulation is done here
-        print("SEND PANIC AND WAIT ===================================================")
+        # print("SEND PANIC AND WAIT ===================================================")
         self.midiIO.panic()
-        if self.lickRepetitionCounter > self.lickMaxRepetition :
-            # we pick a random transpose between -5 et 6 semitones
+        if self.practiseAllLicks == True:
+            self.prepareNewLoopAllLicks(delay) # if it is full practise of all licks
+        else:
+            self.prepareNewLoopOneLick(delay)  # if we practise one lick
+
+
+    def prepareNewLoopOneLick(self,delay):
+    # case where we practise one lick
+        self.lickRepetitionCounter+=1
+        if self.lickRepetitionCounter == self.lickMaxRepetition:
             num = random.randint(-5,6)
             while num ==0:
                 num =random.randint(-5,6)
                 
-            self.transpose=num
-            self.lickRepetitionCounter=1
-            self.parent.lblFollowing.config(text="will transpose")
-            newKey = noteName(self.jsonLick["bass"] + self.transpose)
-            self.parent.lblKey.config(foreground="red")
+            self.futureTranspose=num
+            self.parent.lblFollowing.config(text="Last loop before transpose...", foreground="orange")
+            newKey = noteName(self.jsonLick["bass"] + self.futureTranspose)
+            self.parent.lblKey.config(foreground="orange")
             self.parent.lblKey.config(text="=>{}{}".format(newKey, self.jsonLick["type"]))
-            self.parent.lblNotes.config(text="({})".format( formatOutputInterval(self.transpose-self.lastTranspose)))
-            self.parent.lblNotes.config(foreground="red")
-            self.lastTranspose=self.transpose
-            self.lickRepetitionCounter=0
+            self.parent.lblNotes.config(text="({})".format( formatOutputInterval(self.futureTranspose-self.lastTranspose)))
+            self.parent.lblNotes.config(foreground="orange")
+            self.lastTranspose=self.futureTranspose
 
-        if self.lickRepetitionCounter ==0 :
+        elif self.lickRepetitionCounter > self.lickMaxRepetition :
+            # we pick a random transpose between -5 et 6 semitones
+            self.transpose=self.futureTranspose
+            self.lickRepetitionCounter=1
+
+        if self.lickRepetitionCounter ==1 :
             self.playLick(self.transpose)
         else:
         # TODO : find a rule here i think play melody one time each transpose is OK
-            self.playLick(self.transpose, playOnlyChord=True)
+            if self.lickRepetitionCounter == self.lickMaxRepetition:
+                self.playLick(self.transpose,playOnlyChord=True, lastBeforeTranspose=True)
+            else:
+                self.playLick(self.transpose, playOnlyChord=True)
+    
+    def prepareNewLoopAllLicks(self,delay):
+        self.lickRepetitionCounter +=1
+        print("ALL LOPPSSSSS", self.lickRepetitionCounter, self.lickMaxRepetition)
+        # if we practise all licks we must choose a new lick
+        # i can't get the selection of tree so we have to reload a nextFile
+        # case where we practise all licks
+        if self.lickRepetitionCounter == self.lickMaxRepetition:
+            self.parent.lblFollowing.config(text="Last loop before changing Lick...", foreground="orange")
+            self.playLick(self.transpose, lastBeforeLickChange=True)
+        elif self.lickRepetitionCounter > self.lickMaxRepetition:
+            self.lickRepetitionCounter=1
+            nextFile=""
+            num = random.randint(0,len(self.midiFiles)-1)
+            #we must check hehre the number of repetitions
+            # we cahnge lick if it is the end
+            # TODO: resolve the case where there is only 1 lick !!!!
+            if len(self.midiFiles) == 0:
+                return
+            num =random.randint(0,len(self.midiFiles)-1)
+            nextFile = self.midiFiles[num]
+            self.loadSelectedItem(nextFile)
+            self.transpose=random.randint(-5,6)
+        print("before switch" , self.lickRepetitionCounter)
+
+        if self.lickRepetitionCounter == 1:
+            self.playLick(self.transpose)
+        else:
+            self.playLick(self.transpose,playOnlyChord=True)
+    
         
     
     def previousLick(self):
@@ -369,6 +398,11 @@ class Game:
         self.playLick()
 
     def playAll(self):
+        # should load random file
+        # one transpose 
+            # play lick 4 tims
+        # change lick and transpose
+        self.transpose=random.randint(-5,6)
         self.practiseAllLicks= True
         self.playLick()
         
@@ -422,8 +456,6 @@ class Game:
         self.alert.btnSave.place(x=220,y=360,width=80,height=80)
 
 
-        # self.precountTimer= Timer(3, lambda: self.activateRecordingNotes())
-        # self.precountTimer.start()
         self.precountTimer = Bpm(self.recordBpm, lambda: self.activateRecordingNotes())
 
     def showRecordCustomChordWindow(self, bassNote):
@@ -464,7 +496,7 @@ class Game:
 
 
     def customChordSave(self):
-        print(self.recordedCustomChords)
+        # print(self.recordedCustomChords)
         self.recordingCustomChords=False
         self.customChordWindow.destroy()
         self.showRecordWindow(self.bassNote)
@@ -493,23 +525,24 @@ class Game:
 
     def playChord(self, bass, mType):
         for note in self.recordedCustomChords:
-            CustomSignal(self,note["type"], note["note"],note["time"])
-        print(self.recordedCustomChords)
+            CustomSignal(self,note["type"], note["note"],note["velocity"], note["time"])
+        # print(self.recordedCustomChords)
 
 
         
 
 
     def handleMIDIInput(self, msg):
-        print( "receiving MIDI input, ", msg)
+        # print( "receiving MIDI input, ", msg)
         if self.recordingBassLick == True: # case : recording of bass
             if msg.type == "note_on":
+                # print(msg.velocity)
                 bassNote = msg.note
                 self.bassNote= msg.note
                 self.recordWindow.lblBass.config(text=noteName(self.bassNote), foreground="white")
                 self.recordWindow.lblBass.config(font=("Courier", 40, "bold"))
                 # self.recordWindow.lbl2.config(text="Choosen Key : {} {}".format( noteName(self.bassNote), str(self.chordQuality)))
-                print(bassNote)
+                # print(bassNote)
 
         elif self.recordingNotes == True:
             # if self.startingTime == 0: # it means it is the first played note
@@ -523,7 +556,7 @@ class Game:
         if self.recordingCustomChords == True:
             if self.startingTime==0:
                 self.startingTime=int(round(time.time()*1000))
-                print("first starting TIme trigger", self.startingTime)
+                # print("first starting TIme trigger", self.startingTime)
             mTime =self.getTimeFromStart()
             self.insertNoteAtTimeInJsonCustomChords(msg,mTime)
             # TODO  : Le mieux est aussi d'enregistrer le backtrack dans le json
@@ -538,7 +571,8 @@ class Game:
         dictionnary =  { 
                 "type": msg.type,
                 "note": msg.note,
-                "time": time
+                "velocity": msg.velocity,
+                "time": time,
                 }
         self.recordedNotes.append(dictionnary)
         # we also put the note in a string in order to show the user the notes
@@ -549,6 +583,7 @@ class Game:
         dictionnary =  { 
                 "type": msg.type,
                 "note": msg.note,
+                "velocity": msg.velocity,
                 "time": time
                 }
         self.recordedCustomChords.append(dictionnary)
@@ -566,6 +601,10 @@ class Game:
             self.silenceIntervalTimer.cancel()
         except:
             print("no threads to cancel")
+        try:
+            self.precountTimer.cancel()
+        except:
+            print("no threads to cancel")
         # we try to kill all notes no already played
         for signal in self.activeCustomSignals:
             signal.timer.cancel()
@@ -573,6 +612,13 @@ class Game:
 
 
     def destroy(self):
+        print("TRIGGER       trying destroy")
         self.cancelThreads()
-        print("trying destroy")
+        try:
+            del self.silenceIntervalTimer
+            del self.nextLoopTimer
+            del self.activeCustomSignals
+            del self.precountTimer
+        except:
+            print("tried delete")
         del self

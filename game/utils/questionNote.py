@@ -18,7 +18,7 @@ class QuestionNote:
 
 class CustomNote:
     def __init__(self,  parent, note, delayOn, noteDuration):
-        print("TRIGGER CUSTOM .................")
+        # print("TRIGGER CUSTOM .................")
         self.noteOnDelay = delayOn
         self.noteOffDelay= noteDuration
         self.parent = parent
@@ -28,7 +28,7 @@ class CustomNote:
         self.timer.start()
 
     def prepareNoteIn(self, note):
-        print("prepare note in")
+        # print("prepare note in")
         self.parent.midiIO.sendOut("note_on", self.note)
         tout = Timer(self.noteOffDelay, lambda: self.prepareNoteOut(self.note))
         tout.start()
@@ -36,7 +36,7 @@ class CustomNote:
 
     def prepareNoteOut(self, note):
         self.parent.midiIO.sendOut("note_off", self.note)
-        print("send note off")
+        # print("send note off")
 
 
         
@@ -58,17 +58,14 @@ class Melody:
 
 
 class CustomSignal:
-    def __init__(self, parent,noteType, note,delayOn):
+    def __init__(self, parent,noteType, note, velocity,delayOn):
         self.parent =parent
-        print("CUSTOM SIGNAL")
         if noteType == "note_on":
-            self.timer= Timer(delayOn/1000,lambda: self.parent.midiIO.sendOut("note_on", note))
+            self.timer= Timer(delayOn/1000,lambda: self.parent.midiIO.sendOut("note_on", note, velocity))
             self.timer.start()
         elif noteType == "note_off": 
-            print("sending note off timer", delayOn/1000)
-            self.timer= Timer(delayOn/1000,lambda: self.parent.midiIO.sendOut("note_off", note))
+            self.timer= Timer(delayOn/1000,lambda: self.parent.midiIO.sendOut("note_off", note,velocity))
             self.timer.start()
         else: 
-
             print("note type unknown", note.type)
 

@@ -7,6 +7,10 @@ from autoload import Autoload
 class Game:
 
     def __init__(self, parent, config):
+        #get audio instance to be sure the audio is loaded
+        self.audio =Autoload().getInstanceAudio()
+        self.midiIO= Autoload().getInstance()
+
         self.config = config
         self.parent = parent
         self.parent.btnConfig.config(command= self.openMidiPanel)

@@ -36,9 +36,6 @@ class MainApplication(tk.Frame):
         self.frame=None
         self.master.body =None
 
-        # print(self.config)
-
-
         # if(tag == "pi"): # to run at fullscreen if we get the "pi" tag
         self.master.attributes( "-fullscreen", True)
         #     self.master.buttonQuit = tk.Button(self.master, text="exit", command=lambda: self.master.quit())
@@ -46,8 +43,6 @@ class MainApplication(tk.Frame):
 
         # keyboard shortcuts for dev
         self.master.bind("<Escape>", lambda event: self.master.quit())
-
-
 
 
         # toolbar
@@ -91,9 +86,10 @@ class MainApplication(tk.Frame):
         self.button5.place(x=240,y=0, width=80, height=50)
 
         self.buttonMidiListen = BtnMenu(self.master.footer, text="MIDILis", command=self.toggleMidiListen)
+        self.buttonMidiListen.config(background="grey", foreground="black")
         self.buttonMidiListen.place(x=0,y=0, width=80, height=50)
 
-        self.volumeSlider = tk.Scale(self.master.footer,  from_=0, to=100, orient=tk.HORIZONTAL,command=self.sliderMoved) 
+        self.volumeSlider = tk.Scale(self.master.footer,width=25, sliderlength=40, from_=0, to=100,label="AudioVol",showvalue=0, orient=tk.HORIZONTAL,command=self.sliderMoved) 
         self.volumeSlider.place(x=80,y=0, width=160, height=50)
 
         # load default volume
@@ -210,14 +206,13 @@ class MainApplication(tk.Frame):
         
     
     def toggleMidiListen(self):
-        print("toggle listen mode")
         instance = Autoload().getInstance()
         instance.panic()
         instance.toggleListening()
         if instance.isListening == True:
-            self.buttonMidiListen.config(text="MIDILis")
+            self.buttonMidiListen.config(background="grey",text="MIDILis")
         else:
-            self.buttonMidiListen.config(text="OFF")
+            self.buttonMidiListen.config(background="red" , text="OFF")
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:

@@ -61,9 +61,9 @@ class MidiIO:
     def setCallback(self, callback):
         self.inport.callback = callback
 
-    def sendOut(self, msgtype, note):
-        print("[+] sending note : ", msgtype, note)
-        msg = mido.Message(msgtype, note=note)
+    def sendOut(self, msgtype, note, velocity=55):
+        # print("[+] sending note : ", msgtype, note, velocity)
+        msg = mido.Message(msgtype, note=note, velocity=velocity)
         self.outport.send(msg)
 
     def panic(self):
