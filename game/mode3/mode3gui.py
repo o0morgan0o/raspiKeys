@@ -3,22 +3,22 @@ from tkinter import ttk as ttk
 from mode3.gameplay import Game
 import utils.tinkerStyles 
 
-from utils.customElements import BtnDefault
-from utils.customElements import LblDefault
-from utils.customElements import BtnWavList
-from utils.customElements import BtnBigButton
-from utils.customElements import LblCurrentPlaying
+from utils.customElements.buttons import BtnDefault
+from utils.customElements.labels import LblDefault
+from utils.customElements.buttons import BtnWavList
+from utils.customElements.buttons import BtnBigButton
+from utils.customElements.labels import LblCurrentPlaying
 
-from utils.customElements import LblMode3
+from utils.customElements.labels import LblMode3
 
-from utils.customElements import MyLabel8
-from utils.customElements import MyLabel12
-from utils.customElements import MyLabel18
-from utils.customElements import MyLabel30
-from utils.customElements import MyLabel40
-from utils.customElements import BtnBlack10
-from utils.customElements import BtnBlack12
-from utils.customElements import BtnBlack20
+from utils.customElements.labels import MyLabel8
+from utils.customElements.labels import MyLabel12
+from utils.customElements.labels import MyLabel18
+from utils.customElements.labels import MyLabel30
+from utils.customElements.labels import MyLabel40
+from utils.customElements.buttons import BtnBlack10
+from utils.customElements.buttons import BtnBlack12
+from utils.customElements.buttons import BtnBlack20
 
 
         
@@ -45,7 +45,7 @@ class Mode3:
 
         self.gameFrame.lblKey = MyLabel30(self.gameFrame, text="KEY")
         self.gameFrame.lblKey.config(font=("Courier", 30, "bold"))
-        self.gameFrame.lblNotes = MyLabel18(self.gameFrame, text="notes....", wraplength=180 )
+        self.gameFrame.lblNotes = MyLabel12(self.gameFrame, text="notes....", wraplength=180 )
         self.gameFrame.lblFollowing = MyLabel8(self.gameFrame, text="next...")
 
         self.gameFrame.btnNext = BtnBlack12(self.gameFrame, text=">")

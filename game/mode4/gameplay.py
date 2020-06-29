@@ -1,6 +1,6 @@
 import tkinter as tk
-from utils.customElements import LblSettings
-from utils.customElements import BtnSettings
+from utils.customElements.labels import LblSettings
+from utils.customElements.buttons import BtnSettings
 from autoload import Autoload
 import json
 import env

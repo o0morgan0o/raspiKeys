@@ -3,23 +3,23 @@ from tkinter import ttk
 from mode4.gameplay import Game
 import utils.tinkerStyles 
 
-from utils.customElements import BtnDefault
-from utils.customElements import LblDefault
-from utils.customElements import BtnWavList
-from utils.customElements import BtnBigButton
-from utils.customElements import LblCurrentPlaying
+from utils.customElements.buttons import BtnDefault
+from utils.customElements.labels import LblDefault
+from utils.customElements.buttons import BtnWavList
+from utils.customElements.buttons import BtnBigButton
+from utils.customElements.labels import LblCurrentPlaying
 
-from utils.customElements import LblSettings
-from utils.customElements import BtnSettings
-from utils.customElements import BtnDefault
+from utils.customElements.labels import LblSettings
+from utils.customElements.buttons import BtnSettings
+from utils.customElements.buttons import BtnDefault
 
-from utils.customElements import MyLabel10
-from utils.customElements import MyLabel12
-from utils.customElements import MyLabel18
-from utils.customElements import MyLabel24
-from utils.customElements import MyLabel30
+from utils.customElements.labels import MyLabel10
+from utils.customElements.labels import MyLabel12
+from utils.customElements.labels import MyLabel18
+from utils.customElements.labels import MyLabel24
+from utils.customElements.labels import MyLabel30
 
-from utils.customElements import SettingsScale
+from utils.customElements.scales import SettingsScale
 
         
 
@@ -43,7 +43,7 @@ class Mode4:
         self.gameFrame.slider2_2 = SettingsScale(self.gameFrame,  from_=0, to=200, orient=tk.HORIZONTAL)
 #
         self.gameFrame.btnSaveDefault = BtnDefault(self.gameFrame, text="Save") 
-        self.gameFrame.btnCancel = BtnDefault(self.gameFrame, text="Cancel") 
+        self.gameFrame.lblSaveAsDefault = MyLabel10(self.gameFrame, text="Save current settings as default:") 
 
         self.gameFrame.label3_1 = MyLabel10(self.gameFrame, text="Select Midi interface:")
         self.gameFrame.btnConfig = BtnDefault(self.gameFrame, text="Select MIDI") 
@@ -77,7 +77,7 @@ class Mode4:
 
 
         # SECTION 4 - bouttons
-        self.gameFrame.btnCancel.place(x=30, y=320, width=115, height=40)
+        self.gameFrame.lblSaveAsDefault.place(x=0, y=320, width=175, height=40)
         self.gameFrame.btnSaveDefault.place(x=175, y=320,width=115, height=40)
         
 

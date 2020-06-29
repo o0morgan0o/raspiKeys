@@ -7,10 +7,10 @@ import time
 import tkinter as tk
 import json
 from tkinter import ttk as ttk
-from utils.customElements import BtnDefault
-from utils.customElements import BtnSettings
-from utils.customElements import LblDefault
-from utils.customElements import LblSettings
+from utils.customElements.buttons import BtnDefault
+from utils.customElements.buttons import BtnSettings
+from utils.customElements.labels import LblDefault
+from utils.customElements.labels import LblSettings
 import mido
 from utils.midiIO import MidiIO
 from threading import Timer
@@ -23,14 +23,14 @@ from utils.utilFunctions import formatOutputInterval
 from autoload import Autoload
 
 
-from utils.customElements import MyLabel8
-from utils.customElements import MyLabel12
-from utils.customElements import MyLabel18
-from utils.customElements import MyLabel24
-from utils.customElements import MyLabel30
-from utils.customElements import MyLabel40
-from utils.customElements import BtnBlack12
-from utils.customElements import BtnBlack20
+from utils.customElements.labels import MyLabel8
+from utils.customElements.labels import MyLabel12
+from utils.customElements.labels import MyLabel18
+from utils.customElements.labels import MyLabel24
+from utils.customElements.labels import MyLabel30
+from utils.customElements.labels import MyLabel40
+from utils.customElements.buttons import BtnBlack12
+from utils.customElements.buttons import BtnBlack20
 
 
 
@@ -136,7 +136,10 @@ class Game:
         for note in notes:
             # print(note)
             if note["type"]=="note_on":
-                self.userMessage += noteName(note["note"]+transpose)+" "
+                if len(self.userMessage) > 30:
+                    self.userMessage = self.userMessage[:28]+"..."
+                else:
+                    self.userMessage += noteName(note["note"]+transpose)+" "
         self.parent.lblKey.config(foreground="white")
         self.parent.lblKey.config(text="{} {}".format(noteName(bass+transpose), mType))
         self.parent.lblNotes.config(foreground="white")
@@ -256,6 +259,7 @@ class Game:
 
         # TODO : Make try excerpt
         now = datetime.datetime.now()
+        print("output file: ",now)
         now_string = now.strftime("%Y-%m-%d_%H:%M:%S-")
         now_string+=noteName(bassNote)
         now_string+=self.chordQuality

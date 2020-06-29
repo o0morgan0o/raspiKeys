@@ -1,4 +1,5 @@
 from threading import Timer
+import threading
 from utils.midiIO import MidiIO
 
 class QuestionNote:
@@ -60,12 +61,16 @@ class Melody:
 class CustomSignal:
     def __init__(self, parent,noteType, note, velocity,delayOn):
         self.parent =parent
-        if noteType == "note_on":
-            self.timer= Timer(delayOn/1000,lambda: self.parent.midiIO.sendOut("note_on", note, velocity))
-            self.timer.start()
-        elif noteType == "note_off": 
-            self.timer= Timer(delayOn/1000,lambda: self.parent.midiIO.sendOut("note_off", note,velocity))
-            self.timer.start()
-        else: 
-            print("note type unknown", note.type)
+        try:
+            if noteType == "note_on":
+                self.timer= Timer(delayOn/1000,lambda: self.parent.midiIO.sendOut("note_on", note, velocity))
+                self.timer.start()
+            elif noteType == "note_off": 
+                self.timer= Timer(delayOn/1000,lambda: self.parent.midiIO.sendOut("note_off", note,velocity))
+                self.timer.start()
+            else: 
+                print("note type unknown", note.type)
+        except RuntimeError as f:
+            print(f'Failed at {len(threading.enumerate())} threads in')
+            print(str(f))
 

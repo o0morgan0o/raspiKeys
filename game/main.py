@@ -11,7 +11,7 @@ from mode3.mode3gui import Mode3
 from mode4.mode4gui import Mode4
 
 # import button styles
-from utils.customElements import BtnMenu
+from utils.customElements.buttons import BtnMenu
 from autoload import Autoload
 from utils.audio import Sound
 from utils.utilFunctions import loadConfig
@@ -54,7 +54,7 @@ class MainApplication(tk.Frame):
         # toolbar buttons
         # ///////// btn
         self.button1 = BtnMenu(self.master.toolbar, text="EarN")
-        self.button1["command"] = lambda: self.new_window(0)
+        self.button1.config(command=lambda: self.new_window(0))
         self.button1.place(x=0,y=0,width=80, height=60)
         self.original_background = self.button1.cget("background") # get original background color
         # ///////// btn
@@ -79,7 +79,7 @@ class MainApplication(tk.Frame):
         self.buttonMidiListen.config(background="grey", foreground="black")
         self.buttonMidiListen.place(x=0,y=0, width=80, height=50)
 
-        self.volumeSlider = tk.Scale(self.master.footer,width=25, sliderlength=40, from_=0, to=100,label="AudioVol",showvalue=0, orient=tk.HORIZONTAL,command=self.sliderMoved) 
+        self.volumeSlider = tk.Scale(self.master.footer,width=45, sliderlength=80, from_=0, to=100,showvalue=0, orient=tk.HORIZONTAL,command=self.sliderMoved) 
         self.volumeSlider.place(x=80,y=0, width=160, height=50)
 
         # load default volume
@@ -171,6 +171,6 @@ if __name__ == "__main__":
         tag=""
         print("run with no arguments...")
     root=tk.Tk()
-    root.config(cursor="dot")
+    root.config(cursor="none")
     MainApplication(root, tag)
     root.mainloop()

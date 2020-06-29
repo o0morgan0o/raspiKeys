@@ -1,14 +1,15 @@
 import tkinter as tk 
 from mode0.gameplay import Game
-from utils.customElements import BtnDefault
-from utils.customElements import LblMode0
 
-from utils.customElements import MyLabel8
-from utils.customElements import MyLabel12
-from utils.customElements import MyLabel18
-from utils.customElements import MyLabel30
-from utils.customElements import MyLabel40
-from utils.customElements import BtnBlack20
+from utils.customElements.buttons import BtnDefault
+from utils.customElements.buttons import BtnBlack20
+
+from utils.customElements.labels import LblMode0
+from utils.customElements.labels import MyLabel8
+from utils.customElements.labels import MyLabel12
+from utils.customElements.labels import MyLabel18
+from utils.customElements.labels import MyLabel30
+from utils.customElements.labels import MyLabel40
 
 class Mode0:
     def __init__(self,gameFrame, config):
