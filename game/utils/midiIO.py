@@ -2,10 +2,27 @@
 import mido
 
 class MidiIO:
-    def __init__(self):
+    def __init__(self, midiIn, midiOut):
+        self.midoInList = self.getAllMidiInputs()
+        self.midoOutList = self.getAllMidiOutputs()
+        print("list:", self.midoInList, self.midoOutList)
         # define input and ouput USB midi
-        self.outport= mido.open_output('USB-MIDI:USB-MIDI MIDI 1 24:0')
-        self.inport= mido.open_input('USB-MIDI:USB-MIDI MIDI 1 24:0')
+        # we check if the default interface is present in the list
+        if midiIn in self.midoInList:
+            self.inport= mido.open_input(midiOut)
+        else:
+            print("default IN setting not found !, use mido[0] insted")
+            self.inport =mido.open_input(self.midoInList[0])
+
+        if midiOut in self.midoOutList:
+            self.outport = mido.open_output(midiOut)
+        else:
+            print("default OUT setting not found !, use mido[0] insted")
+            self.outport=mido.open_output(self.midoOutList[0])
+
+        self.resetInAndOut()
+
+    def resetInAndOut(self):
         self.inport.callback = None
         self.inport.poll()
 
@@ -26,6 +43,7 @@ class MidiIO:
         self.outport.panic()
         self.outport.reset()
 
+
     def showIOPorts(self):
         print(80*"=")
         # ['Midi Through:Midi Through Port-0 14:0', 'USB-MIDI:USB-MIDI MIDI 1 24:0']
@@ -42,10 +60,27 @@ class MidiIO:
         return mido.get_output_names()
 
     def setMidiInput(self, _input):
-        self.inport = mido.open_input(_input)
+        try:
+            self.inport.close()
+        except Exception as e:
+            print("can't close input port.", e)
+        try :
+            self.inport = mido.open_input(_input)
+        except Exception as e:
+            print(e)
+        self.resetInAndOut()
+        
 
     def setMidiOutput(self,_output):
-        self.outport= mido.open_output(_output)
+        try:
+            self.outport.close()
+        except Exception as e:
+            print("can't close output port" , e)
+        try:
+            self.outport= mido.open_output(_output)
+        except Exception as e:
+            print(e)
+        self.resetInAndOut()
 
     def destroy(self):
         self.inport.callback = None
@@ -75,3 +110,4 @@ class MidiIO:
         else:
             self.isListening=True
         print("isListening ? " , self.isListening)
+

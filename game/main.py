@@ -14,6 +14,7 @@ from mode4.mode4gui import Mode4
 from utils.customElements import BtnMenu
 from autoload import Autoload
 from utils.audio import Sound
+from utils.utilFunctions import loadConfig
 
 import env
 
@@ -22,10 +23,8 @@ class MainApplication(tk.Frame):
     # definition de la fenetre g)lobale
 
     def __init__(self, master, tag=""):
-        # self.config = self.loadConfig()
-        self.config=self.loadConfig()
-        print("config: " , self.config)
-
+        self.config=loadConfig()
+        # print("config: " , self.config)
 
         self.gameMode=int(self.config["default_mode"])
         self.master=master
@@ -38,12 +37,9 @@ class MainApplication(tk.Frame):
 
         # if(tag == "pi"): # to run at fullscreen if we get the "pi" tag
         self.master.attributes( "-fullscreen", True)
-        #     self.master.buttonQuit = tk.Button(self.master, text="exit", command=lambda: self.master.quit())
-        #     self.master.buttonQuit.pack(side=tk.BOTTOM, pady=(0,40))
 
         # keyboard shortcuts for dev
         self.master.bind("<Escape>", lambda event: self.master.quit())
-
 
         # toolbar
         self.master.toolbar = tk.Frame(self.master, bg=env.COL_TOOLBG, )
@@ -51,12 +47,8 @@ class MainApplication(tk.Frame):
 #        self.master.toolbar.pack(side=tk.TOP, fill=tk.X)
 
         self.master.body = tk.Frame(self.master, bg="orange")
-#        self.master.body.pack(expand=True, side=tk.TOP, fill=tk.BOTH)
-
         self.master.footer = tk.Frame(self.master, bg="yellow")
         self.master.footer.place(x=0,y=430,width=320,height=50)
-#        self.master.footer.pack(side=tk.BOTTOM, fill=tk.X) 
-        
 
         # TODO: make a way to load last settigns. save automatically each time a change
         # toolbar buttons
@@ -78,8 +70,6 @@ class MainApplication(tk.Frame):
         self.button4["command"]= lambda: self.new_window(3)
         self.button4.place(x=240,y=0,width=80, height=60)
 
-        
-
         self.master.footer.columnconfigure((0,1,2), weight=1)
         self.button5 = BtnMenu(self.master.footer, text="Opts")
         self.button5["command"]= lambda: self.new_window(4)
@@ -97,11 +87,6 @@ class MainApplication(tk.Frame):
         print(" vol", volume)
         self.volumeSlider.set(volume)
 
-
-#        self.buttonMidiListen.grid(row=0, column=0, sticky="NSEW")
-#        self.volumeSlider.grid(row=0, column=1, sticky="NSEW")
-#        self.button5.grid(row=0, column=2, sticky="NSEW")
-
         # storage of the current Game Classe
         self.currentGameClass = None
 
@@ -111,43 +96,8 @@ class MainApplication(tk.Frame):
         # TODO make a way to retrieve the last open tab (config file load at startup ? )
 
     def sliderMoved(self, value):
-        print("silder moved", value)
+        # print("silder moved", value)
         mSound = Sound.setVolume(value) 
-        
-
-    def loadConfig(self):
-        print("trying to load config")
-    # location of config file
-        # DEFAULT CONFIGURATION IF LOADING OF FILE FAILED
-        default_config = {}
-        default_config["volume"]= 80
-        default_config["default_mode"] = 0
-        default_config["question_delay"] = 50
-        default_config["difficulty"]=50
-        default_config["times_each_transpose"]=4
-        default_config["nb_of_transpose_before_change"]=4
-        default_config["MIDI_interface_in"]=""
-        default_config["MIDI_interface_out"]=""
-        default_config["midi_hotkey"]=50
-
-
-        configFile = env.CONFIG_FILE
-        configLabels=default_config.keys()
-        print("before loading -----", configLabels)
-        config={}
-        try:
-            with open(configFile, 'r') as file:
-                for line in file:
-                    for param in configLabels:
-                        if line.find(param) != -1:
-                            paramVal = line.split("=")[1].replace("\n","")
-                            config[param]= paramVal
-                    # maybe should test values
-        except:
-            print("No config file found")
-        print("loaded config is " , config)
-        return config
-
     
     # method to load a new game mode
     def new_window(self, intMode):
@@ -174,7 +124,7 @@ class MainApplication(tk.Frame):
         elif intMode == 3:
             self.app = Mode3(self.master.body,self.config)
         elif intMode == 4:
-            self.app = Mode4(self.master.body,self.config)
+            self.app = Mode4(self.master.body,self.config, self.volumeSlider)
         else:
             return
 

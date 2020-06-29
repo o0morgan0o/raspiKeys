@@ -21,6 +21,7 @@ TODO : improve on hover , etc, (read tkinter doc about that)
 TODO : better handle of midi inputs and audio
 TODO: choice of midi interface
 TODO: option menu
+TODO : refactor gameplays modes
 
 TODO: make separate screens in mode 2 and 3
 TOOD : implement recording with the backgroundChord

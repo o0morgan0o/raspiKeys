@@ -1,3 +1,5 @@
+import env
+import json
 
 def formatOutputInterval(mInterval):
     #TODO: Extend to other responses
@@ -58,4 +60,38 @@ def getChordInterval(type):
         return [0,3,6,10]
     elif type=="dom7":
         return [0,4,10]
+
+def loadConfig():
+    print("trying to load config") # location of config file
+    # DEFAULT CONFIGURATION IF LOADING OF FILE FAILED
+    default_config = {}
+    default_config["default_mode"] = 0
+    default_config["question_delay"] = 50
+    default_config["difficulty"]=50
+    default_config["times_each_transpose"]=4
+    default_config["nb_of_transpose_before_change"]=4
+    default_config["MIDI_interface_in"]=""
+    default_config["MIDI_interface_out"]=""
+    default_config["midi_hotkey"]=50
+    default_config["volume"]= 80
+
+
+    configFilePath = env.CONFIG_FILE
+    config={}
+    try:
+        with open(configFilePath, 'r') as f:
+            configFile = json.load(f)
+            default_config["default_mode"]=configFile["default_mode"]
+            default_config["question_delay"]=configFile["question_delay"]
+            default_config["difficulty"]=configFile["difficulty"]
+            default_config["times_each_transpose"]=configFile["times_each_transpose"]
+            default_config["nb_of_transpose_before_change"]=configFile["nb_of_transpose_before_change"]
+            default_config["MIDI_interface_in"]=configFile["MIDI_interface_in"]
+            default_config["MIDI_interface_in"]=configFile["MIDI_interface_in"]
+            default_config["MIDI_interface_in"]=configFile["MIDI_interface_in"]
+    except:
+        print("No config file found")
+    # print("loaded config is " , config)
+    return configFile
+
 

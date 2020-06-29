@@ -23,7 +23,7 @@ class Game:
         self.sound = Autoload().getInstanceAudio()
         self.parent.btnPlay.config(command=self.toggleBacktrack)
         # midi io
-        self.midiIO=MidiIO()
+        self.midiIO=Autoload().getInstance()
         self.midiIO.setCallback(self.handleMIDIInput)
 
         self.parent.btnRandom.config(command=self.playRandom)

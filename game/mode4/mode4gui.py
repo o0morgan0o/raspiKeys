@@ -25,7 +25,7 @@ from utils.customElements import SettingsScale
 
 
 class Mode4:
-    def __init__(self,gameFrame,config):
+    def __init__(self,gameFrame,config, volumeSlider):
         print( "launching game 4 -------------- ")
         self.gameFrame = gameFrame
         self.gameFrame.pack_propagate(0)
@@ -51,7 +51,7 @@ class Mode4:
 
         self.placeElements()
 
-        self.game = Game(self.gameFrame, config)
+        self.game = Game(self.gameFrame, config, volumeSlider)
 
 
 

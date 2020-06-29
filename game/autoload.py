@@ -1,13 +1,22 @@
 import os
 from utils.midiIO import MidiIO
 from utils.audio import Sound
+from utils.utilFunctions import loadConfig
+import sys
+import mido
 
 # Class used for singleton pattern, for storing global midiIO config
 class Autoload:
     class __Autoload:
         def __init__(self):
             # audio instance of midiIO
-            self.midiIO = MidiIO()
+            self.config=loadConfig()
+            self.configIn = self.config["MIDI_interface_in"]
+            self.configOut = self.config["MIDI_interface_out"]
+            print("default interface :" , self.configIn, self.configOut)
+
+            
+            self.midiIO = MidiIO(self.configIn, self.configOut)
             self.audioPCM = Sound()
             self.audioPCM.convertNewFiles()
 
@@ -35,7 +44,6 @@ class Autoload:
     
     def getActiveSamples(self):
         return self.instance.activeSamples
-
 
 
 

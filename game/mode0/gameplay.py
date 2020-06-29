@@ -25,7 +25,7 @@ class Game:
 
     def __init__(self, parent,config):
         self.parent = parent
-        print("config mode 0 ",config)
+        # print("config mode 0 ",config)
         self.delay = float(config["question_delay"])/100
         self.isListening = False
 
@@ -41,7 +41,6 @@ class Game:
         self.waitingNotes= []
         self.initMIDIArray(128)
 
-        # TODO : in this MidiIo class, allow user to select between available usb ports
         self.midiIO = Autoload().getInstance()
         self.midiIO.setCallback(self.handleMIDIInput)
 
@@ -53,8 +52,6 @@ class Game:
         self.startingNote = -1
 
         self.changeAllBg("black")
-        self.sounds = Sound() 
-        # self.sounds.loadEffectSounds() # load success and error sounds
 
         self.parent.btnSkip.configure( command=self.skip)
 
