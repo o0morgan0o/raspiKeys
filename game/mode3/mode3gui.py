@@ -43,7 +43,7 @@ class Mode3:
         self.gameFrame.lblMessage = MyLabel12(self.gameFrame, text="there are no licks in the base")
         self.gameFrame.lblStatic1 = MyLabel12(self.gameFrame, text="licks found: ")
 
-        self.gameFrame.lblKey = MyLabel30(self.gameFrame, text="KEY")
+        self.gameFrame.lblKey = MyLabel30(self.gameFrame, text="")
         self.gameFrame.lblKey.config(font=("Courier", 30, "bold"))
         self.gameFrame.lblNotes = MyLabel12(self.gameFrame, text="notes....", wraplength=180 )
         self.gameFrame.lblFollowing = MyLabel8(self.gameFrame, text="next...")

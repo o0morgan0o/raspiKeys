@@ -24,16 +24,17 @@ from utils.midiToNotenames  import noteNameFull
 class Game:
 
     def __init__(self, parent,config):
+        self.config = config
         self.parent = parent
         # print("config mode 0 ",config)
         self.delay = float(config["question_delay"])/100
+        print("self delay is :", self.delay)
         self.isListening = False
 
         # variable for user score
         self.counter=0
         self.score=0
         self.globalIsListening = True
-        
 
         print( "launchin MIDI program... \n")
         debug=True
@@ -52,7 +53,6 @@ class Game:
         self.startingNote = -1
 
         self.changeAllBg("black")
-
         self.parent.btnSkip.configure( command=self.skip)
 
     def toggleGlobalListen(self):
@@ -146,11 +146,11 @@ class Game:
             #we test according to the gamestate
 
             if self.gameState == "waitingUserInput":
+                self.changeGameState("listen")
                 self.startingNote = msg.note
                 #pick a random note
                 questionNote = self.pickNewNote(self.startingNote)
                 self.questionNote = QuestionNote(questionNote, self, self.delay)
-                self.changeGameState("listen")
                 #show the note on the ui
                 self.lblUserShow = noteNameFull(self.startingNote)+"-> "
                 self.parent.lblNote.config(text=self.lblUserShow)
@@ -172,31 +172,31 @@ class Game:
                 self.score = self.score + 1
 
             # TODO : is it really the best way to do time.sleep here ?
-            time.sleep(1)
-            self.melodies.playWinMelody()
-            time.sleep(1)
             self.changeGameState("waitingUserInput") # if we gave the good answer, we want a new note
+            time.sleep(.4)
+            self.melodies.playWinMelody()
+            time.sleep(.4)
         else:
             self.parent.label2["text"]= "incorrect\nA: {}".format(formatOutputInterval(answer - self.startingNote))
             self.questionNote.isFirstTry= False
             self.parent.label2["bg"] = "red"
             self.parent.lblNoteUser["text"]=noteNameFull(answer)
             self.parent.lblNoteUser["fg"]="red"
+            self.changeGameState("listen")
 
             # time.sleep(1)
             # self.melodies.playLooseMelody()
             # time.sleep(1)
             # we replay the interval if the user didnt find the correct answer
-            self.replayNote = QuestionNote(self.startingNote, self, .2) # i want to replay both notes
-            self.replayNote = QuestionNote(self.questionNote.note, self, .2+self.delay) # i want to replay both notes
-            self.changeGameState("listen")
+            self.replayNote = QuestionNote(self.startingNote, self, 0) # i want to replay both notes
+            self.replayNote = QuestionNote(self.questionNote.note, self, 0+self.delay) # i want to replay both notes
         
         self.midiIO.panic()
 
     def pickNewNote(self, startingNote):
         self.counter = self.counter+1
         #TODO : make the max interval customizable
-        maxInterval = 14
+        maxInterval = 17
         offset = 0
         while offset == 0: # we dont want the same note than the starting note
             offset = random.randint(-maxInterval, maxInterval)

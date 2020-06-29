@@ -124,7 +124,7 @@ class MainApplication(tk.Frame):
         elif intMode == 3:
             self.app = Mode3(self.master.body,self.config)
         elif intMode == 4:
-            self.app = Mode4(self.master.body,self.config, self.volumeSlider)
+            self.app = Mode4(self.master.body,self.config, self.volumeSlider, self)
         else:
             return
 

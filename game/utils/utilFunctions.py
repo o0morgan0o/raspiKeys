@@ -77,7 +77,6 @@ def loadConfig():
 
 
     configFilePath = env.CONFIG_FILE
-    config={}
     try:
         with open(configFilePath, 'r') as f:
             configFile = json.load(f)
