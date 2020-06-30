@@ -33,9 +33,9 @@ class Mode3:
 
         
         # Creation of the elements
-        self.gameFrame.tree = ttk.Treeview(self.gameFrame)
-        self.gameFrame.scrollBar = ttk.Scrollbar(self.gameFrame,orient="vertical",command=self.gameFrame.tree.yview)
-        self.gameFrame.scrollBarHor = ttk.Scrollbar(self.gameFrame,orient="horizontal",command=self.gameFrame.tree.xview)
+        # self.gameFrame.tree = ttk.Treeview(self.gameFrame)
+        # self.gameFrame.scrollBar = ttk.Scrollbar(self.gameFrame,orient="vertical",command=self.gameFrame.tree.yview)
+        # self.gameFrame.scrollBarHor = ttk.Scrollbar(self.gameFrame,orient="horizontal",command=self.gameFrame.tree.xview)
         self.gameFrame.btnRecord = BtnBlack10(self.gameFrame, text="record")
         self.gameFrame.btnDeleteSelected = BtnBlack10(self.gameFrame, text="Delete lick")
         self.gameFrame.btnPractiseLick = BtnBlack10(self.gameFrame, text="Practise Lick")

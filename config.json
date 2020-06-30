@@ -1,9 +1,9 @@
 {
     "default_mode": 0,
-    "question_delay": 0,
+    "question_delay": 10,
     "difficulty": 0,
-    "times_each_transpose": 0,
-    "nb_of_transpose_before_change": 0,
+    "times_each_transpose": 1,
+    "nb_of_transpose_before_change": 1,
     "MIDI_interface_in": "USB-MIDI:USB-MIDI MIDI 1 24:0",
     "MIDI_interface_out": "USB-MIDI:USB-MIDI MIDI 1 24:0",
     "midi_hotkey": 50,

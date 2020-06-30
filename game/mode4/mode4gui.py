@@ -37,12 +37,12 @@ class Mode4:
         self.gameFrame.label1_1= MyLabel8(self.gameFrame, text="question Delay ms:\n(Affect modes EarN and EarC)")
         self.gameFrame.slider1_1 = SettingsScale(self.gameFrame,  from_=10, to=200, orient=tk.HORIZONTAL, command=self.updateConfig)
         self.gameFrame.label1_2 = MyLabel8(self.gameFrame, text="Difficulty:\n(Affect mode EarN)")
-        self.gameFrame.slider1_2 = SettingsScale(self.gameFrame,  from_=0, to=1000, orient=tk.HORIZONTAL, command=self.updateConfig)
+        self.gameFrame.slider1_2 = SettingsScale(self.gameFrame,  from_=0, to=4, orient=tk.HORIZONTAL, command=self.updateConfig)
 #
         self.gameFrame.label2_1 = MyLabel8(self.gameFrame, text="Times each transpose:\n(Affect mode Lick)")
-        self.gameFrame.slider2_1 = SettingsScale(self.gameFrame,  from_=0, to=200, orient=tk.HORIZONTAL, command=self.updateConfig)
+        self.gameFrame.slider2_1 = SettingsScale(self.gameFrame,  from_=1, to=8, orient=tk.HORIZONTAL, command=self.updateConfig)
         self.gameFrame.label2_2 = MyLabel8(self.gameFrame, text="Num of transposes / Lick:\n(Affect mode Lick)")
-        self.gameFrame.slider2_2 = SettingsScale(self.gameFrame,  from_=0, to=200, orient=tk.HORIZONTAL, command=self.updateConfig)
+        self.gameFrame.slider2_2 = SettingsScale(self.gameFrame,  from_=1, to=8, orient=tk.HORIZONTAL, command=self.updateConfig)
 #
         self.gameFrame.btnSaveDefault = BtnDefault(self.gameFrame, text="Save") 
         self.gameFrame.lblSaveAsDefault = MyLabel8(self.gameFrame, text="Save current settings\nas default:") 

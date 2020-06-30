@@ -59,7 +59,7 @@ class Game:
         self.reloadMidiFiles()
         self.fileIndex=0
 
-        self.parent.tree.bind('<<TreeviewSelect>>', self.on_select)
+        # self.parent.tree.bind('<<TreeviewSelect>>', self.on_select)
 
         self.midiIO = Autoload().getInstance()
         self.midiIO.setCallback(self.handleMIDIInput)
@@ -75,7 +75,7 @@ class Game:
         self.transpose=0
         self.activeCustomSignals=[]
         self.lickRepetitionCounter=1
-        self.lickMaxRepetition=2
+        self.lickMaxRepetition=self.config["times_each_transpose"]
         self.playOnlyChord= False
 
         self.currentLickIndex=0
@@ -110,20 +110,20 @@ class Game:
 
 
     # Return the details of the selected item
-    def on_select(self, selected):
-       selection = self.parent.tree.focus()
-       selection_details = self.parent.tree.item(selection)
-       self.loadSelectedItem(selection_details['text'])
-       # we must find the index of the selected item
-       counter= 0
-       print("starting loop")
-       for lick in self.midiFiles:
-           search = os.path.join(self.midiRepository, selection_details["text"])
-           if lick == search:
-            #    print("FOUND")
-               self.currentLickIndex=counter
-           counter+=1
-    #    print("index Lick selected :", self.currentLickIndex)
+    # def on_select(self, selected):
+    #    selection = self.parent.tree.focus()
+    #    selection_details = self.parent.tree.item(selection)
+    #    self.loadSelectedItem(selection_details['text'])
+    #    # we must find the index of the selected item
+    #    counter= 0
+    #    print("starting loop")
+    #    for lick in self.midiFiles:
+    #        search = os.path.join(self.midiRepository, selection_details["text"])
+    #        if lick == search:
+    #         #    print("FOUND")
+    #            self.currentLickIndex=counter
+    #        counter+=1
+    # #    print("index Lick selected :", self.currentLickIndex)
        
     def loadSelectedItem(self, name):
         # print("selected is: ", name)

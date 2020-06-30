@@ -12,6 +12,7 @@ from utils.utilFunctions import formatOutputInterval
 from utils.midiChords import MidiChords
 from utils.questionNote import CustomNote
 from utils.questionNote import Melody
+from utils.questionNote import CustomSignal
 
 from autoload import Autoload
 
@@ -25,7 +26,8 @@ class Game:
     def __init__(self, parent, config):
         self.questionArray = []
         self.config= config
-        self.delay=float(config["question_delay"])/100
+        self.delay=float(self.config["question_delay"])/100
+        print("initial delay:", self.delay)
         self.parent = parent
         self.isListening = False
 
@@ -38,7 +40,6 @@ class Game:
         debug=True
         self.stopGame = False
         self.waitingNotes= []
-        self.initMIDIArray(128)
 
         self.midiIO = Autoload().getInstance() # open connections and ports
         self.midiIO.setCallback(self.handleMIDIInput)
@@ -49,7 +50,6 @@ class Game:
         # startGame
         self.startGame()
         self.startingNote = -1
-
 
         self.parent.btnSkip.configure( command=self.skip)
 
@@ -114,10 +114,6 @@ class Game:
             print( "ERROR : new state not defined", newstate)
         
 
-    # init a 128 array of WaitingNote in order to store all the timers
-    def initMIDIArray(self, maxNote):
-        for i in range (maxNote):
-            self.waitingNotes.append(WaitingNote(i, self))
 
     # callback launched when the timer is at 0
     def noteOff(self,note):
@@ -144,6 +140,23 @@ class Game:
         self.parent.canvas.create_rectangle(  rw+ self.canvasCounter*rw , 40 , rw+  self.canvasCounter*rw + rw/2 , 80, fill="white") 
         self.canvasCounter = self.canvasCounter + 1
 
+    def drawAndPlayAnswer(self):
+        self.parent.canvas.delete("all") 
+        self.timers=[] 
+        counter = 0
+        print("current delay", self.delay*1000)
+        
+        for note in self.questionArray:
+            print(note+self.startingNote)
+            # self.timers.append(Timer(1, lambda: self.midiIO.sendOut("note_on", self.startingNote+note, 100)))
+            isLast=False
+            if counter == len(self.questionArray)-1:
+                isLast=True
+            # minimum delay ?
+            self.timers.append(Timer(1+counter*self.delay, self.sendOut, ["note_on", self.startingNote+note, 100, isLast], ).start())
+            self.timers.append(Timer(3 +counter*self.delay, self.sendOut, ["note_off", self.startingNote+note, 100]).start())
+            counter+=1
+
 
     def handleMIDIInput(self,msg):
         if Autoload().getInstance().isListening== False:
@@ -166,44 +179,53 @@ class Game:
                 self.parent.lblNote.config(font=("Courier", 30, "bold"))
                 self.parent.lblNote["text"] = noteNameFull(self.startingNote)
                 #pick a random chord intervals
-                self.questionArray = self.pickNewChord(self.startingNote)
-                # we want a array of QuestionNots
-                arr = []
-                counter = 1
-                for note in self.questionArray:
-                    # TODO : make a way to custom the harmonic delay between notes
-                    arr.append(QuestionNote(note,self, .0 + self.delay* counter))
-                    counter = counter + 1 
+                self.question = self.pickNewChord(self.startingNote)
+                self.questionArray = self.question[1]
+                
+                self.drawAndPlayAnswer()
+                    
                 self.allIsCorrect = True # var to know if we make a mistake in the answrs
                 self.isFirstTry = True
                 self.counter = self.counter + 1
-                self.questionChord = arr
-                print("size of question: " ,  len(self.questionChord))
                 self.answerChord =[] # we initialize an answer chord
                 self.answerBools = []
                 # we initialize some vars and clear the canvas
-                self.parent.canvas.delete("all")
                 self.answerIndex=0
                 self.canvasCounter=0
 
 
+
             elif self.gameState == "waitingUserAnswer":
-                print("answer: ", self.answerIndex, self.canvasCounter)
+                print("answer: ", msg.note, self.questionArray, self.answerIndex, self.questionArray[self.answerIndex]+self.startingNote)
+                correctNote= self.questionArray[self.answerIndex] + self.startingNote
+                self.checkAnswer(msg.note, correctNote)
+                self.answerIndex = self.answerIndex + 1
                 # we muste check all the notes of the chord.
                 # we trace the current note with self.answerIndex
-                correctNote = self.questionChord[self.answerIndex]
-                print("correct note in array is ", correctNote.note, msg.note, self.answerIndex)
-                self.checkAnswer(msg.note, correctNote) # we check the answer
-                self.answerIndex = self.answerIndex + 1
+
+    def sendOut(self, mType, note, velocity, isLast=False):
+        print("trigger", mType,note,velocity)
+        if mType=="note_on":
+            self.midiIO.sendOut("note_on", note)
+            rw= 2 * self.calcRectWidthOnCanvas() # rw est 2 largeur de rectgangle
+            print("add to canvas...")
+            self.parent.canvas.create_rectangle(  rw+ self.canvasCounter*rw , 40 , rw+  self.canvasCounter*rw + rw/2 , 80, fill="white") 
+            self.canvasCounter = self.canvasCounter + 1
+            if isLast==True:
+                print("last")
+                self.changeGameState("waitingUserAnswer")
+        elif mType =="note_off":
+            self.midiIO.sendOut("note_off", note)
+
+
 
     def resetQuestion(self):
         print("should reset question")
+        self.parent.canvas.delete("all") 
         self.changeGameState( "listen")
         self.parent.label2["text"]= "incorrect"
         self.parent.label2["bg"] = "red"
-        for note in self.questionChord:
-            print("resetting a timer")
-            note.resetTimer()
+        self.drawAndPlayAnswer()
         self.answerBools = []
         self.allIsCorrect= True
         self.parent.canvas.delete("all") 
@@ -212,25 +234,30 @@ class Game:
         self.isFirstTry= False
         self.midiIO.panic() # TODO : there is still a bug with first note ringing
         # affichage score
-        self.parent
         self.parent.canvas.delete("all") 
 
     def checkAnswer(self, userAnswer, correctAnswer):
 
         #print(answer, self.questionNote.note)
         rw= 2 * self.calcRectWidthOnCanvas() # rw est 2 largeur de rectgangle
-        if userAnswer == correctAnswer.note: 
+        if userAnswer == correctAnswer: 
+
             # ok one answer is 
             self.answerBools.append(True)
             self.parent.canvas.create_rectangle(  rw+ self.answerIndex*rw , 0 , rw+  self.answerIndex*rw + rw/2 , 40, fill="green") 
         else:
             # we made a mistake on one note
+            time.sleep(.2)
+            self.parent.label2["text"]= "incorrect"
+            self.parent.label2["bg"] = "red"
+            time.sleep(.4)
+
             self.answerBools.append(False)
             self.allIsCorrect = False
             self.parent.canvas.create_rectangle(  rw+ self.answerIndex*rw , 0 , rw+  self.answerIndex*rw + rw/2 , 40, fill="red") 
             self.resetQuestion()
 
-        if self.answerIndex == len(self.questionChord) -1:
+        if self.answerIndex == len(self.questionArray) -1:
             
             self.isListening= False
             print("WE CAN RETURN")
@@ -238,8 +265,6 @@ class Game:
             if self.allIsCorrect == False:
                 pass
 #                self.changeGameState( "listen")
-#                self.parent.label2["text"]= "incorrect"
-#                self.parent.label2["bg"] = "red"
 #
 #
 #                for note in self.questionChord:
@@ -279,26 +304,9 @@ class Game:
         chordsInit = MidiChords()
         chord = chordsInit.pickRandom()
         self.chordName = chord[0]
-        #return [startingNote,  startingNote + 3,startingNote +  7,startingNote +  12]
-        # we must add the starting note
-        returnChord = []
-        for note in chord[1]:
-            returnChord.append(note + self.startingNote)
-        return returnChord
+        self.chordNotes= chord[1]
+        return chord
     
-
-
-    def pickNewNote(self, startingNote):
-        self.counter = self.counter+1
-        #TODO : make the max interval customizable
-        maxInterval = 18
-        offset = 0
-        while offset == 0: # we dont want the same note than the starting note
-            offset = random.randint(-maxInterval, maxInterval)
-        return startingNote + offset
-
-    def handleQuestionNote(self, mNote):
-        self.prepareNoteOut
 
     def changeAllBg(self, newColor):
         self.parent.label1["bg"] = newColor
@@ -310,7 +318,7 @@ class Game:
         
     def calcRectWidthOnCanvas(self):
         canvasW = 200
-        nbRects = len(self.questionChord)
+        nbRects = len(self.questionArray)
         # calcul savant !
         w = 2*nbRects + 3
         return canvasW / w
