@@ -73,4 +73,9 @@ class CustomSignal:
         except RuntimeError as f:
             print(f'Failed at {len(threading.enumerate())} threads in')
             print(str(f))
+    
+    def cancel(self):
+        self.timer.cancel()
+        
+
 

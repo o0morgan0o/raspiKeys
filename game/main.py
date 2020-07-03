@@ -102,7 +102,7 @@ class MainApplication(tk.Frame):
     # method to load a new game mode
     def new_window(self, intMode):
         try:
-            pass
+            # pass
             self.master.body.destroy()
         except:
             print("no window to destroy, recreation ...", intMode)
@@ -122,7 +122,7 @@ class MainApplication(tk.Frame):
         elif intMode == 2:
             self.app = Mode2(self.master.body,self.config)
         elif intMode == 3:
-            self.app = Mode3(self.master.body,self.config)
+            self.app = Mode3(self.master, self.master.body,self.config)
         elif intMode == 4:
             self.app = ModeOptions(self.master.body,self.config, self.volumeSlider, self)
         else:

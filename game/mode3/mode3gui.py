@@ -11,8 +11,9 @@ from utils.customElements.labels import *
 
 
 class Mode3:
-    def __init__(self,gameFrame, config):
+    def __init__(self,globalRoot,gameFrame, config):
         print( "launching game 4 -------------- ")
+        self.globalRoot = globalRoot
         self.gameFrame = gameFrame
         self.gameFrame.pack_propagate(0)
         self.gameFrame.config(bg="black")
@@ -38,7 +39,7 @@ class Mode3:
 
         # placement
         self.placeElements()
-        self.game = Game(self.gameFrame, config)
+        self.game = Game(self.globalRoot,self.gameFrame, config)
 
 
         
@@ -67,12 +68,12 @@ class Mode3:
         
 
     def destroy(self):
+        # self.game.destroy()
         self.game.destroy()
         del self
         pass
         # TODO : should i do destory here ? would be better to destroy the frame but ici les elements ne sont pas dessin�s sur la frame
 #        print( "trying destroy frame 3")
-#        self.game.destroy()
 #        del self
 
     def __del__(self):

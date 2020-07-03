@@ -1,4 +1,5 @@
 import tkinter as tk 
+import pygame
 from tkinter import ttk 
 from mode2.gameplay import Game
 import utils.tinkerStyles 
@@ -43,7 +44,10 @@ class Mode2:
         # self.game.destroy()
 
     def __del__(self):
-        print("trying destroy")
+        print("trying destroy mode 2")
+        pygame.mixer.music.stop()
+        del self
+        # del self
 
     def activateListening(self):
         self.game.isListening=True

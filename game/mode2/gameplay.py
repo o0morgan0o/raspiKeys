@@ -17,6 +17,7 @@ from autoload import Autoload
 class Game:
 
     def __init__(self, parent,config):
+        print("reconstruction backtrack window ...")
         self.config = config
         self.parent = parent
         self.sound = Autoload().getInstanceAudio()
@@ -37,8 +38,9 @@ class Game:
         self.currentTrack = self.activeSamples[0]
 
         self.showRandomTracks()
-        if self.sound.isPlaying == False:
-            self.playBacktrack()
+        # if self.sound.isPlaying == False:
+        #     self.playBacktrack()
+        self.playBacktrack()
 
         # we want to show the number of tracks
         nbTracksStr = "Random beat:\n{} beats in the base.".format(str(len(self.tracksWav)))
@@ -95,7 +97,6 @@ class Game:
     def stopBacktrack(self):
         self.sound.stopPlay()
         self.parent.btnPlay.config(text="Play")
-        self.canvasUpdateThread.isAlive=False
 
     def playBacktrack(self):
         self.sound.isPlaying=True

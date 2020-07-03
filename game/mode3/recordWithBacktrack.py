@@ -4,17 +4,18 @@ from autoload import Autoload
 from utils.customElements.buttons import *
 from utils.customElements.labels import *
 
-class RecordWithBacktrack:
-    def __init__(self, root,parent):
+from mode3.recordSetupGui import RecordSetupGui
 
-        self.root=root
-        self.parent = parent
+class RecordWithBacktrack:
+    def __init__(self, globalRoot):
+
+        self.globalRoot=globalRoot
         self.audioInstance = Autoload().getInstanceAudio()
 
         self.nbOfLoops=2
         self.backtrack= None
 
-        self.window = tk.Toplevel(self.root)
+        self.window = tk.Toplevel(self.globalRoot)
         self.window.attributes('-fullscreen', True)
         self.window.geometry("320x480")
         self.window["bg"]="black"
@@ -45,5 +46,22 @@ class RecordWithBacktrack:
 
     def nextWindow(self):
         self.window.destroy()
-        self.parent.showSetupWindow(self.currentTrack[0], self.currentTrack[1], self.nbOfLoops)
+        try :
+            self.globalRoot.recordWindow.destroy()
+        except Exception as e:
+            print(e)
+        try:
+            del self.globalRoot.recordWindow
+        except Exception as e:
+            print(e)
+
+        self.globalRoot.recordWindow= RecordSetupGui(
+            self.globalRoot, 
+            self.currentTrack[0], 
+            self.currentTrack[1], 
+            self.nbOfLoops)
+        del self
+
+    def destroy(self):
+        pass
 

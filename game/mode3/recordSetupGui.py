@@ -1,10 +1,8 @@
 import tkinter as tk
 from autoload import Autoload
-from utils.bpm import Bpm
 
 from mode3.recordChordsGui import RecordChordsGui
 
-from utils.questionNote import CustomSignal
 from utils.midiToNotenames import noteName
 from utils.utilFunctions import getChordInterval
 from utils.utilFunctions import formatOutputInterval
@@ -14,16 +12,18 @@ from utils.customElements.labels import *
 
 
 class RecordSetupGui:
-    def __init__(self,root, parent, backtrackFile, backtrackDuration, nbOfLoops ):
-        self.root=  root
-        self.parent= parent
+    def __init__(self,globalRoot, backtrackFile, backtrackDuration, nbOfLoops ):
+        self.globalRoot=  globalRoot
+        self.midiIO=Autoload().getInstance() 
+        self.midiIO.setCallback(self.handleMIDIInput)
         self.backtrackFile = backtrackFile
         self.backtrackDuration = backtrackDuration
         self.nbOfLoops = nbOfLoops
+        self.isRecording = False
 
         print("backtrack : ", backtrackFile, backtrackDuration, nbOfLoops)
 
-        self.window= tk.Toplevel(self.root)
+        self.window= tk.Toplevel(self.globalRoot)
         self.window.geometry("320x480")
         self.window.attributes('-fullscreen', True)
         self.window["bg"]="black"
@@ -75,11 +75,10 @@ class RecordSetupGui:
         # self.bassNote=0 # reinitilisation of the bassnote
         self.bassNote=60 # reinitilisation of the bassnote
         self.chordQuality="major"
-        self.parent.recordingBassLick= True
+        # self.ent.recordingBassLick= True
 
     def updateBpmValue(self, value):
         self.recordBpm=value
-    
 
     def setChordQuality(self,quality):
         self.chordQuality=quality
@@ -93,13 +92,26 @@ class RecordSetupGui:
             self.window.lbl1.configure(text="Error, you need a valid bass note and valid chord quality!")
         
         else:
-            self.parent.recordingBassLick=False # desactivate the listen of user Bass
+            # self.parent.recordingBassLick=False # desactivate the listen of user Bass
             self.window.destroy()
-            self.parent.showRecordCustomChordWindow(
-                self.recordBpm, 
-                self.bassNote, 
-                self.chordQuality,
-                self.backtrackFile,
-                self.backtrackDuration,
-                self.nbOfLoops)
+            # TODO use the same "temp window"  in global root for all (try delete it first)
+            self.globalRoot.showRecordCustomChordWindow = RecordChordsGui(
+                    self.globalRoot, 
+                    self.bassNote,
+                    self.chordQuality,
+                    self.backtrackFile,
+                    self.backtrackDuration,
+                    self.nbOfLoops)
 
+
+    def handleMIDIInput(self, msg):
+        if self.isRecording == True: # case : recording of bass
+            if msg.type == "note_on":
+                # print(msg.velocity)
+                bassNote = msg.note
+                # self.recordSetupWindow.bassNote= msg.note
+                # self.recordSetupWindow.window.lblBass.config(text=noteName(self.recordSetupWindow.bassNote), foreground="white")
+                # self.recordSetupWindow.window.lblBass.config(font=("Courier", 40, "bold"))
+                # self.recordSetupWindow.window.lbl2.config(text=noteName(self.bassNote), foreground="white")
+                # self.recordWindow.lbl2.config(text="Choosen Key : {} {}".format( noteName(self.bassNote), str(self.chordQuality)))
+                # print(bassNote)

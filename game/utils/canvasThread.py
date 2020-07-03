@@ -1,12 +1,11 @@
 import threading
 
 class MyThread(threading.Thread):
-    def __init__(self,threadID, name, canvas, audioInstance, totalLength,parent):
+    def __init__(self, name, canvas, audioInstance, totalLength,parent):
         threading.Thread.__init__(self)
         self.parent=parent
         self.audioInstance =audioInstance
         self.canvas = canvas
-        self.threadID=threadID
         self.totalLength =totalLength
         self.name=name
         self.isAlive = True
