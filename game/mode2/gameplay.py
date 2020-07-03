@@ -10,7 +10,6 @@ import pygame
 import env
 
 from utils.midiIO import MidiIO
-
 from utils.audio import Sound
 from autoload import Autoload
 
@@ -45,8 +44,6 @@ class Game:
         nbTracksStr = "Random beat:\n{} beats in the base.".format(str(len(self.tracksWav)))
         self.parent.lblStatic1.config(text=nbTracksStr)
 
-
-
     # def destroy(self):
     #     self.sound.unloadAudio()
     #     del self.sound
@@ -57,7 +54,7 @@ class Game:
 
     def showCurrentPlayingInLabel(self):
         name = os.path.basename(self.currentTrack)
-        self.parent.labelCurrent.config(text="Currently Playing:\n"+ name)
+        # self.parent.labelCurrent.config(text="Currently Playing:\n"+ name + "\n" + str(self.sound.getCurrentTrack()[0]) +" sec") 
 
     def changeTrack(self, index):
         try :
@@ -98,11 +95,20 @@ class Game:
     def stopBacktrack(self):
         self.sound.stopPlay()
         self.parent.btnPlay.config(text="Play")
+        self.canvasUpdateThread.isAlive=False
 
     def playBacktrack(self):
         self.sound.isPlaying=True
         self.sound.simplePlay(self.currentTrack)
         self.parent.btnPlay.config(text="Stop")
+        trackInfo = self.sound.getCurrentTrack()
+        self.parent.labelCurrent.config(text="Currently Playing:\n{}\n{} sec length".format(trackInfo[0], str(trackInfo[1])))
+        # while pygame.mixer.music.get_busy():
+
+        # print("launching thread")
+        # self.canvasUpdateThread = MyThread(1, "ThreadCanvas", self.parent.canvas, self.sound)
+        # self.canvasUpdateThread.start()
+
         
 
         
@@ -114,5 +120,3 @@ class Game:
                 self.playRandom()
         pass
 
-
- 

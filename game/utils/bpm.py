@@ -3,12 +3,15 @@ import pygame
 from autoload import Autoload
 import pygame
 class Bpm:
-    def __init__(self, bpm,callback):
+    def __init__(self, bpm, backtrack, backtrackDuration, nbOfLoops,callback):
         self.sound = Autoload().getInstanceAudio()
         self.sound.loadTick()
-        self.saved_volume = pygame.mixer.music.get_volume()
-        print(self.saved_volume)
-        pygame.mixer.music.set_volume(1)
+        self.backtrack = backtrack
+        self.backtrackDuration=backtrackDuration
+        self.nbOfLoops= nbOfLoops
+        # self.saved_volume = pygame.mixer.music.get_volume()
+        # print(self.saved_volume)
+        # pygame.mixer.music.set_volume(1)
 
         self.bpm=bpm
         self.count=4
@@ -16,7 +19,7 @@ class Bpm:
         print("delay between notes", self.delayBetweenBeats)
         self.callback = callback
 
-        self.t1 = Timer(self.delayBetweenBeats, lambda: self.playTick())
+        self.t1 = Timer(self.delayBetweenBeats, lambda: self.playFirstTick())
         self.t2= Timer(2* self.delayBetweenBeats, lambda: self.playTick())
         self.t3 = Timer(3*self.delayBetweenBeats, lambda: self.playTick())
         self.t4 = Timer(4*self.delayBetweenBeats, lambda: self.playLastTick())
@@ -26,7 +29,9 @@ class Bpm:
         self.t3.start()
         self.t4.start()
 
-
+    def playFirstTick(self):
+        print("First TICK")
+        self.sound.playTick()
 
     def playTick(self):
         print("TICK")
@@ -35,6 +40,8 @@ class Bpm:
 
     def playLastTick(self):
         print("TACK - recording...")
-        self.sound.playTick()
+        # self.sound.playTick()
+        self.sound.prepareBacktrackForRecord(self.backtrack)
+        self.sound.playBacktrackForRecord(self.nbOfLoops)
         self.callback()
-        pygame.mixer.music.set_volume(self.saved_volume)
+        # pygame.mixer.music.set_volume(self.saved_volume)

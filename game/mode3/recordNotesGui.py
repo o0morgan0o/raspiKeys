@@ -3,26 +3,21 @@ import time
 import datetime
 import json
 
+from autoload import Autoload
+from utils.canvasThread import MyThread
 from utils.bpm import Bpm
 from utils.midiToNotenames import noteName
-from utils.customElements.buttons import BtnDefault
-from utils.customElements.buttons import BtnSettings
-from utils.customElements.labels import LblDefault
-from utils.customElements.labels import LblSettings
-
-from utils.customElements.labels import MyLabel8
-from utils.customElements.labels import MyLabel12
-from utils.customElements.labels import MyLabel18
-from utils.customElements.labels import MyLabel24
-from utils.customElements.labels import MyLabel30
-from utils.customElements.labels import MyLabel40
-from utils.customElements.buttons import BtnBlack12
-from utils.customElements.buttons import BtnBlack20
+from utils.customElements.buttons import *
+from utils.customElements.labels import *
 
 class RecordNotesGui:
-    def __init__(self,root,parent,choosenBpm, bassNote, chordQuality):
+    def __init__(self,root,parent,choosenBpm, bassNote, chordQuality, backtrack, backtrackDuration, nbOfLoops):
+        self.root = root
         self.parent = parent
-        self.root= root
+        self.audioInstance = Autoload().getInstanceAudio()
+        self.backtrack = backtrack
+        self.backtrackDuration = backtrackDuration
+        self.nbOfLoops=nbOfLoops
         self.choosenBpm =choosenBpm
         self.chordQuality=chordQuality
         self.bassNote = bassNote
@@ -30,6 +25,7 @@ class RecordNotesGui:
         self.window.attributes('-fullscreen', True)
         self.window.geometry("320x480")
         self.window["bg"]="black"
+        print("backtrack gui:", self.backtrack)
 
         self.window.lbl1 = MyLabel12(self.window, text="Please record now...", wraplength=280)
         self.stringNotes=""
@@ -42,9 +38,10 @@ class RecordNotesGui:
         self.window.btnRetry = BtnBlack12(self.window,text="Retry", command= self.retry)
         self.window.btnSave = BtnBlack12(self.window, text="Save", command=lambda: self.saveMidi())
 
+        self.window.canvas = tk.Canvas(self.window)
 
-        self.parent.precountTimer = Bpm(self.choosenBpm, lambda: self.activateRecordingNotes())
-        self.parent.recordingNotes = True
+
+        self.parent.precountTimer = Bpm(self.choosenBpm, self.backtrack, self.backtrackDuration,self.nbOfLoops, lambda: self.activateRecordingNotes())
 
 
         self.window.lbl1.place(x=0,y=40,width=320, height=80)
@@ -55,6 +52,8 @@ class RecordNotesGui:
         self.window.btnRetry.place(x=120,y=310,width=80,height=130)
         self.window.btnSave.place(x=200,y=310,width=100,height=130)
 
+        self.window.canvas.place(x=20, y=290,width=280, height=30)
+
 
     def cancel(self):
         self.parent.cancelThreads()
@@ -62,21 +61,31 @@ class RecordNotesGui:
         self.parent.reloadMidiFiles()
 
     def retry(self):
+        self.parent.cancelThreads()
         self.parent.startingTime=0
         self.parent.recordedNotes=[]
         self.parent.stringNotes =""
         self.window.lbl3.config(text="Notes : ")
-        self.parent.precountTimer = Bpm(self.choosenBpm, lambda: self.activateRecordingNotes())
+        self.parent.precountTimer = Bpm(self.choosenBpm, self.backtrack, self.backtrackDuration,self.nbOfLoops, lambda: self.activateRecordingNotes())
         self.window.lblRec.config(background="black", text="")
 
     def saveMidi(self):
-        self.parent.createJson(self.bassNote, self.chordQuality)
+        self.parent.createJson(self.bassNote, self.chordQuality, self.backtrack, self.backtrackDuration,self.nbOfLoops)
         self.window.destroy()
 
     def activateRecordingNotes(self):
         self.parent.startingTime = int(round(time.time()*1000))
         self.parent.playChord(self.bassNote, self.chordQuality) # in order to play the chord when the user record
         self.window.lblRec.config(background="red", foreground="white", text="REC.")
+        self.thread = MyThread(0,"thread-canvas", self.window.canvas, self.audioInstance,self.backtrackDuration * self.nbOfLoops, self)
+        self.thread.start()
+        self.parent.recordingNotes = True
+
+
+    def endRecording(self):
+        self.parent.recordingNotes=False
+        self.window.lblRec.config(background="black", foreground="white", text="Finished!")
+        self.window.canvas.delete("all")
 
     def destroy(self):
         self.window.destroy()

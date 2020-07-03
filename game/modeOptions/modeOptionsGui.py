@@ -1,31 +1,15 @@
 import tkinter as tk 
 from tkinter import ttk 
-from mode4.gameplay import Game
+from modeOptions.gameplay import Game
 import utils.tinkerStyles 
 
-from utils.customElements.buttons import BtnDefault
-from utils.customElements.labels import LblDefault
-from utils.customElements.buttons import BtnWavList
-from utils.customElements.buttons import BtnBigButton
-from utils.customElements.labels import LblCurrentPlaying
-
-from utils.customElements.labels import LblSettings
-from utils.customElements.buttons import BtnSettings
-from utils.customElements.buttons import BtnDefault
-
-from utils.customElements.labels import MyLabel8
-from utils.customElements.labels import MyLabel10
-from utils.customElements.labels import MyLabel12
-from utils.customElements.labels import MyLabel18
-from utils.customElements.labels import MyLabel24
-from utils.customElements.labels import MyLabel30
-
-from utils.customElements.scales import SettingsScale
-
+from utils.customElements.buttons import *
+from utils.customElements.labels import *
+from utils.customElements.scales import *
         
 
 
-class Mode4:
+class ModeOptions:
     def __init__(self,gameFrame,config, volumeSlider, parent):
         self.parent = parent
         print( "launching game 4 -------------- ")

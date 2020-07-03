@@ -8,10 +8,10 @@ from mode0.mode0gui import Mode0
 from mode1.mode1gui import Mode1
 from mode2.mode2gui import Mode2
 from mode3.mode3gui import Mode3
-from mode4.mode4gui import Mode4
+from modeOptions.modeOptionsGui import ModeOptions
 
 # import button styles
-from utils.customElements.buttons import BtnMenu
+from utils.customElements.buttons import *
 from autoload import Autoload
 from utils.audio import Sound
 from utils.utilFunctions import loadConfig
@@ -124,7 +124,7 @@ class MainApplication(tk.Frame):
         elif intMode == 3:
             self.app = Mode3(self.master.body,self.config)
         elif intMode == 4:
-            self.app = Mode4(self.master.body,self.config, self.volumeSlider, self)
+            self.app = ModeOptions(self.master.body,self.config, self.volumeSlider, self)
         else:
             return
 
@@ -173,4 +173,5 @@ if __name__ == "__main__":
     root=tk.Tk()
     root.config(cursor="none")
     MainApplication(root, tag)
+    
     root.mainloop()

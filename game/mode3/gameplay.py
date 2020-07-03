@@ -3,6 +3,7 @@ from utils.bpm import Bpm
 from threading import Timer
 import random
 import os
+import env
 import time
 import tkinter as tk
 import json
@@ -12,8 +13,7 @@ from utils.midiIO import MidiIO
 from threading import Timer
 from mode3.recordSetupGui import RecordSetupGui
 from mode3.recordNotesGui import RecordNotesGui
-
-import env
+from mode3.recordChordsGui import RecordChordsGui
 
 from autoload import Autoload
 from utils.questionNote import CustomSignal
@@ -21,19 +21,11 @@ from utils.midiToNotenames import noteName
 from utils.utilFunctions import getChordInterval
 from utils.utilFunctions import formatOutputInterval
 
-from utils.customElements.buttons import BtnDefault
-from utils.customElements.buttons import BtnSettings
-from utils.customElements.labels import LblDefault
-from utils.customElements.labels import LblSettings
+from mode3.recordWithBacktrack import RecordWithBacktrack
 
-from utils.customElements.labels import MyLabel8
-from utils.customElements.labels import MyLabel12
-from utils.customElements.labels import MyLabel18
-from utils.customElements.labels import MyLabel24
-from utils.customElements.labels import MyLabel30
-from utils.customElements.labels import MyLabel40
-from utils.customElements.buttons import BtnBlack12
-from utils.customElements.buttons import BtnBlack20
+from utils.customElements.buttons import *
+from utils.customElements.labels import *
+
 
 
 class Game:
@@ -48,7 +40,7 @@ class Game:
         self.recordBpm = 90
 
         # Callbacks for buttons
-        self.parent.btnRecord.config(command=self.startRecording)
+        self.parent.btnRecord.config(command=self.showWithOrWithoutBacktrackWindow)
         self.parent.btnPractiseLick.config(command=self.playOneLick) 
         self.parent.btnPractiseAll.config(command=self.playAll) 
         self.parent.btnDeleteSelected.config(command=self.deleteLick)
@@ -59,7 +51,7 @@ class Game:
         self.reloadMidiFiles()
         self.fileIndex=0
 
-        # self.parent.tree.bind('<<TreeviewSelect>>', self.on_select)
+        self.recordNotes = None
 
         self.midiIO = Autoload().getInstance()
         self.midiIO.setCallback(self.handleMIDIInput)
@@ -83,6 +75,7 @@ class Game:
 
         self.practiseAllLicks = False
         self.lastTranspose=0
+        self.futureTranspose=0
 
         # we need the number of licks in order to show the user
         nbOfSamples = len(self.midiFiles) 
@@ -109,21 +102,6 @@ class Game:
         print("reloading ", len(self.midiFiles))
 
 
-    # Return the details of the selected item
-    # def on_select(self, selected):
-    #    selection = self.parent.tree.focus()
-    #    selection_details = self.parent.tree.item(selection)
-    #    self.loadSelectedItem(selection_details['text'])
-    #    # we must find the index of the selected item
-    #    counter= 0
-    #    print("starting loop")
-    #    for lick in self.midiFiles:
-    #        search = os.path.join(self.midiRepository, selection_details["text"])
-    #        if lick == search:
-    #         #    print("FOUND")
-    #            self.currentLickIndex=counter
-    #        counter+=1
-    # #    print("index Lick selected :", self.currentLickIndex)
        
     def loadSelectedItem(self, name):
         # print("selected is: ", name)
@@ -165,10 +143,38 @@ class Game:
             # print("problem loading file :", mFile, e)
             return
 
-    def startRecording(self):
+    def showWithOrWithoutBacktrackWindow(self):
         self.cancelThreads()
         self.startingTime=0
-        self.recordSetupWindow = RecordSetupGui(self.parent, self)
+        self.withOrWithoutBacktrackWindow= RecordWithBacktrack(self.parent, self)
+        
+    def showSetupWindow(self, backtrackFile, backtrackDuration, nbOfLoops):
+        self.recordSetupWindow= RecordSetupGui(self.parent, self, backtrackFile, backtrackDuration, nbOfLoops)
+
+    def showRecordCustomChordWindow(self, recordBpm, bassNote, chordQuality, backtrack, backtrackDuration, nbOfLoops):
+        self.parent.customChordWindow= RecordChordsGui(
+           self.parent, 
+           self,
+           recordBpm,
+           bassNote,
+           chordQuality,
+           backtrack,
+           backtrackDuration,
+           nbOfLoops)
+
+    def showRecordNotesWindow(self, recordBpm, bassNote, chordQuality, backtrack, backtrackDuration, nbOfLoops):
+        self.parent.recordNotes =RecordNotesGui(
+            self.parent,
+            self,
+            recordBpm,
+            bassNote,
+            chordQuality,
+            backtrack,
+            backtrackDuration,
+            nbOfLoops)
+
+
+    
 
 
 
@@ -250,7 +256,6 @@ class Game:
         self.lickRepetitionCounter +=1
         print("ALL LOPPSSSSS", self.lickRepetitionCounter, self.lickMaxRepetition)
         # if we practise all licks we must choose a new lick
-        # i can't get the selection of tree so we have to reload a nextFile
         # case where we practise all licks
         if self.lickRepetitionCounter == self.lickMaxRepetition:
             self.parent.lblFollowing.config(text="Last loop before changing Lick...", foreground="orange")
@@ -340,11 +345,14 @@ class Game:
             CustomSignal(self,note["type"], note["note"],note["velocity"], note["time"])
         # print(self.recordedCustomChords)
 
-    def createJson(self, bassNote,chordQuality):
+    def createJson(self, bassNote,chordQuality, backtrack, backtrackDuration, nbOfLoops):
         mTime = self.getTimeFromStart()
         obj = {
                 "bass": bassNote,
                 "type": chordQuality,
+                "backtrack":backtrack,
+                "backtrackDuration":backtrackDuration,
+                "nbOfLoops":nbOfLoops,
                 "chord_notes": self.recordedCustomChords,
                 "notes": self.recordedNotes,
                 "duration":mTime
@@ -369,7 +377,6 @@ class Game:
         self.currentLick=self.midiFiles[self.currentLickIndex]
         self.loadSelectedItem(self.currentLick)
         # self.recordNotes.destroy() # close windwo
-        # self.reloadTree()
         self.currentLickIndex=len(self.midiFiles)-1
         self.currentLick = self.midiFiles[self.currentLickIndex]
         self.loadSelectedItem(self.currentLick)
@@ -383,8 +390,8 @@ class Game:
                 }
         self.recordedNotes.append(dictionnary)
         # we also put the note in a string in order to show the user the notes
-        if msg.type == "note_on":
-            self.recordNotes.stringNotes += noteName(msg.note)
+        # if msg.type == "note_on":
+            # self.recordNotes.stringNotes += noteName(msg.note)
     
     def insertNoteAtTimeInJsonCustomChords(self,msg,time):
         dictionnary =  { 
@@ -446,7 +453,7 @@ class Game:
             #TODO pass recordingNotes to False when one of the button is clicked
             mTime = self.getTimeFromStart()
             self.insertNoteAtTimeInJson(msg, mTime)
-            self.recordNotes.window.lbl3.config(text="Notes : " +noteName(msg.note))
+            # self.recordNotes.window.lbl3.config(text="Notes : " +noteName(msg.note))
 
         if self.recordingCustomChords == True:
             if self.startingTime==0:

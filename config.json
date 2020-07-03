@@ -1,6 +1,6 @@
 {
-    "default_mode": 0,
-    "question_delay": 10,
+    "default_mode": 2,
+    "question_delay": 73,
     "difficulty": 0,
     "times_each_transpose": 1,
     "nb_of_transpose_before_change": 1,

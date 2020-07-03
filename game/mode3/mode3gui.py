@@ -3,22 +3,8 @@ from tkinter import ttk as ttk
 from mode3.gameplay import Game
 import utils.tinkerStyles 
 
-from utils.customElements.buttons import BtnDefault
-from utils.customElements.labels import LblDefault
-from utils.customElements.buttons import BtnWavList
-from utils.customElements.buttons import BtnBigButton
-from utils.customElements.labels import LblCurrentPlaying
-
-from utils.customElements.labels import LblMode3
-
-from utils.customElements.labels import MyLabel8
-from utils.customElements.labels import MyLabel12
-from utils.customElements.labels import MyLabel18
-from utils.customElements.labels import MyLabel30
-from utils.customElements.labels import MyLabel40
-from utils.customElements.buttons import BtnBlack10
-from utils.customElements.buttons import BtnBlack12
-from utils.customElements.buttons import BtnBlack20
+from utils.customElements.buttons import *
+from utils.customElements.labels import *
 
 
         
@@ -32,10 +18,6 @@ class Mode3:
         self.gameFrame.config(bg="black")
 
         
-        # Creation of the elements
-        # self.gameFrame.tree = ttk.Treeview(self.gameFrame)
-        # self.gameFrame.scrollBar = ttk.Scrollbar(self.gameFrame,orient="vertical",command=self.gameFrame.tree.yview)
-        # self.gameFrame.scrollBarHor = ttk.Scrollbar(self.gameFrame,orient="horizontal",command=self.gameFrame.tree.xview)
         self.gameFrame.btnRecord = BtnBlack10(self.gameFrame, text="record")
         self.gameFrame.btnDeleteSelected = BtnBlack10(self.gameFrame, text="Delete lick")
         self.gameFrame.btnPractiseLick = BtnBlack10(self.gameFrame, text="Practise Lick")

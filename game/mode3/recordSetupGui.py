@@ -9,25 +9,19 @@ from utils.midiToNotenames import noteName
 from utils.utilFunctions import getChordInterval
 from utils.utilFunctions import formatOutputInterval
 
-from utils.customElements.buttons import BtnDefault
-from utils.customElements.buttons import BtnSettings
-from utils.customElements.labels import LblDefault
-from utils.customElements.labels import LblSettings
-
-from utils.customElements.labels import MyLabel8
-from utils.customElements.labels import MyLabel12
-from utils.customElements.labels import MyLabel18
-from utils.customElements.labels import MyLabel24
-from utils.customElements.labels import MyLabel30
-from utils.customElements.labels import MyLabel40
-from utils.customElements.buttons import BtnBlack12
-from utils.customElements.buttons import BtnBlack20
+from utils.customElements.buttons import *
+from utils.customElements.labels import *
 
 
 class RecordSetupGui:
-    def __init__(self,root, parent ):
+    def __init__(self,root, parent, backtrackFile, backtrackDuration, nbOfLoops ):
         self.root=  root
         self.parent= parent
+        self.backtrackFile = backtrackFile
+        self.backtrackDuration = backtrackDuration
+        self.nbOfLoops = nbOfLoops
+
+        print("backtrack : ", backtrackFile, backtrackDuration, nbOfLoops)
 
         self.window= tk.Toplevel(self.root)
         self.window.geometry("320x480")
@@ -78,7 +72,9 @@ class RecordSetupGui:
 
 
 
-        self.bassNote=0 # reinitilisation of the bassnote
+        # self.bassNote=0 # reinitilisation of the bassnote
+        self.bassNote=60 # reinitilisation of the bassnote
+        self.chordQuality="major"
         self.parent.recordingBassLick= True
 
     def updateBpmValue(self, value):
@@ -99,10 +95,11 @@ class RecordSetupGui:
         else:
             self.parent.recordingBassLick=False # desactivate the listen of user Bass
             self.window.destroy()
-            self.showRecordCustomChordWindow()
+            self.parent.showRecordCustomChordWindow(
+                self.recordBpm, 
+                self.bassNote, 
+                self.chordQuality,
+                self.backtrackFile,
+                self.backtrackDuration,
+                self.nbOfLoops)
 
-
-    def showRecordCustomChordWindow(self):
-        self.parent.recordedCustomChords=[]
-        self.parent.customChordNotes=[]
-        self.parent.customChordWindow= RecordChordsGui(self.root, self.parent, self.recordBpm, self.bassNote, self.chordQuality)

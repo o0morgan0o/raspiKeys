@@ -56,6 +56,7 @@ class Game:
         print("opening settings" )
         self.window = tk.Toplevel(self.parent)
         self.window.attributes('-topmost', True)
+        self.window.config(background="black")
         self.window.geometry("320x480")
         yplacement=15
         label = LblSettings(self.window, text="click on your midi IN device:")
@@ -76,10 +77,11 @@ class Game:
         yplacement += 40
         
         for mInput in midi_inputs:
-            btn = tk.Button(self.window, text=mInput)
-            btn.config(command= lambda mInput=mInput: self.setIn(mInput))
-            btn.place(x=0, y=yplacement, width=320, height=30)
-            yplacement +=30
+            if not "RtMidi" in mInput:
+                btn = tk.Button(self.window, text=mInput)
+                btn.config(command= lambda mInput=mInput: self.setIn(mInput))
+                btn.place(x=0, y=yplacement, width=320, height=30)
+                yplacement +=30
 
         yplacement+=40
 
@@ -93,14 +95,15 @@ class Game:
         yplacement +=10
 
         for mOutput in midi_outputs:
-            btn = tk.Button(self.window, text=mOutput)
-            btn.config(command= lambda mOutput=mOutput: self.setOut(mOutput))
-            yplacement+= 30
-            btn.place(x=0, y=yplacement, width=320, height=30)
+            if not "RtMidi" in mOutput:
+                btn = tk.Button(self.window, text=mOutput)
+                btn.config(command= lambda mOutput=mOutput: self.setOut(mOutput))
+                yplacement+= 30
+                btn.place(x=0, y=yplacement, width=320, height=30)
 
         yplacement+=40
         btnClose = BtnSettings(self.window, text="Close", command=self.quitConfig)
-        btnClose.place(x=80, y=yplacement, width=160, height=50)
+        btnClose.place(x=80, y=380, width=160, height=80)
 
     def setIn(self, mInput):
         print("input selected: " , mInput)
