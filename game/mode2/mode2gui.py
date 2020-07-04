@@ -45,7 +45,7 @@ class Mode2:
 
     def __del__(self):
         print("trying destroy mode 2")
-        pygame.mixer.music.stop()
+        # pygame.mixer.music.stop()
         del self
         # del self
 

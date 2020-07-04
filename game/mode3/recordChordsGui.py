@@ -1,6 +1,7 @@
 import tkinter as tk
 import threading
 import time
+import pygame
 
 from autoload import Autoload
 from utils.canvasThread import MyThread
@@ -14,7 +15,8 @@ from utils.customElements.labels import *
 from mode3.recordNotesGui import RecordNotesGui
 
 class RecordChordsGui:
-    def __init__(self, globalRoot, bassNote, chordQuality, backtrack, backtrackDuration, nbOfLoops):
+    def __init__(self, globalRoot, bassNote, chordQuality, backtrack, backtrackDuration, nbOfLoops, app):
+        self.app = app
         self.globalRoot = globalRoot
         self.midiIO = Autoload().getInstance()
         self.midiIO.setCallback(self.handleMIDIInput)
@@ -38,7 +40,7 @@ class RecordChordsGui:
         self.window.btnCancel=BtnBlack12(self.window, text="Cancel")
         self.window.btnCancel.config(command=self.cancel)
         self.window.btnOK=BtnBlack12(self.window, text="OK")
-        self.window.btnOK.config(command=self.nextWindow)
+        self.window.btnOK.config(command=self.nextWindow, state="disabled")
 
         self.window.lblRec = MyLabel18(self.window, text="")
         self.window.lblRec.config(background="black")
@@ -82,7 +84,8 @@ class RecordChordsGui:
             self.backtrack,
             self.backtrackDuration,
             self.nbOfLoops,
-            self.chordNotes)
+            self.chordNotes,
+            self.app)
         self.destroy()
 
 
@@ -109,12 +112,20 @@ class RecordChordsGui:
         # self.parent.recordingCustomChords=False
         self.isRecording=False
         self.window.lblRec.config(text="Finished!", background="black", foreground="white")
+        self.window.btnOK.config(state="normal")
         self.window.canvas.delete("all")
         
     
 
     def cancel(self):
         self.window.destroy()
+        try:
+            self.thread.isAlive = False
+        except Exception as e:
+            print(e)
+        pygame.mixer.music.stop()
+        self.app.new_window(3)
+        del self
         # self.parent.cancelThreads()
         # self.parent.record
     

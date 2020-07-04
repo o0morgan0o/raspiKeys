@@ -34,8 +34,10 @@ class Game:
 
         # TODO : handle errors if non valid files are loaded
         self.tracksWav = Autoload().getTracksWav()
-        self.activeSamples = Autoload().getActiveSamples()
-        self.currentTrack = self.activeSamples[0]
+        self.activeSample = Autoload().getActiveSample()
+        self.activeSampleIndex = Autoload().getActiveSampleIndex()
+        self.currentTrack = self.activeSample
+
 
         self.showRandomTracks()
         # if self.sound.isPlaying == False:
@@ -64,23 +66,25 @@ class Game:
         except : 
             print( "cant stop track during changeTrack.")
 
-        self.currentTrack = self.activeSamples[index]
+        self.currentTrack = self.activeSample[index]
         self.playBacktrack()
         self.showCurrentPlayingInLabel()
         self.sound.isPlaying = True
 
-    def pickRandomSamples(self):
-        return  random.sample(self.tracksWav, 4)
+    def pickRandomSample(self):
+        index = random.randint(0, len(self.tracksWav)-1)
+        self.activeSampleIndex = index
+        return  (self.tracksWav[index], index)
 
 
     
     def playRandom(self):
-        self.activeSamples = self.pickRandomSamples()
+        self.activeSample = self.pickRandomSample()
         self.showRandomTracks()
         if self.sound.isPlaying == True:
             self.sound.stopPlay()
         
-        self.currentTrack = self.activeSamples[0]
+        self.currentTrack = self.activeSample[0]
         self.showCurrentPlayingInLabel()
         self.sound.isPlaying =False
         self.playBacktrack()
@@ -103,7 +107,13 @@ class Game:
         self.sound.simplePlay(self.currentTrack)
         self.parent.btnPlay.config(text="Stop")
         trackInfo = self.sound.getCurrentTrack()
-        self.parent.labelCurrent.config(text="Currently Playing:\n{}\n{} sec length".format(trackInfo[0], str(trackInfo[1])))
+        trackName = trackInfo[0].split("/")[-1]
+        trackLength = "{0:.2f}".format(trackInfo[1])
+        self.parent.labelCurrent.config(text="Currently Playing ({} / {}):\n{}\n({} sec length)".format(
+            self.activeSampleIndex,
+            str(len(self.tracksWav)),
+            trackName, 
+            str(trackLength)))
         # while pygame.mixer.music.get_busy():
 
         # print("launching thread")

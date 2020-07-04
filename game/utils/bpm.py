@@ -45,3 +45,21 @@ class Bpm:
         self.sound.playBacktrackForRecord(self.nbOfLoops)
         self.callback()
         # pygame.mixer.music.set_volume(self.saved_volume)
+    
+    def cancel(self):
+        try:
+            self.t4.cancel()
+        except Exception as e:
+            print(e)
+        try:
+            self.t3.cancel()
+        except Exception as e:
+            print(e)
+        try:
+            self.t2.cancel()
+        except Exception as e:
+            print(e)
+        try:
+            self.t1.cancel()
+        except Exception as e:
+            print(e)

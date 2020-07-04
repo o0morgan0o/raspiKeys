@@ -7,10 +7,11 @@ from utils.customElements.labels import *
 from mode3.recordSetupGui import RecordSetupGui
 
 class RecordWithBacktrack:
-    def __init__(self, globalRoot):
+    def __init__(self, globalRoot, app):
 
         self.globalRoot=globalRoot
         self.audioInstance = Autoload().getInstanceAudio()
+        self.app = app
 
         self.nbOfLoops=2
         self.backtrack= None
@@ -23,12 +24,11 @@ class RecordWithBacktrack:
         self.window.btnWithBacktrack = BtnBlack12(self.window, text="WITH Backtrack")
         self.window.btnWithBacktrack.config(command=self.nextWindow)
         self.window.nbOfLoops = MyLabel40(self.window, text=self.nbOfLoops)
-        self.window.btnLess = BtnBlack12(self.window, text="<")
-        self.window.btnMore = BtnBlack12(self.window, text=">")
+        self.window.btnLess = BtnBlack12(self.window, text="<", command=self.lessLoops)
+        self.window.btnMore = BtnBlack12(self.window, text=">", command=self.moreLoops)
         self.currentTrack = self.audioInstance.getCurrentTrack()
         self.window.lblBacktrack = MyLabel12(self.window, text="length one loop {} sec.".format(str(round(self.currentTrack[1],2))))
-        self.window.btnWithoutBacktrack = BtnBlack12(self.window, text="WITHOUT Backtrack")
-
+        self.window.btnWithoutBacktrack = BtnBlack12(self.window, text="Cancel", command=self.cancel)
 
         # PLACEMENT
         yplacement=40
@@ -42,6 +42,17 @@ class RecordWithBacktrack:
         yplacement+=80
         self.window.btnWithoutBacktrack.place(x=40, y=yplacement,width=240, height=60)
 
+    def lessLoops(self):
+        self.nbOfLoops += -1
+        if self.nbOfLoops <= 1:
+            self.nbOfLoops=1
+        self.window.nbOfLoops.config(text=self.nbOfLoops)
+
+    def moreLoops(self):
+        self.nbOfLoops += 1
+        if self.nbOfLoops >=24 :
+            self.nbOfLoops=24
+        self.window.nbOfLoops.config(text=self.nbOfLoops)
 
 
     def nextWindow(self):
@@ -59,8 +70,13 @@ class RecordWithBacktrack:
             self.globalRoot, 
             self.currentTrack[0], 
             self.currentTrack[1], 
-            self.nbOfLoops)
+            self.nbOfLoops,
+            self.app)
         del self
+
+    def cancel(self):
+        self.window.destroy()
+        self.app.new_window(3)
 
     def destroy(self):
         pass

@@ -22,7 +22,7 @@ class Autoload:
 
             self.sound = Sound()
             self.tracksWav=self.sound.loadBacktracksWav()
-            self.activeSamples = self.sound.pickRandomSamples(self.tracksWav);
+            self.activeSample = self.sound.pickRandomSample(self.tracksWav);
 
     instance = None
     def __init__(self):
@@ -42,8 +42,12 @@ class Autoload:
     def getTracksWav(self):
         return self.instance.tracksWav
     
-    def getActiveSamples(self):
-        return self.instance.activeSamples
+    def getActiveSample(self):
+        return self.instance.activeSample[0]
+
+    def getActiveSampleIndex(self):
+        return self.instance.activeSample[1]
+    
 
 
 

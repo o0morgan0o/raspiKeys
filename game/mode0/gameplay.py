@@ -188,6 +188,7 @@ class Game:
             # self.melodies.playLooseMelody()
             # time.sleep(1)
             # we replay the interval if the user didnt find the correct answer
+            time.sleep(.4)
             self.replayNote = QuestionNote(self.startingNote, self, 0) # i want to replay both notes
             self.replayNote = QuestionNote(self.questionNote.note, self, 0+self.delay) # i want to replay both notes
         

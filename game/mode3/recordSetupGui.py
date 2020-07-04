@@ -12,7 +12,8 @@ from utils.customElements.labels import *
 
 
 class RecordSetupGui:
-    def __init__(self,globalRoot, backtrackFile, backtrackDuration, nbOfLoops ):
+    def __init__(self,globalRoot, backtrackFile, backtrackDuration, nbOfLoops, app):
+        self.app = app
         self.globalRoot=  globalRoot
         self.midiIO=Autoload().getInstance() 
         self.midiIO.setCallback(self.handleMIDIInput)
@@ -53,7 +54,7 @@ class RecordSetupGui:
         self.window.btnCustom.config(command=self.validateBeforeShowingWindow)
         # Button cancel
         self.window.btnCancel = BtnBlack12(self.window, text="Cancel")
-        self.window.btnCancel.config(command=self.window.destroy)
+        self.window.btnCancel.config(command=self.cancel)
 
         #----Placement------
         self.window.lbl1.place(x=0,y=10,width=320, height=60)
@@ -72,10 +73,10 @@ class RecordSetupGui:
 
 
 
-        # self.bassNote=0 # reinitilisation of the bassnote
+        self.bassNote=0 # reinitilisation of the bassnote
+        self.chordQuality="-"
         self.bassNote=60 # reinitilisation of the bassnote
         self.chordQuality="major"
-        # self.ent.recordingBassLick= True
 
     def updateBpmValue(self, value):
         self.recordBpm=value
@@ -101,17 +102,21 @@ class RecordSetupGui:
                     self.chordQuality,
                     self.backtrackFile,
                     self.backtrackDuration,
-                    self.nbOfLoops)
+                    self.nbOfLoops,
+                    self.app)
 
 
     def handleMIDIInput(self, msg):
-        if self.isRecording == True: # case : recording of bass
-            if msg.type == "note_on":
-                # print(msg.velocity)
-                bassNote = msg.note
-                # self.recordSetupWindow.bassNote= msg.note
-                # self.recordSetupWindow.window.lblBass.config(text=noteName(self.recordSetupWindow.bassNote), foreground="white")
-                # self.recordSetupWindow.window.lblBass.config(font=("Courier", 40, "bold"))
-                # self.recordSetupWindow.window.lbl2.config(text=noteName(self.bassNote), foreground="white")
-                # self.recordWindow.lbl2.config(text="Choosen Key : {} {}".format( noteName(self.bassNote), str(self.chordQuality)))
-                # print(bassNote)
+        if msg.type == "note_on":
+            # print(msg.velocity)
+            self.bassNote = msg.note
+            # self.recordSetupWindow.bassNote= msg.note
+            self.window.lblBass.config(text=noteName(self.bassNote), foreground="white")
+            # self.recordSetupWindow.window.lblBass.config(font=("Courier", 40, "bold"))
+            # self.recordSetupWindow.window.lbl2.config(text=noteName(self.bassNote), foreground="white")
+            # self.recordWindow.lbl2.config(text="Choosen Key : {} {}".format( noteName(self.bassNote), str(self.chordQuality)))
+            # print(bassNote)
+
+    def cancel(self):
+        self.window.destroy()
+        self.app.new_window(3)

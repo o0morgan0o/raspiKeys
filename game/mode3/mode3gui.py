@@ -11,7 +11,7 @@ from utils.customElements.labels import *
 
 
 class Mode3:
-    def __init__(self,globalRoot,gameFrame, config):
+    def __init__(self,globalRoot,gameFrame, config, app):
         print( "launching game 4 -------------- ")
         self.globalRoot = globalRoot
         self.gameFrame = gameFrame
@@ -39,26 +39,30 @@ class Mode3:
 
         # placement
         self.placeElements()
-        self.game = Game(self.globalRoot,self.gameFrame, config)
+        self.game = Game(self.globalRoot,self.gameFrame, config, app)
 
 
         
     def placeElements(self):
-
-        self.gameFrame.lblMessage.place(x=0, y=10, width=320, height=20)
-
-        self.gameFrame.lblKey.place(x=20,y=60, width=280, height=40)
-        self.gameFrame.lblNotes.place(x=0, y=120, width=320, height=50)
-        self.gameFrame.lblFollowing.place(x=0, y=180, width=320, height=30)
+        yplacement = 10
+        self.gameFrame.lblMessage.place(x=0, y=yplacement, width=320, height=20)
+        yplacement+=50
+        self.gameFrame.lblKey.place(x=20,y=yplacement, width=280, height=40)
+        yplacement+=60
+        self.gameFrame.lblNotes.place(x=0, y=yplacement, width=320, height=50)
+        yplacement+=50
+        self.gameFrame.lblFollowing.place(x=0, y=yplacement, width=320, height=15)
 
         self.gameFrame.btnPrev.place(x=-2,y=45, width=40,height=80)
         self.gameFrame.btnNext.place(x=275,y=40, width=47,height=80)
+        yplacement+=20
 
+        self.gameFrame.btnPractiseLick.place(x=30, y=yplacement, width=130,height=80)
+        self.gameFrame.btnPractiseAll.place(x=160,y=yplacement,width=130,height=80)
+        yplacement+=80
 
-        self.gameFrame.btnRecord.place(x=30, y=300, width=115, height=50)
-        self.gameFrame.btnDeleteSelected.place(x=175, y=300, width=115, height=50)
-        self.gameFrame.btnPractiseLick.place(x=30, y=210, width=115,height=70)
-        self.gameFrame.btnPractiseAll.place(x=175,y=210,width=115,height=70)
+        self.gameFrame.btnRecord.place(x=30, y=yplacement, width=130, height=80)
+        self.gameFrame.btnDeleteSelected.place(x=160, y=yplacement, width=130, height=80)
 
 
 

@@ -4,6 +4,7 @@ import time
 import datetime
 import json
 import os
+import pygame
 
 from utils.questionNote import CustomSignal
 from autoload import Autoload
@@ -14,7 +15,8 @@ from utils.customElements.buttons import *
 from utils.customElements.labels import *
 
 class RecordNotesGui:
-    def __init__(self,globalRoot,choosenBpm, bassNote, chordQuality, backtrack, backtrackDuration, nbOfLoops, chordNotes):
+    def __init__(self,globalRoot,choosenBpm, bassNote, chordQuality, backtrack, backtrackDuration, nbOfLoops, chordNotes, app):
+        self.app = app
         self.globalRoot = globalRoot
         self.midiIO= Autoload().getInstance()
         self.midiIO.setCallback(self.handleMIDIInput)
@@ -44,10 +46,9 @@ class RecordNotesGui:
         self.window.btnCancel = BtnBlack12(self.window, text="Cancel", command=self.cancel)
         self.window.btnRetry = BtnBlack12(self.window,text="Retry", command= self.retry)
         self.window.btnSave = BtnBlack12(self.window, text="Save", command=lambda: self.saveMidi())
+        # self.window.btnSave.config(state="disabled")
 
         self.window.canvas = tk.Canvas(self.window)
-
-
 
         self.window.lbl1.place(x=0,y=40,width=320, height=80)
         self.window.lbl2.place(x=0,y=120,width=320, height=60)
@@ -66,9 +67,11 @@ class RecordNotesGui:
 
 
     def cancel(self):
-        # self.parent.cancelThreads()
         self.window.destroy()
-        # self.parent.reloadMidiFiles()
+        self.thread.isAlive = False
+        pygame.mixer.music.stop()
+        self.app.new_window(3)
+        del self
 
     def retry(self):
         pass
@@ -82,8 +85,23 @@ class RecordNotesGui:
 
     def saveMidi(self):
         # self.parent.createJson(self.bassNote, self.chordQuality, self.backtrack, self.backtrackDuration,self.nbOfLoops)
+        self.cancelThreads()
         self.saveLickAsJsonFile()
+        # self.cancelRecorgindThreads()
         self.window.destroy()
+        self.app.new_window(3) # recreation of window 3
+
+    def cancelThreads(self):
+        self.precountTimer.cancel()
+        try:
+            self.thread.isAlive=False
+        except Exception as e:
+            print(e)
+        for signal in self.customSignals:
+            signal.cancel()
+        self.customSignals =[]
+        pygame.mixer.music.stop()
+        # self.saveMidi()
 
     def saveLickAsJsonFile(self):
         obj = {
@@ -136,6 +154,7 @@ class RecordNotesGui:
         # self.parent.recordingNotes=False
         self.window.lblRec.config(background="black", foreground="white", text="Finished!")
         self.window.canvas.delete("all")
+        self.window.btnSave.config(state="normal")
 
     def destroy(self):
         self.window.destroy()
