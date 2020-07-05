@@ -17,14 +17,13 @@ from autoload import Autoload
 class Game:
 
     def __init__(self, parent,config):
-        print("reconstruction backtrack window ...")
         self.config = config
         self.parent = parent
         self.sound = Autoload().getInstanceAudio()
         self.parent.btnPlay.config(command=self.toggleBacktrack)
         # midi io
-        self.midiIO=Autoload().getInstance()
-        self.midiIO.setCallback(self.handleMIDIInput)
+        # self.midiIO=Autoload().getInstance()
+        # self.midiIO.setCallback(self.handleMIDIInput)
 
         self.parent.btnRandom.config(command=self.playRandom)
 #        self.isPlaying = False
@@ -40,8 +39,6 @@ class Game:
 
 
         self.showRandomTracks()
-        # if self.sound.isPlaying == False:
-        #     self.playBacktrack()
         self.playBacktrack()
 
         # we want to show the number of tracks
@@ -91,20 +88,20 @@ class Game:
         self.sound.isPlaying= True
 
     def toggleBacktrack(self):
-        if self.sound.isPlaying == True:
-            self.sound.isPlaying= False
+        if pygame.mixer.music.get_busy() == True:
             self.stopBacktrack()
+            self.sound.isPlaying= False
         else :
-            self.sound.isPlaying = True
             self.playBacktrack()
+            self.sound.isPlaying = True
 
     def stopBacktrack(self):
         self.sound.stopPlay()
         self.parent.btnPlay.config(text="Play")
 
     def playBacktrack(self):
-        self.sound.isPlaying=True
         self.sound.simplePlay(self.currentTrack)
+        self.sound.isPlaying=True
         self.parent.btnPlay.config(text="Stop")
         trackInfo = self.sound.getCurrentTrack()
         trackName = trackInfo[0].split("/")[-1]
@@ -123,11 +120,3 @@ class Game:
         
 
         
-    def handleMIDIInput(self,msg):
-        print("receiving : ", msg.note)
-        if msg.type =="note_on" :
-            #TODO : make this custimizable
-            if msg.note == 21:
-                self.playRandom()
-        pass
-

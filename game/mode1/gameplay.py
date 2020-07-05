@@ -27,7 +27,6 @@ class Game:
         self.questionArray = []
         self.config= config
         self.delay=float(self.config["question_delay"])/100
-        print("initial delay:", self.delay)
         self.parent = parent
         self.isListening = False
 
@@ -36,7 +35,6 @@ class Game:
         self.score=0
         self.globalIsListening = True
 
-        print( "launchin MIDI program... \n")
         debug=True
         self.stopGame = False
         self.waitingNotes= []
@@ -68,15 +66,13 @@ class Game:
             notesAnswer = ""
             for note in self.questionArray:
                 notesAnswer += noteName(note) + "-"
-            print(notesAnswer)
             self.parent.lblNote.config(font=("Courier", 18, "bold"))
             self.parent.lblNote[ "text"] = "It was\n{}".format(notesAnswer)
             # .format(formatOutputInterval(self.questionNote.note - self.startingNote))
             self.parent.lblNote["bg"] = "orange"
             self.changeGameState("waitingUserInput") # if we gave the good answer, we want a new note
         except Exception as e :
-            print("Impossible to skip question")
-            print(e)
+            print("Impossible to skip question", e)
 
     def startGame(self):
         self.changeGameState("waitingUserInput")
@@ -84,7 +80,6 @@ class Game:
         self.changeAllBg("black")
 
     def destroy(self):
-        print("destroy in class")
         self.isListening = False
         self.midiIO.destroy() # delete everything in midiIO class
         del self.waitingNotes # delete WantingNotes
@@ -94,13 +89,11 @@ class Game:
         if newstate == "notStarted":
             pass
         elif newstate == "waitingUserInput":
-            print( "waiting user input", self.score)
             self.parent.label1["text"] = "Pick a starting Note"
             self.gameState = "waitingUserInput"
             percentage = int((self.score / self.counter) * 100) if(self.counter != 0) else 0
             self.parent.label3["text"] = "{}/{} ({}%)".format(self.score, self.counter, percentage)
         elif newstate == "listen":
-            print("LISTENNNNNN")
             self.parent.label2["bg"]= "black"
             self.parent.label1["text"] = "Listen ..."
             self.parent.label2["text"] = ""
@@ -131,7 +124,6 @@ class Game:
                 print("changing state...") 
                 self.changeGameState("waitingUserAnswer")
 
-        print("preparing")
         self.midiIO.sendOut("note_on", mNote) # send note on
         currentNote = self.waitingNotes[mNote]
         currentNote.resetTimer(offset)
@@ -144,7 +136,6 @@ class Game:
         self.parent.canvas.delete("all") 
         self.timers=[] 
         counter = 0
-        print("current delay", self.delay*1000)
         
         for note in self.questionArray:
             print(note+self.startingNote)
@@ -196,7 +187,6 @@ class Game:
 
 
             elif self.gameState == "waitingUserAnswer":
-                print("answer: ", msg.note, self.questionArray, self.answerIndex, self.questionArray[self.answerIndex]+self.startingNote)
                 correctNote= self.questionArray[self.answerIndex] + self.startingNote
                 self.checkAnswer(msg.note, correctNote)
                 self.answerIndex = self.answerIndex + 1
@@ -204,15 +194,12 @@ class Game:
                 # we trace the current note with self.answerIndex
 
     def sendOut(self, mType, note, velocity, isLast=False):
-        print("trigger", mType,note,velocity)
         if mType=="note_on":
             self.midiIO.sendOut("note_on", note)
             rw= 2 * self.calcRectWidthOnCanvas() # rw est 2 largeur de rectgangle
-            print("add to canvas...")
             self.parent.canvas.create_rectangle(  rw+ self.canvasCounter*rw , 40 , rw+  self.canvasCounter*rw + rw/2 , 80, fill="white") 
             self.canvasCounter = self.canvasCounter + 1
             if isLast==True:
-                print("last")
                 self.changeGameState("waitingUserAnswer")
         elif mType =="note_off":
             self.midiIO.sendOut("note_off", note)
@@ -220,7 +207,6 @@ class Game:
 
 
     def resetQuestion(self):
-        print("should reset question")
         self.parent.canvas.delete("all") 
         self.changeGameState( "listen")
         self.parent.label2["text"]= "incorrect"
@@ -260,8 +246,6 @@ class Game:
         if self.answerIndex == len(self.questionArray) -1:
             
             self.isListening= False
-            print("WE CAN RETURN")
-            print("WIN ? ", self.allIsCorrect)
             if self.allIsCorrect == False:
                 pass
 #                self.changeGameState( "listen")
@@ -282,7 +266,6 @@ class Game:
                 self.parent.lblNote.config(font=("Courier", 18, "bold"))
                 self.parent.lblNote["text"] = "correct ;-)\n{}".format(self.chordName)
                 self.parent.lblNote["bg"] = "green"
-                print("first try" , self.isFirstTry)
                 if self.isFirstTry:
                     self.score = self.score + 1
                 self.changeGameState("waitingUserInput")

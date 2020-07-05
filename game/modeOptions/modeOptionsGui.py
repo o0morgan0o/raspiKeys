@@ -1,7 +1,6 @@
 import tkinter as tk 
 from tkinter import ttk 
 from modeOptions.gameplay import Game
-import utils.tinkerStyles 
 
 from utils.customElements.buttons import *
 from utils.customElements.labels import *

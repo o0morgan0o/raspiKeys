@@ -83,6 +83,7 @@ class Game:
         self.bass=None
         self.mType=None
         self.notes=None
+        self.backtrackVolume=None
 
         self.loadASample(len(self.midiFiles)-1)
 
@@ -97,6 +98,8 @@ class Game:
             self.currentLickIndex=index
             self.loadSelectedItem(self.midiFiles[self.currentLickIndex])
             self.root.lblMessage.config(text="Lick {} / {} loaded.".format(index+1,len(self.midiFiles)))
+        
+        self.showUserInfo(0)
 
 
 
@@ -111,8 +114,8 @@ class Game:
                 counter+=1
         
         self.midiFiles = midiFiles
-        self.midiFiles.sort(reverse=True)
-        print("reloading ", len(self.midiFiles))
+        self.midiFiles.sort()
+        print("Reloading all MIDI files...", len(self.midiFiles))
        
     def loadSelectedItem(self, name):
         self.loadFile( os.path.join(self.midiRepository, name))
@@ -154,10 +157,10 @@ class Game:
                 self.bass = datastore["bass"]
                 self.notes=datastore["notes"]
                 self.mType = datastore["type"]
+                self.backtrackVolume = datastore["volumeBacktrack"]
                 self.showUserInfo(0)
         except Exception as e:
             print("problem loading file :", mFile, e)
-            return
 
     def showWithOrWithoutBacktrackWindow(self):
         self.cancelThreads()
@@ -202,6 +205,8 @@ class Game:
         self.nbOfLoops = jsonLick["nbOfLoops"]
         self.backtrack = jsonLick["backtrack"]
         self.duration=jsonLick["backtrackDuration"] * self.nbOfLoops
+        
+        print("Current file has nb of notes :" + str(len(self.melodyNotes) + len(self.chord_notes)))
 
         self.audioThread = BackTrackThread(self,self.backtrack, self.nbOfLoops,completeTraining)
         self.audioThread.start()
@@ -231,7 +236,6 @@ class Game:
             self.isPlaying=True
             self.activateAudioThread(completeTraining)
         else:
-            print("should destroy")
             self.root.btnPractiseLick.config(text="Practise Lick")
             self.audioThread.isAlive=False
             # del self.audioThread
@@ -263,6 +267,7 @@ class Game:
                 self.root.lblMessage.config(text="")
         except Exception as e:
             print("Error trying to delete lick", self.currentLick, e)
+        self.reloadMidiFiles()
 
 
 
@@ -291,12 +296,10 @@ class Game:
         self.cancelThreads()
         pygame.mixer.music.stop()
         try:
-            del self.silenceIntervalTimer
-            del self.nextLoopTimer
             del self.activeCustomSignals
             del self.precountTimer
-        except:
-            print("tried delete")
+        except Exception as e:
+            print("error in destroy :", e)
         del self
 
 
@@ -312,26 +315,29 @@ class BackTrackThread(threading.Thread):
         self.MUSIC_END= pygame.USEREVENT+1
         pygame.mixer.music.set_endevent(self.MUSIC_END)
         pygame.mixer.music.load(self.backtrack)
+        pygame.mixer.music.set_volume(self.parent.backtrackVolume*100)
         # pygame.mixer.set_endevent("test")
+        pygame.mixer.music.play(loops=self.nbOfLoops)
         self.parent.playChords(0)
         self.parent.playMelody(0)
-        pygame.mixer.music.play(loops=self.nbOfLoops)
         self.counter = 0
         self.transpose= 0
-        print("initialisation AUDIO THREAD")
+        print("Initialisation AUDIO THREAD")
         self.nbBeforeTranspose = 4
         self.parent.showUserInfo(self.transpose,self.counter+1, self.nbBeforeTranspose)
 
     def run(self):
-        print("runing thread...")
+        print("Running thread...")
+
+        # TODO: problem here with delay, it would probably be better to make my own function
         while self.isAlive == True:
             for event in pygame.event.get():
-                print(event.type)
+                # print(event.type)
                 if event.type == self.MUSIC_END:
             # if pygame.mixer.music.get_busy() == False: # means it is not playing => reload a new loop
                     self.counter+=1
                     self.parent.showUserInfo(self.transpose, self.counter+1, self.nbBeforeTranspose)
-                    print("relaunching backtrack loop ", self.counter, self.transpose)
+                    print("Relaunching backtrack loop ", self.counter, self.transpose)
                     pygame.mixer.music.play(self.nbOfLoops)
                     # self.parent.replayLick()
                     self.parent.playChords(self.transpose)
@@ -340,7 +346,7 @@ class BackTrackThread(threading.Thread):
 
                     if self.counter == self.nbBeforeTranspose -1:
                         newTranspose= random.randint(-7,6)
-                        print("transposing next loop ..." , self.transpose)
+                        print("Transposing next loop ..." , self.transpose)
                         self.parent.showUserInfoNextTranspose(self.transpose,newTranspose)
                         self.transpose = newTranspose
                         self.counter =-1

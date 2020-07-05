@@ -28,12 +28,11 @@ class Autoload:
     def __init__(self):
         if not Autoload.instance:
             Autoload.instance = Autoload.__Autoload()
-            print(" created")
+            print("Creation of instance")
         else:
-            print(" not created")
+            print("Recuperation of instance")
             pass
     def getInstance(self):
-        print(" returning")
         return self.instance.midiIO
 
     def getInstanceAudio(self):

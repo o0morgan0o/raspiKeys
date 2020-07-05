@@ -109,7 +109,7 @@ class MidiChords:
             b= ch[1]
             b.sort()
             cc = ( a, b)
-            print (cc)
+            # print (cc)
 
         for chord in tmpChords:
             ch = self.get2ndInversion(chord)
@@ -117,14 +117,14 @@ class MidiChords:
             b= ch[1]
             b.sort()
             cc = ( a, b)
-            print (cc)
+            # print (cc)
         for chord in tmpChords:
             ch = self.get3rdInversion(chord)
             a = ch[0]
             b= ch[1]
             b.sort()
             cc = ( a, b)
-            print (cc)
+            # print (cc)
             
 
 #a = MidiChords()

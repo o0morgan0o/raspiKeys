@@ -24,7 +24,7 @@ class MainApplication(tk.Frame):
 
     def __init__(self, master, tag=""):
         self.config=loadConfig()
-        # print("config: " , self.config)
+
 
         self.gameMode=int(self.config["default_mode"])
         self.master=master
@@ -84,7 +84,6 @@ class MainApplication(tk.Frame):
 
         # load default volume
         volume = int(self.config["volume"])
-        print(" vol", volume)
         self.volumeSlider.set(volume)
 
         # storage of the current Game Classe
@@ -96,21 +95,27 @@ class MainApplication(tk.Frame):
         # TODO make a way to retrieve the last open tab (config file load at startup ? )
 
     def sliderMoved(self, value):
-        # print("silder moved", value)
         mSound = Sound.setVolume(value) 
     
     # method to load a new game mode
     def new_window(self, intMode):
+        self.audioInstance = Autoload().getInstanceAudio() # in order to create the first instance of audio file
         try:
             # pass
             self.master.body.destroy()
+            del self.app
         except:
             print("no window to destroy, recreation ...", intMode)
-        print("new window")
+        print("Creating new window")
         # recreation of the body frame (middle frame)
         self.master.body=tk.Frame(self.master, bg="green")
 #        self.master.body.pack(side=tk.TOP, expand=True, fill=tk.BOTH)
         self.master.body.place(x=0,y=60,width=320,height=370)
+
+        try:
+            print("Should be empty  : ", self.app)
+        except:
+            pass
 
         if intMode == 0:
             self.app= Mode0(self.master.body, self.config)
@@ -131,7 +136,6 @@ class MainApplication(tk.Frame):
         self.highLightActiveMode(intMode)
 
     def highLightActiveMode(self, intMode):
-        print("highlighting ...")
         self.button1.configure(background=self.original_background)
         self.button2.configure(background=self.original_background)
         self.button3.configure(background=self.original_background)
@@ -169,7 +173,7 @@ if __name__ == "__main__":
         tag= sys.argv[1].split("=")[1]
     else:
         tag=""
-        print("run with no arguments...")
+        print("Program runned with no arguments...")
     root=tk.Tk()
     root.config(cursor="none")
     MainApplication(root, tag)

@@ -28,7 +28,6 @@ class Game:
         self.parent = parent
         # print("config mode 0 ",config)
         self.delay = float(config["question_delay"])/100
-        print("self delay is :", self.delay)
         self.isListening = False
 
         # variable for user score
@@ -36,7 +35,6 @@ class Game:
         self.score=0
         self.globalIsListening = True
 
-        print( "launchin MIDI program... \n")
         debug=True
         self.stopGame = False
         self.waitingNotes= []
@@ -76,11 +74,13 @@ class Game:
         self.melodies = Melody(self)
 
     def destroy(self):
-        print("destroy in class")
-        self.isListening = False
-        self.midiIO.destroy() # delete everything in midiIO class
+        # print("destroying...")
+        # self.isListening = False
+        # self.midiIO.destroy() # delete everything in midiIO class
+        self.midiIO.setCallback(None)
+
         # del self.waitingNotes # delete WantingNotes
-        del self
+        # del self
 
     def changeGameState(self, newstate):
         if newstate == "notStarted":
@@ -125,7 +125,6 @@ class Game:
             self.changeGameState("listen")
         elif self.gameState == "listen":
             self.changeGameState("waitingUserAnswer")
-        print("preparing")
         self.midiIO.sendOut("note_on", mNote) # send note on
         currentNote = self.waitingNotes[mNote]
         currentNote.resetTimer(offset)
@@ -162,7 +161,6 @@ class Game:
                 self.checkAnswer(msg.note) # we check the answer
 
     def checkAnswer(self, answer):
-        print(answer, self.questionNote.note)
         if answer == self.questionNote.note:
             self.parent.label2[ "text"] = "correct ;-)\n{}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
             self.parent.label2["bg"] = "green"
@@ -182,13 +180,13 @@ class Game:
             self.parent.label2["bg"] = "red"
             self.parent.lblNoteUser["text"]=noteNameFull(answer)
             self.parent.lblNoteUser["fg"]="red"
-            self.changeGameState("listen")
 
             # time.sleep(1)
             # self.melodies.playLooseMelody()
             # time.sleep(1)
             # we replay the interval if the user didnt find the correct answer
             time.sleep(.4)
+            self.changeGameState("listen")
             self.replayNote = QuestionNote(self.startingNote, self, 0) # i want to replay both notes
             self.replayNote = QuestionNote(self.questionNote.note, self, 0+self.delay) # i want to replay both notes
         

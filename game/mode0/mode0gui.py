@@ -41,7 +41,8 @@ class Mode0:
 
 
     def __del__(self):
-        print("trying destroy 0000")
+        print("trying destroy Mode 0")
+        self.game.destroy()
 
     def activateListening(self):
         self.game.isListening=True

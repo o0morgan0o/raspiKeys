@@ -68,7 +68,7 @@ class Sound:
         sound = pygame.mixer.Sound(file)
         self.currentFile = file # we keep trace of the current file if we want to retreive it for the lick recording
         self.currentFileLength = sound.get_length()
-        print("current audio file is ... :", sound.get_length(), " ms, ", self.currentFile)
+        print("Current audio file is ... :", sound.get_length(), " ms, ", self.currentFile)
         pygame.mixer.music.play(loops=-1, fade_ms=200)
 
     def stopPlay(self):
@@ -89,7 +89,7 @@ class Sound:
         pygame.mixer.music.unload()
 
     def setVolume( value):
-        print("update sound voulme", value)
+        print("Update sound voulme", value)
         pygame.mixer.music.set_volume(int(value)/100)
 
     def getCurrentTrack(self):
@@ -99,7 +99,7 @@ class Sound:
         return pygame.mixer.music.get_pos()/1000
 
     def prepareBacktrackForRecord(self, backtrackFile):
-        print(backtrackFile)
+        # print(backtrackFile)
         pygame.mixer.music.load(backtrackFile)
 
     def playBacktrackForRecord(self, nbOfLoops):

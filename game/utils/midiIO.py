@@ -67,7 +67,7 @@ class MidiIO:
         try :
             self.inport = mido.open_input(_input)
         except Exception as e:
-            print(e)
+            print("error setting input port",e)
         self.resetInAndOut()
         
 
@@ -79,7 +79,7 @@ class MidiIO:
         try:
             self.outport= mido.open_output(_output)
         except Exception as e:
-            print(e)
+            print("error setting output port",e)
         self.resetInAndOut()
 
     def destroy(self):

@@ -114,6 +114,7 @@ class RecordChordsGui:
         self.window.lblRec.config(text="Finished!", background="black", foreground="white")
         self.window.btnOK.config(state="normal")
         self.window.canvas.delete("all")
+        self.window.canvas.place_forget()
         
     
 

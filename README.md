@@ -1,4 +1,43 @@
-# RaspyKeyz
+# RaspiKeys
+
+RaspiKeys is a raspberry based project, for intermediate or advanced pianists. It provides a practise tool which help musicians to practise their Ear and to practise a collection of licks in all keys. It also provides drum loops playing.
+
+# Usage
+
+**Wanring:** In order to work for the moment you must have a digital keyboard which supports USB-Midi transmission.
+
+
+### Connection and parts
+
+(schema de connection)
+
+
+## Main Window
+
+When you power on the device, after startup you should see this screen:
+(image)
+
+
+
+## Modes
+
+The differents practise modes of the raspiKeys are the following:
+
+1. EarN : Ear Training of note intervals. When you push a note, you hear another note, you should find the interval played between these two notes.
+2. EarC : Ear Training of chords. When you push a note, you will hear several other notes (all compose a more or less difficult chord inversion), you should guess all the notes proposed.
+3. BkTr : Play a drum loop. Just practise a groove on a random drum loop of the collection.
+4. Lick : Practise your favorites licks or chord progression. Record you own short chord progression and melody and practise it in all keys.
+
+
+## EarN (Ear Training Note)
+
+## EarC (Ear Training Chord)
+
+## BkTr (DrumLoop)
+
+## Lick 
+
+##
 
 Work in progress ...
 
@@ -56,3 +95,6 @@ TOOD : implement recording with the backgroundChord
 	]
 
 ```
+
+ulimit -s newvalue pour augmenter le nombre de threads. diminuer newvalue pour avoir plus de threads
+aconnect -x  # close all alsa connections 

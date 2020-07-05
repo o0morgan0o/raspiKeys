@@ -104,6 +104,7 @@ class RecordNotesGui:
         # self.saveMidi()
 
     def saveLickAsJsonFile(self):
+        volume = pygame.mixer.music.get_volume()
         obj = {
                 "bass": self.bassNote,
                 "type": self.chordQuality,
@@ -112,6 +113,7 @@ class RecordNotesGui:
                 "nbOfLoops":self.nbOfLoops,
                 "chord_notes": self.chordNotes,
                 "notes": self.melodyNotes,
+                "volumeBacktrack": volume
                 }
         # creation d'un objet json
         json_object = json.dumps(obj, indent=4)
@@ -154,7 +156,8 @@ class RecordNotesGui:
         # self.parent.recordingNotes=False
         self.window.lblRec.config(background="black", foreground="white", text="Finished!")
         self.window.canvas.delete("all")
-        self.window.btnSave.config(state="normal")
+        # self.window.btnSave.config(state="normal")
+        self.window.canvas.place_forget()
 
     def destroy(self):
         self.window.destroy()

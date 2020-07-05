@@ -1,7 +1,6 @@
 import tkinter as tk 
 from tkinter import ttk as ttk
 from mode3.gameplay import Game
-import utils.tinkerStyles 
 
 from utils.customElements.buttons import *
 from utils.customElements.labels import *
@@ -12,7 +11,7 @@ from utils.customElements.labels import *
 
 class Mode3:
     def __init__(self,globalRoot,gameFrame, config, app):
-        print( "launching game 4 -------------- ")
+        print( "launching game 3 -------------- ")
         self.globalRoot = globalRoot
         self.gameFrame = gameFrame
         self.gameFrame.pack_propagate(0)

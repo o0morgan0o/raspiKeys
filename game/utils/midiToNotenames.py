@@ -28,6 +28,6 @@ def noteName(midiNum):
 
 def noteNameFull(midiNum):
     entier = int(midiNum/12)
-    print(entier)
+    # print(entier)
     key = noteName(midiNum)
     return "{}{}".format(key,str(entier))
