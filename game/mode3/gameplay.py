@@ -173,24 +173,48 @@ class Game:
         self.globalRoot.recordWindow= RecordWithBacktrack(self.globalRoot, self.app)
 
     def playChords(self, transpose):
-        for note in self.chord_notes:
-            self.activeCustomSignals.append(CustomSignal(
-                self,
-                note["type"],
-                note["note"] + transpose,
-                note["velocity"],
-                note["time"]
-            ))
+        # notes_on_timing =[]
+        # notes_on_notes=[]
+        # notes_on_velocity=[]
+        # notes_off_timing=[]
+        # notes_off_notes=[]
+        # for note in self.chord_notes:
+        #     if note["type"] == "note_on":
+        #         notes_on_timing.append(note["time"])
+        #         notes_on_notes.append(note["note"]+transpose)
+        #         notes_on_velocity.append(note["velocity"])
+        #     elif note["type"]== "note_off":
+        #         notes_off_timing.append(note["time"])
+        #         notes_off_notes.append(note["note"]+transpose)
+        # print(notes_on_timing)
+        # print(notes_on_notes)
+
+        # self.playingThread= TestThread(self,notes_on_timing, notes_on_notes, notes_on_velocity, notes_off_timing, notes_off_notes)
+        self.playingThreadChord = TestThread(self,self.chord_notes, transpose)
+        self.playingThreadChord.start()
+
+        
+
+        # for note in self.chord_notes:
+        #     self.activeCustomSignals.append(CustomSignal(
+        #         self,
+        #         note["type"],
+        #         note["note"] + transpose,
+        #         note["velocity"],
+        #         note["time"]
+        #     ))
 
     def playMelody(self, transpose):
-        for note in self.melodyNotes:
-            self.activeCustomSignals.append(CustomSignal(
-                self,
-                note["type"],
-                note["note"] + transpose,
-                note["velocity"],
-                note["time"]
-            ))
+        # for note in self.melodyNotes:
+        #     self.activeCustomSignals.append(CustomSignal(
+        #         self,
+        #         note["type"],
+        #         note["note"] + transpose,
+        #         note["velocity"],
+        #         note["time"]
+        #     ))
+        self.playingThreadMelody = TestThread(self,self.melodyNotes, transpose)
+        self.playingThreadMelody.start()
         
 
     def activateAudioThread(self,completeTraining):
@@ -284,6 +308,14 @@ class Game:
         except Exception as e:
             print("no threads to cancel", e)
         # we try to kill all notes no already played
+        try:
+            self.playingThreadChord.isAlive=False
+        except Exception as e:
+            print("no threads to cancel", e)
+        try:
+            self.playingThreadMelody.isAlive=False
+        except Exception as e:
+            print("no threads to cancel", e)
         for signal in self.activeCustomSignals:
             signal.timer.cancel()
         del self.activeCustomSignals
@@ -316,12 +348,16 @@ class BackTrackThread(threading.Thread):
         pygame.mixer.music.set_endevent(self.MUSIC_END)
         pygame.mixer.music.load(self.backtrack)
         pygame.mixer.music.set_volume(self.parent.backtrackVolume*100)
-        # pygame.mixer.set_endevent("test")
         pygame.mixer.music.play(loops=self.nbOfLoops)
-        self.parent.playChords(0)
-        self.parent.playMelody(0)
-        self.counter = 0
+
         self.transpose= 0
+        self.newTranspose=-99
+        self.prepareChordArray()
+        self.prepareMelodyArray()
+        self.time0 =int(round(time.time()*1000))
+
+
+        self.counter = 0
         print("Initialisation AUDIO THREAD")
         self.nbBeforeTranspose = 4
         self.parent.showUserInfo(self.transpose,self.counter+1, self.nbBeforeTranspose)
@@ -331,27 +367,121 @@ class BackTrackThread(threading.Thread):
 
         # TODO: problem here with delay, it would probably be better to make my own function
         while self.isAlive == True:
+
             for event in pygame.event.get():
-                # print(event.type)
+                print(event.type)
                 if event.type == self.MUSIC_END:
+                    if self.newTranspose != -99:
+                        self.transpose = self.newTranspose
+                        self.newTranspose = -99
+
+                    self.ChordIndexNoteOn=0
+                    self.ChordIndexNoteOff=0
+                    self.MelodyIndexNoteOn=0
+                    self.MelodyIndexNoteOff=0
+                    self.time0 =int(round(time.time()*1000))
             # if pygame.mixer.music.get_busy() == False: # means it is not playing => reload a new loop
+                    # self.parent.playingThreadChord.reset()
                     self.counter+=1
                     self.parent.showUserInfo(self.transpose, self.counter+1, self.nbBeforeTranspose)
                     print("Relaunching backtrack loop ", self.counter, self.transpose)
                     pygame.mixer.music.play(self.nbOfLoops)
                     # self.parent.replayLick()
-                    self.parent.playChords(self.transpose)
-                    if self.counter % 2 == 0: # play melody one time on 2
-                        self.parent.playMelody(self.transpose)
+                    # self.parent.playChords(self.transpose)
+                    # if self.counter % 2 == 0: # play melody one time on 2
+                        # self.parent.playMelody(self.transpose)
 
                     if self.counter == self.nbBeforeTranspose -1:
-                        newTranspose= random.randint(-7,6)
+                        self.newTranspose= random.randint(-7,6)
                         print("Transposing next loop ..." , self.transpose)
-                        self.parent.showUserInfoNextTranspose(self.transpose,newTranspose)
-                        self.transpose = newTranspose
+                        self.parent.showUserInfoNextTranspose(self.transpose,self.newTranspose)
+                        # self.transpose = newTranspose
                         self.counter =-1
+
+            timeT = int(round(time.time()*1000))-self.time0
+            self.checkMelody(timeT, self.transpose)
+            self.checkChords(timeT, self.transpose)
+            
+
+        # def playMelody(self):
         
         pygame.mixer.music.stop()
+
+    def checkChords(self, timeT, transpose):
+        if self.ChordIndexNoteOn <= len(self.ChordNoteOnTiming)-1:
+            if timeT >= self.ChordNoteOnTiming[self.ChordIndexNoteOn]:
+                noteToPlay = self.ChordNoteOnNotes[self.ChordIndexNoteOn]
+                velocity=self.ChordNoteOnVelocity[self.ChordIndexNoteOn]
+                print("note on", noteToPlay, velocity)
+                t1= time.time()
+                self.parent.midiIO.sendOut("note_on", noteToPlay+transpose,velocity)
+                t2= time.time()
+                print("time loosed: ", t2-t1)
+                self.ChordIndexNoteOn +=1
+        if self.ChordIndexNoteOff <= len(self.ChordNoteOffTiming)-1:
+            if timeT >= self.ChordNoteOffTiming[self.ChordIndexNoteOff]:
+                noteToEnd = self.ChordNoteOffNotes[self.ChordIndexNoteOff]
+                self.parent.midiIO.sendOut("note_off", noteToEnd+transpose)
+                self.ChordIndexNoteOff+=1
+
+    def checkMelody(self, timeT, transpose):
+        if self.MelodyIndexNoteOn <= len(self.MelodyNoteOnTiming)-1:
+            if timeT >= self.MelodyNoteOnTiming[self.MelodyIndexNoteOn]:
+                noteToPlay = self.MelodyNoteOnNotes[self.MelodyIndexNoteOn]
+                velocity=self.MelodyNoteOnVelocity[self.MelodyIndexNoteOn]
+                print("note on", noteToPlay, velocity)
+                t1= time.time()
+                self.parent.midiIO.sendOut("note_on", noteToPlay+transpose,velocity)
+                t2= time.time()
+                print("time loosed: ", t2-t1)
+                self.MelodyIndexNoteOn +=1
+        if self.MelodyIndexNoteOff <= len(self.MelodyNoteOffTiming)-1:
+            if timeT >= self.MelodyNoteOffTiming[self.MelodyIndexNoteOff]:
+                noteToEnd = self.MelodyNoteOffNotes[self.MelodyIndexNoteOff]
+                self.parent.midiIO.sendOut("note_off", noteToEnd+transpose)
+                self.MelodyIndexNoteOff+=1
+
+    
+    def prepareChordArray(self):
+        self.ChordNotes = self.parent.chord_notes
+        self.ChordNoteOnTiming = []
+        self.ChordNoteOnNotes = []
+        self.ChordNoteOnVelocity= []
+        self.ChordNoteOffTiming = []
+        self.ChordNoteOffNotes= []
+        for note in self.ChordNotes:
+            if note["type"] == "note_on":
+                self.ChordNoteOnTiming.append(note["time"])
+                self.ChordNoteOnNotes.append(note["note"])
+                self.ChordNoteOnVelocity.append(note["velocity"])
+            elif note["type"]== "note_off":
+                self.ChordNoteOffTiming.append(note["time"])
+                self.ChordNoteOffNotes.append(note["note"])
+        print(self.ChordNoteOnTiming)
+        print(self.ChordNoteOnNotes)
+        self.ChordIndexNoteOn=0
+        self.ChordIndexNoteOff=0
+
+    def prepareMelodyArray(self):
+        self.MelodyNotes = self.parent.melodyNotes
+        self.MelodyNoteOnTiming = []
+        self.MelodyNoteOnNotes = []
+        self.MelodyNoteOnVelocity= []
+        self.MelodyNoteOffTiming = []
+        self.MelodyNoteOffNotes= []
+        for note in self.MelodyNotes:
+            if note["type"] == "note_on":
+                self.MelodyNoteOnTiming.append(note["time"])
+                self.MelodyNoteOnNotes.append(note["note"])
+                self.MelodyNoteOnVelocity.append(note["velocity"])
+            elif note["type"]== "note_off":
+                self.MelodyNoteOffTiming.append(note["time"])
+                self.MelodyNoteOffNotes.append(note["note"])
+        print(self.MelodyNoteOnTiming)
+        print(self.MelodyNoteOnNotes)
+        self.MelodyIndexNoteOn=0
+        self.MelodyIndexNoteOff=0
+
 
 
 

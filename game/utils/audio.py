@@ -18,7 +18,7 @@ class Sound:
 
         pygame.init()
 #        pygame.mixer.pre_init(44100, 16, 2, 4096)
-        pygame.mixer.pre_init(44100, 8, 2, 4096)
+        pygame.mixer.pre_init(44100, 8, 2, 128)
         pygame.mixer.music.set_volume(.1)
         self.isPlaying=False
 
