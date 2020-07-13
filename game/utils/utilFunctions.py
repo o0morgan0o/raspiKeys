@@ -77,6 +77,7 @@ def loadConfig():
 
 
     configFilePath = env.CONFIG_FILE
+    configFile = ""
     try:
         with open(configFilePath, 'r') as f:
             configFile = json.load(f)
@@ -88,9 +89,10 @@ def loadConfig():
             default_config["MIDI_interface_in"]=configFile["MIDI_interface_in"]
             default_config["MIDI_interface_in"]=configFile["MIDI_interface_in"]
             default_config["MIDI_interface_in"]=configFile["MIDI_interface_in"]
+            print(configFile)
     except:
         print("No config file found")
     # print("loaded config is " , config)
-    return configFile
+    return default_config
 
 

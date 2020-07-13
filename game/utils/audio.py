@@ -69,7 +69,8 @@ class Sound:
         self.currentFile = file # we keep trace of the current file if we want to retreive it for the lick recording
         self.currentFileLength = sound.get_length()
         print("Current audio file is ... :", sound.get_length(), " ms, ", self.currentFile)
-        pygame.mixer.music.play(loops=-1, fade_ms=200)
+        pygame.mixer.music.play(loops=-1)
+        # pygame.mixer.music.play(loops=-1, fade_ms=200)
 
     def stopPlay(self):
         pygame.mixer.music.stop()

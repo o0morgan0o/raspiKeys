@@ -36,7 +36,7 @@ class MainApplication(tk.Frame):
         self.master.body =None
 
         # if(tag == "pi"): # to run at fullscreen if we get the "pi" tag
-        self.master.attributes( "-fullscreen", True)
+        # self.master.attributes( "-fullscreen", True)
 
         # keyboard shortcuts for dev
         self.master.bind("<Escape>", lambda event: self.master.quit())
@@ -166,7 +166,7 @@ class MainApplication(tk.Frame):
         if instance.isListening == True:
             self.buttonMidiListen.config(background="grey",text="MIDILis")
         else:
-            self.buttonMidiListen.config(background="red" , text="OFF")
+            self.buttonMidiListen.config(background="red", text="OFF")
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
