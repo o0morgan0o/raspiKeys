@@ -1,18 +1,18 @@
 import tkinter as tk
-import env
+import game.env
 import time
 import datetime
 import json
 import os
 import pygame
 
-from utils.questionNote import CustomSignal
-from autoload import Autoload
-from utils.canvasThread import MyThread
-from utils.bpm import Bpm
-from utils.midiToNotenames import noteName
-from utils.customElements.buttons import *
-from utils.customElements.labels import *
+from game.utils.questionNote import CustomSignal
+from game.autoload import Autoload
+from game.utils.canvasThread import MyThread
+from game.utils.bpm import Bpm
+from game.utils.midiToNotenames import noteName
+from game.utils.customElements.buttons import *
+from game.utils.customElements.labels import *
 
 class RecordNotesGui:
     def __init__(self,globalRoot,choosenBpm, bassNote, chordQuality, backtrack, backtrackDuration, nbOfLoops, chordNotes, app):

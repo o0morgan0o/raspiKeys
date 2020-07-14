@@ -1,14 +1,14 @@
 import tkinter as tk
-from autoload import Autoload
+from game.autoload import Autoload
 
-from mode3.recordChordsGui import RecordChordsGui
+from game.mode3.recordChordsGui import RecordChordsGui
 
-from utils.midiToNotenames import noteName
-from utils.utilFunctions import getChordInterval
-from utils.utilFunctions import formatOutputInterval
+from game.utils.midiToNotenames import noteName
+from game.utils.utilFunctions import getChordInterval
+from game.utils.utilFunctions import formatOutputInterval
 
-from utils.customElements.buttons import *
-from utils.customElements.labels import *
+from game.utils.customElements.buttons import *
+from game.utils.customElements.labels import *
 
 
 class RecordSetupGui:

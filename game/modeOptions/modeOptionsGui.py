@@ -1,10 +1,10 @@
 import tkinter as tk 
 from tkinter import ttk 
-from modeOptions.gameplay import Game
+from game.modeOptions.gameplay import Game
 
-from utils.customElements.buttons import *
-from utils.customElements.labels import *
-from utils.customElements.scales import *
+from game.utils.customElements.buttons import *
+from game.utils.customElements.labels import *
+from game.utils.customElements.scales import *
         
 
 

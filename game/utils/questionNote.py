@@ -1,6 +1,6 @@
 from threading import Timer
 import threading
-from utils.midiIO import MidiIO
+from game.utils.midiIO import MidiIO
 
 class QuestionNote:
 

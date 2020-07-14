@@ -1,10 +1,10 @@
 import tkinter as tk
-from autoload import Autoload
+from game.autoload import Autoload
 
-from utils.customElements.buttons import *
-from utils.customElements.labels import *
+from game.utils.customElements.buttons import *
+from game.utils.customElements.labels import *
 
-from mode3.recordSetupGui import RecordSetupGui
+from game.mode3.recordSetupGui import RecordSetupGui
 
 class RecordWithBacktrack:
     def __init__(self, globalRoot, app):

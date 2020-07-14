@@ -7,11 +7,11 @@ import mido
 import simpleaudio as sa
 import tkinter as tk
 import pygame
-import env
+import game.env
 
-from utils.midiIO import MidiIO
-from utils.audio import Sound
-from autoload import Autoload
+from game.utils.midiIO import MidiIO
+from game.utils.audio import Sound
+from game.autoload import Autoload
 
 
 class Game:

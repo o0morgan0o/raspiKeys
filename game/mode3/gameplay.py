@@ -1,30 +1,30 @@
 import datetime
 import random
 import pygame
-from utils.bpm import Bpm
+from game.utils.bpm import Bpm
 from threading import Timer
 import threading
 import random
 import os
-import env
+from game import env
 import time
 import tkinter as tk
 import json
 from tkinter import ttk as ttk
 import mido
-from utils.midiIO import MidiIO
-from mode3.recordSetupGui import RecordSetupGui
-from mode3.recordNotesGui import RecordNotesGui
-from mode3.recordChordsGui import RecordChordsGui
-from autoload import Autoload
-from utils.questionNote import CustomSignal
-from utils.midiToNotenames import noteName
-from utils.utilFunctions import getChordInterval
-from utils.utilFunctions import formatOutputInterval
-from mode3.recordWithBacktrack import RecordWithBacktrack
+from game.utils.midiIO import MidiIO
+from game.mode3.recordSetupGui import RecordSetupGui
+from game.mode3.recordNotesGui import RecordNotesGui
+from game.mode3.recordChordsGui import RecordChordsGui
+from game.autoload import Autoload
+from game.utils.questionNote import CustomSignal
+from game.utils.midiToNotenames import noteName
+from game.utils.utilFunctions import getChordInterval
+from game.utils.utilFunctions import formatOutputInterval
+from game.mode3.recordWithBacktrack import RecordWithBacktrack
 
-from utils.customElements.buttons import *
-from utils.customElements.labels import *
+from game.utils.customElements.buttons import *
+from game.utils.customElements.labels import *
 
 class Game:
 

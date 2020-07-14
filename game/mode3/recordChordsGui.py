@@ -3,16 +3,16 @@ import threading
 import time
 import pygame
 
-from autoload import Autoload
-from utils.canvasThread import MyThread
+from game.autoload import Autoload
+from game.utils.canvasThread import MyThread
 
-from utils.midiToNotenames import noteName
+from game.utils.midiToNotenames import noteName
 
-from utils.bpm import Bpm
-from utils.customElements.buttons import *
-from utils.customElements.labels import *
+from game.utils.bpm import Bpm
+from game.utils.customElements.buttons import *
+from game.utils.customElements.labels import *
 
-from mode3.recordNotesGui import RecordNotesGui
+from game.mode3.recordNotesGui import RecordNotesGui
 
 class RecordChordsGui:
     def __init__(self, globalRoot, bassNote, chordQuality, backtrack, backtrackDuration, nbOfLoops, app):

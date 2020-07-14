@@ -1,7 +1,7 @@
 import os
-from utils.midiIO import MidiIO
-from utils.audio import Sound
-from utils.utilFunctions import loadConfig
+from game.utils.midiIO import MidiIO
+from game.utils.audio import Sound
+from game.utils.utilFunctions import loadConfig
 import sys
 import mido
 

@@ -5,19 +5,19 @@ from threading import Timer
 import mido
 import simpleaudio as sa
 
-from utils.waitingNote import WaitingNote
-from utils.questionNote import QuestionNote
-from utils.midiIO import MidiIO
-from utils.utilFunctions import formatOutputInterval
-from utils.midiChords import MidiChords
-from utils.questionNote import CustomNote
-from utils.questionNote import Melody
-from utils.questionNote import CustomSignal
+from game.utils.waitingNote import WaitingNote
+from game.utils.questionNote import QuestionNote
+from game.utils.midiIO import MidiIO
+from game.utils.utilFunctions import formatOutputInterval
+from game.utils.midiChords import MidiChords
+from game.utils.questionNote import CustomNote
+from game.utils.questionNote import Melody
+from game.utils.questionNote import CustomSignal
 
-from autoload import Autoload
+from game.autoload import Autoload
 
-from utils.midiToNotenames import noteNameFull
-from utils.midiToNotenames import noteName
+from game.utils.midiToNotenames import noteNameFull
+from game.utils.midiToNotenames import noteName
 
 """ the mode 1 is for eartraining on a CHORD INTERVAL
 """

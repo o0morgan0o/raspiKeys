@@ -1,9 +1,9 @@
 import tkinter as tk
-from utils.customElements.labels import LblSettings
-from utils.customElements.buttons import BtnSettings
-from autoload import Autoload
+from game.utils.customElements.labels import LblSettings
+from game.utils.customElements.buttons import BtnSettings
+from game.autoload import Autoload
 import json
-import env
+import game.env
 
 
 class Game:

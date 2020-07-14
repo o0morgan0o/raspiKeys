@@ -3,7 +3,7 @@ import soundfile
 from pydub import AudioSegment
 import os
 import pygame
-import env
+from game import env
 import random
 
 class Sound:

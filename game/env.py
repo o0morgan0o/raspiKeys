@@ -1,7 +1,8 @@
 
 import os
 
-ROOT_DIR=os.path.dirname(os.getcwd())
+ROOT_DIR=os.path.join("/", "home","pi")
+ROOT_DIR= os.path.join(ROOT_DIR,"raspiKeys")
 print("ROOT :::", ROOT_DIR)
 PROGRAM_FOLDER= os.path.join(ROOT_DIR,  "game")
 USER_WAV_FOLDER=os.path.join(ROOT_DIR, "res", "backtracks", "user_wav")

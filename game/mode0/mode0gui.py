@@ -1,8 +1,8 @@
 import tkinter as tk 
-from mode0.gameplay import Game
+from game.mode0.gameplay import Game
 
-from utils.customElements.buttons import *
-from utils.customElements.labels import *
+from game.utils.customElements.buttons import *
+from game.utils.customElements.labels import *
 
 class Mode0:
     def __init__(self,gameFrame, config):

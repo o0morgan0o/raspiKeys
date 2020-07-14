@@ -1,11 +1,12 @@
 import tkinter as tk 
 import pygame
 from tkinter import ttk 
-from mode2.gameplay import Game
-import env
 
-from utils.customElements.buttons import *
-from utils.customElements.labels import *
+from game.mode2.gameplay import Game
+import game.env
+
+from game.utils.customElements.buttons import *
+from game.utils.customElements.labels import *
 
 class Mode2:
     def __init__(self,gameFrame, config):

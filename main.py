@@ -4,28 +4,27 @@ from random import choice
 import sys
 
 # import odes
-from mode0.mode0gui import Mode0
-from mode1.mode1gui import Mode1
-from mode2.mode2gui import Mode2
-from mode3.mode3gui import Mode3
-from modeOptions.modeOptionsGui import ModeOptions
+from game.mode0.mode0gui import Mode0
+from game.mode1.mode1gui import Mode1
+from game.mode2.mode2gui import Mode2
+from game.mode3.mode3gui import Mode3
+from game.modeOptions.modeOptionsGui import ModeOptions
 
 # import button styles
-from utils.customElements.buttons import *
-from autoload import Autoload
-from utils.audio import Sound
-from utils.utilFunctions import loadConfig
+from game.utils.customElements.buttons import *
+from game.autoload import Autoload
+from game.utils.audio import Sound
+from game.utils.utilFunctions import loadConfig
 
-import env
+from game import env
 
 
 class MainApplication(tk.Frame):
     # definition de la fenetre g)lobale
 
     def __init__(self, master, tag=""):
+
         self.config=loadConfig()
-
-
         self.gameMode=int(self.config["default_mode"])
         self.master=master
         

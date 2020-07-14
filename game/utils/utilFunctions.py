@@ -1,4 +1,4 @@
-import env
+from game import env
 import json
 
 def formatOutputInterval(mInterval):
