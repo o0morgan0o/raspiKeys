@@ -3,7 +3,7 @@ import pygame
 from tkinter import ttk 
 
 from game.mode2.gameplay import Game
-import game.env
+from game import env
 
 from game.utils.customElements.buttons import *
 from game.utils.customElements.labels import *
