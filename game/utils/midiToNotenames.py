@@ -1,33 +1,34 @@
-def noteName(midiNum):
+def noteName(midiNum: int) -> str:
     # convert note number to name "A", "B", ...
     num = midiNum % 12
     if num == 0:
         return "C"
     elif num == 1:
         return "C#"
-    elif num==2:
+    elif num == 2:
         return "D"
-    elif num==3:
+    elif num == 3:
         return "D#"
-    elif num==4:
+    elif num == 4:
         return "E"
-    elif num==5:
+    elif num == 5:
         return "F"
-    elif num==6:
+    elif num == 6:
         return "F#"
-    elif num==7:
+    elif num == 7:
         return "G"
-    elif num==8:
+    elif num == 8:
         return "G#"
-    elif num==9:
+    elif num == 9:
         return "A"
-    elif num==10:
+    elif num == 10:
         return "A#"
-    elif num==11:
+    elif num == 11:
         return "B"
 
-def noteNameFull(midiNum):
+
+def noteNameFull(midiNum: int) -> str:
     entier = int(midiNum/12)
     # print(entier)
     key = noteName(midiNum)
-    return "{}{}".format(key,str(entier))
+    return "{}{}".format(key, str(entier))

@@ -3,7 +3,7 @@ from game.utils.customElements.labels import LblSettings
 from game.utils.customElements.buttons import BtnSettings
 from game.autoload import Autoload
 import json
-import game.env
+from game import env
 
 
 class Game:

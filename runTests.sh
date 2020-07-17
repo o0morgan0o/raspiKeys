@@ -1,8 +1,8 @@
 #!/bin/bash
 #export DISPLAY=localhost:10.0
 aconnect -x
-ulimit -s 2000
-export DISPLAY='192.168.0.14:0.0'
+# ulimit -s 2000
+#export DISPLAY='192.168.0.14:0.0'
 python3 -m unittest
 
 
@@ -12,16 +12,16 @@ python3 -m unittest
 # - env.py
 # - autoload.py 
 # - audio.py
-
-# test TODO
-# =============
 # - bpm.py
+# - midiChords.py 
 # - canvasThread.py 
 # - graph.py 
-# - midiChords.py 
 # - midiIo.py
 # - midiToNoteNames.py 
 # - waitingNote.py 
+
+# test TODO
+# =============
 # - modeOptions.py
 # - mode0gui.py
 # - mode1gui.py
