@@ -1,4 +1,12 @@
 #!/bin/bash
+### BEGIN INIT INFO
+# Provides: raspikeys
+# Required-Start: $all
+# Required-Stop:
+# Default-Start: 2 3 4 5
+# Default-Stop:
+# Short-Description: launch raspikeys service in systemd
+### END INIT INFO
 
 # aconnect -x
 # ulimit -s 2000

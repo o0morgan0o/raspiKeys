@@ -69,6 +69,9 @@ class RecordNotesGui:
         self.precountTimer = Bpm(self.choosenBpm, self.backtrack, self.backtrackDuration, self.nbOfLoops, lambda: self.activateRecording())
         self.startingTime = 0
 
+        self.damper= []
+        self.damperIsActive=False
+
     def cancel(self):
         self.window.destroy()
         self.thread.isAlive = False
@@ -178,17 +181,6 @@ class RecordNotesGui:
     def destroy(self):
         self.window.destroy()
 
-    def handleMIDIInput(self, msg):
-        if self.isRecording == True:
-            # if self.startingTime == 0: # it means it is the first played note
-            # self.startingTime = int(round(time.time()*1000))
-
-            # TODO pass recordingNotes to False when one of the button is clicked
-            mTime = self.getTimeFromStart()
-            dictionnary = {"type": msg.type, "note": msg.note, "velocity": msg.velocity, "time": mTime}
-            print("adding note ", dictionnary)
-            self.melodyNotes.append(dictionnary)
-            # self.recordNotes.window.lbl3.config(text="Notes : " +noteName(msg.note))
 
     def getTimeFromStart(self):
         return int(round(time.time() * 1000)) - self.startingTime
@@ -203,3 +195,31 @@ class RecordNotesGui:
                 print(e)
 
         del self.thread
+
+    def handleMIDIInput(self, msg):
+        if self.isRecording == True:
+            # if self.startingTime == 0: # it means it is the first played note
+            # self.startingTime = int(round(time.time()*1000))
+            if msg.type== "control_change":
+                if msg.control==64 and msg.value > 64:
+                    self.damperIsActive = True
+                if msg.control== 64 and msg.value <= 64:
+                    self.damperIsActive = False 
+                    print("release damper", self.damper)
+                    for damperedNote in self.damper:
+                        mTime = self.getTimeFromStart()
+                        dictionnary = {"type": "note_off" , "note": damperedNote, "velocity" : 127, "time": mTime}
+                    self.damper = []
+            
+            else:
+                if self.damperIsActive == True and msg.type== "note_off":
+                    self.damper.append(msg.note)
+                    return
+                else:
+                    mTime = self.getTimeFromStart()
+                    dictionnary = {"type": msg.type, "note": msg.note, "velocity": msg.velocity, "time": mTime}
+                    print("adding note ", dictionnary)
+                    self.melodyNotes.append(dictionnary)
+                    # self.recordNotes.window.lbl3.config(text="Notes : " +noteName(msg.note))
+
+

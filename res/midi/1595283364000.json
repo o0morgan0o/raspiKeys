@@ -1,0 +1,390 @@
+{
+    "bass": 36,
+    "type": "minor",
+    "backtrack": "/home/pi/raspiKeys/res/backtracks/processed_wav/Amy winehouse - you know i'm no good.wav",
+    "backtrackDuration": 4.6059184074401855,
+    "nbOfLoops": 4,
+    "chord_notes": [
+        {
+            "type": "note_on",
+            "note": 36,
+            "velocity": 67,
+            "time": 0
+        },
+        {
+            "type": "note_off",
+            "note": 36,
+            "velocity": 85,
+            "time": 502
+        },
+        {
+            "type": "note_on",
+            "note": 39,
+            "velocity": 64,
+            "time": 623
+        },
+        {
+            "type": "note_off",
+            "note": 39,
+            "velocity": 81,
+            "time": 1186
+        },
+        {
+            "type": "note_on",
+            "note": 43,
+            "velocity": 59,
+            "time": 1277
+        },
+        {
+            "type": "note_off",
+            "note": 43,
+            "velocity": 80,
+            "time": 1782
+        },
+        {
+            "type": "note_on",
+            "note": 42,
+            "velocity": 48,
+            "time": 1826
+        },
+        {
+            "type": "note_off",
+            "note": 42,
+            "velocity": 88,
+            "time": 2324
+        },
+        {
+            "type": "note_on",
+            "note": 41,
+            "velocity": 72,
+            "time": 2393
+        },
+        {
+            "type": "note_off",
+            "note": 41,
+            "velocity": 79,
+            "time": 2903
+        },
+        {
+            "type": "note_on",
+            "note": 39,
+            "velocity": 68,
+            "time": 2984
+        },
+        {
+            "type": "note_off",
+            "note": 39,
+            "velocity": 68,
+            "time": 3535
+        },
+        {
+            "type": "note_on",
+            "note": 36,
+            "velocity": 68,
+            "time": 3586
+        },
+        {
+            "type": "note_off",
+            "note": 36,
+            "velocity": 83,
+            "time": 4082
+        },
+        {
+            "type": "note_on",
+            "note": 37,
+            "velocity": 57,
+            "time": 4153
+        },
+        {
+            "type": "note_off",
+            "note": 37,
+            "velocity": 76,
+            "time": 4693
+        },
+        {
+            "type": "note_on",
+            "note": 38,
+            "velocity": 59,
+            "time": 4740
+        },
+        {
+            "type": "note_off",
+            "note": 38,
+            "velocity": 84,
+            "time": 5285
+        },
+        {
+            "type": "note_on",
+            "note": 44,
+            "velocity": 70,
+            "time": 5287
+        },
+        {
+            "type": "note_off",
+            "note": 44,
+            "velocity": 97,
+            "time": 5805
+        },
+        {
+            "type": "note_on",
+            "note": 43,
+            "velocity": 65,
+            "time": 5868
+        },
+        {
+            "type": "note_off",
+            "note": 43,
+            "velocity": 81,
+            "time": 6345
+        },
+        {
+            "type": "note_on",
+            "note": 37,
+            "velocity": 66,
+            "time": 6428
+        },
+        {
+            "type": "note_off",
+            "note": 37,
+            "velocity": 66,
+            "time": 6899
+        },
+        {
+            "type": "note_on",
+            "note": 36,
+            "velocity": 53,
+            "time": 7009
+        },
+        {
+            "type": "note_off",
+            "note": 36,
+            "velocity": 83,
+            "time": 7508
+        },
+        {
+            "type": "note_on",
+            "note": 39,
+            "velocity": 63,
+            "time": 7616
+        },
+        {
+            "type": "note_off",
+            "note": 39,
+            "velocity": 71,
+            "time": 8158
+        },
+        {
+            "type": "note_on",
+            "note": 43,
+            "velocity": 65,
+            "time": 8177
+        },
+        {
+            "type": "note_off",
+            "note": 43,
+            "velocity": 60,
+            "time": 8677
+        },
+        {
+            "type": "note_on",
+            "note": 40,
+            "velocity": 67,
+            "time": 8735
+        },
+        {
+            "type": "note_off",
+            "note": 40,
+            "velocity": 68,
+            "time": 9239
+        },
+        {
+            "type": "note_on",
+            "note": 39,
+            "velocity": 57,
+            "time": 9287
+        },
+        {
+            "type": "note_off",
+            "note": 39,
+            "velocity": 63,
+            "time": 9839
+        },
+        {
+            "type": "note_on",
+            "note": 42,
+            "velocity": 75,
+            "time": 9860
+        },
+        {
+            "type": "note_off",
+            "note": 42,
+            "velocity": 83,
+            "time": 10487
+        },
+        {
+            "type": "note_on",
+            "note": 44,
+            "velocity": 76,
+            "time": 10490
+        },
+        {
+            "type": "note_on",
+            "note": 38,
+            "velocity": 69,
+            "time": 11044
+        },
+        {
+            "type": "note_off",
+            "note": 44,
+            "velocity": 62,
+            "time": 11045
+        },
+        {
+            "type": "note_off",
+            "note": 38,
+            "velocity": 83,
+            "time": 11561
+        },
+        {
+            "type": "note_on",
+            "note": 37,
+            "velocity": 68,
+            "time": 11606
+        },
+        {
+            "type": "note_off",
+            "note": 37,
+            "velocity": 84,
+            "time": 12150
+        },
+        {
+            "type": "note_on",
+            "note": 41,
+            "velocity": 73,
+            "time": 12185
+        },
+        {
+            "type": "note_off",
+            "note": 41,
+            "velocity": 58,
+            "time": 12684
+        },
+        {
+            "type": "note_on",
+            "note": 44,
+            "velocity": 75,
+            "time": 12778
+        },
+        {
+            "type": "note_off",
+            "note": 44,
+            "velocity": 88,
+            "time": 13301
+        },
+        {
+            "type": "note_on",
+            "note": 39,
+            "velocity": 68,
+            "time": 13360
+        },
+        {
+            "type": "note_off",
+            "note": 39,
+            "velocity": 62,
+            "time": 13934
+        },
+        {
+            "type": "note_on",
+            "note": 38,
+            "velocity": 70,
+            "time": 13948
+        },
+        {
+            "type": "note_off",
+            "note": 38,
+            "velocity": 74,
+            "time": 14462
+        },
+        {
+            "type": "note_on",
+            "note": 44,
+            "velocity": 68,
+            "time": 14504
+        },
+        {
+            "type": "note_off",
+            "note": 44,
+            "velocity": 78,
+            "time": 15023
+        },
+        {
+            "type": "note_on",
+            "note": 43,
+            "velocity": 61,
+            "time": 15082
+        },
+        {
+            "type": "note_off",
+            "note": 43,
+            "velocity": 75,
+            "time": 15617
+        },
+        {
+            "type": "note_on",
+            "note": 37,
+            "velocity": 60,
+            "time": 15645
+        },
+        {
+            "type": "note_off",
+            "note": 37,
+            "velocity": 68,
+            "time": 16101
+        },
+        {
+            "type": "note_on",
+            "note": 36,
+            "velocity": 65,
+            "time": 16205
+        },
+        {
+            "type": "note_off",
+            "note": 36,
+            "velocity": 79,
+            "time": 16693
+        },
+        {
+            "type": "note_on",
+            "note": 39,
+            "velocity": 68,
+            "time": 16778
+        },
+        {
+            "type": "note_off",
+            "note": 39,
+            "velocity": 60,
+            "time": 17355
+        },
+        {
+            "type": "note_on",
+            "note": 43,
+            "velocity": 68,
+            "time": 17379
+        },
+        {
+            "type": "note_off",
+            "note": 43,
+            "velocity": 66,
+            "time": 17930
+        },
+        {
+            "type": "note_on",
+            "note": 39,
+            "velocity": 68,
+            "time": 17974
+        }
+    ],
+    "notes": [],
+    "volumeBacktrack": 1.0,
+    "additional_latency": 0
+}

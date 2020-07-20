@@ -70,6 +70,9 @@ class Game:
         self.recordedNotes = []
         self.recordedCustomChords = []
 
+        self.damper = []
+        self.damperActive = False
+
     # def destroy(self):
     #     self.sound.unloadAudio()
     #     del self.sound
@@ -181,5 +184,18 @@ class Game:
         # del self
 
     def handleMIDIInput(self, msg):
-        # No handle because we want to ignore the midi input messages
+        print(msg)
+        # if msg.type == "control_change":
+        #     print("pedal ... : ", msg.control, msg.value)
+        #     if msg.control == 64 and msg.value > 64:
+        #         self.damperActive = True
+        #     if msg.control == 64 and msg.value <= 64:
+        #         self.damperActive = False
+        #         print(self.damper)
+        #         self.damper = []
+
+        # if self.damperActive == True and msg.type == "note_off":
+        #     self.damper.append(msg.note)
+
+        # # No handle because we want to ignore the midi input messages
         pass

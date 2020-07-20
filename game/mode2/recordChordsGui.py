@@ -73,6 +73,9 @@ class RecordChordsGui:
         self.isRecording = True
         self.startingTime = 0
 
+        self.damper = []
+        self.damperIsActive = False
+
     def nextWindow(self):
         self.window.destroy()
         self.globalRoot.recordWindow = RecordNotesGui(
@@ -127,17 +130,6 @@ class RecordChordsGui:
         # self.parent.cancelThreads()
         # self.parent.record
 
-    def handleMIDIInput(self, msg):
-        if self.isRecording == True:
-            if self.startingTime == 0:
-                print("should start recording")
-                self.activateRecordingChords()
-                self.startingTime = int(round(time.time() * 1000))
-                # print("first starting TIme trigger", self.startingTime)
-            mTime = self.getTimeFromStart()
-            dictionnary = {"type": msg.type, "note": msg.note, "velocity": msg.velocity, "time": mTime}
-            self.chordNotes.append(dictionnary)
-
     def getTimeFromStart(self):
         return int(round(time.time() * 1000)) - self.startingTime
 
@@ -146,3 +138,31 @@ class RecordChordsGui:
         del self.thread
         del self
         pass
+
+    def handleMIDIInput(self, msg):
+        if self.isRecording == True:
+
+            if self.startingTime == 0:
+                print("should start recording")
+                self.activateRecordingChords()
+                self.startingTime = int(round(time.time() * 1000))
+                # print("first starting TIme trigger", self.startingTime)
+
+            if msg.type == "control_change":
+                if msg.control == 64 and msg.value > 64:
+                    self.damperIsActive = True
+                if msg.control == 64 and msg.value <= 64:
+                    self.damperIsActive = False
+                    print("release damper", self.damper)
+                    for damperedNote in self.damper:
+                        mTime = self.getTimeFromStart()
+                        dictionnary = {"type": "note_off", "note": damperedNote, "velocity": 127, "time": mTime}
+                    self.damper = []
+            else:
+                if self.damperIsActive == True and msg.type == "note_off":
+                    self.damper.append(msg.note)
+                    return
+                else:
+                    mTime = self.getTimeFromStart()
+                    dictionnary = {"type": msg.type, "note": msg.note, "velocity": msg.velocity, "time": mTime}
+                    self.chordNotes.append(dictionnary)
