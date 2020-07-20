@@ -32,6 +32,7 @@ class TestUIMode0(unittest.TestCase):
         self.assertIsInstance(self.gameplay.questionNote, QuestionNote)
 
     def tearDown(self):
+        # self.app.destroy()
         pass
 
 

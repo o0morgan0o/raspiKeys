@@ -19,17 +19,14 @@ from game.utils.midiToNotenames import noteName
 from game.utils.midiToNotenames import noteNameFull
 
 
-""" the mode 0 is for eartraining on a SINGLE INTERVAL
-"""
-
+""" the mode 0 is for eartraining on a SINGLE INTERVAL """ 
 
 class Game:
-
     def __init__(self, parent, config):
         self.config = config
         self.parent = parent
         # print("config mode 0 ",config)
-        self.delay = float(config["question_delay"])/100
+        self.delay = float(config["question_delay"]) / 100
         self.isListening = False
 
         # variable for user score
@@ -66,7 +63,8 @@ class Game:
     def skip(self):
         try:
             self.parent.label2["text"] = "It was ;-)\n{}".format(
-                formatOutputInterval(self.questionNote.note - self.startingNote))
+                formatOutputInterval(self.questionNote.note - self.startingNote)
+            )
             self.parent.label2["bg"] = "orange"
             # if we gave the good answer, we want a new note
             self.changeGameState("waitingUserInput")
@@ -92,12 +90,14 @@ class Game:
         elif newstate == "waitingUserInput":
             self.parent.label1["text"] = "Pick a starting Note"
             self.gameState = "waitingUserInput"
-            percentage = int((self.score / self.counter) *
-                             100) if(self.counter != 0) else 0
+            percentage = (
+                int((self.score / self.counter) * 100) if (self.counter != 0) else 0
+            )
             self.parent.label3["text"] = "{}/{} ({}%)".format(
-                self.score, self.counter, percentage)
+                self.score, self.counter, percentage
+            )
         elif newstate == "listen":
-            #self.parent["bg"] = "orange"
+            # self.parent["bg"] = "orange"
             # self.changeAllBg("orange")
             self.parent.label1["text"] = "Listen ..."
             self.parent.label2["text"] = ""
@@ -107,7 +107,7 @@ class Game:
             self.isListening = False
         elif newstate == "waitingUserAnswer":
             self.isListening = True
-            #self.parent["bg"] = "blue"
+            # self.parent["bg"] = "blue"
             # self.changeAllBg("blue")
             self.parent.label1["text"] = "What is your answer ?"
             self.gameState = "waitingUserAnswer"
@@ -137,17 +137,19 @@ class Game:
 
     def handleMIDIInput(self, msg):
         # used for the midiListening button
-        if Autoload().getInstance().isListening == False:  # check if user has midi  listen
+        if (
+            Autoload().getInstance().isListening == False
+        ):  # check if user has midi  listen
             return
-        if(self.globalIsListening == False):
+        if self.globalIsListening == False:
             return
         # Needed because we still receive signals even if the class is destroyed
-        if(self.isListening == False):
+        if self.isListening == False:
             print("[--] Ignoring queue message...", msg, self.isListening)
             return
 
         print("[-]receiving something", msg, self.isListening)
-        if(msg.type == "note_on"):
+        if msg.type == "note_on":
             # we test according to the gamestate
 
             if self.gameState == "waitingUserInput":
@@ -155,10 +157,9 @@ class Game:
                 self.startingNote = msg.note
                 # pick a random note
                 questionNote = self.pickNewNote(self.startingNote)
-                self.questionNote = QuestionNote(
-                    questionNote, self, self.delay)
+                self.questionNote = QuestionNote(questionNote, self, self.delay)
                 # show the note on the ui
-                self.lblUserShow = noteNameFull(self.startingNote)+"-> "
+                self.lblUserShow = noteNameFull(self.startingNote) + "-> "
                 self.parent.lblNote.config(text=self.lblUserShow)
 
             elif self.gameState == "waitingUserAnswer":
@@ -170,7 +171,8 @@ class Game:
     def checkAnswer(self, answer):
         if answer == self.questionNote.note:
             self.parent.label2["text"] = "correct ;-)\n{}".format(
-                formatOutputInterval(self.questionNote.note - self.startingNote))
+                formatOutputInterval(self.questionNote.note - self.startingNote)
+            )
             self.parent.label2["bg"] = "green"
             self.parent.lblNoteUser["text"] = noteNameFull(answer)
             self.parent.lblNoteUser["fg"] = "green"
@@ -180,12 +182,13 @@ class Game:
             # TODO : is it really the best way to do time.sleep here ?
             # if we gave the good answer, we want a new note
             self.changeGameState("waitingUserInput")
-            time.sleep(.4)
+            time.sleep(0.4)
             self.melodies.playWinMelody()
-            time.sleep(.4)
+            time.sleep(0.4)
         else:
             self.parent.label2["text"] = "incorrect\nA: {}".format(
-                formatOutputInterval(answer - self.startingNote))
+                formatOutputInterval(answer - self.startingNote)
+            )
             self.questionNote.isFirstTry = False
             self.parent.label2["bg"] = "red"
             self.parent.lblNoteUser["text"] = noteNameFull(answer)
@@ -195,18 +198,17 @@ class Game:
             # self.melodies.playLooseMelody()
             # time.sleep(1)
             # we replay the interval if the user didnt find the correct answer
-            time.sleep(.4)
+            time.sleep(0.4)
             self.changeGameState("listen")
             # i want to replay both notes
             self.replayNote = QuestionNote(self.startingNote, self, 0)
             # i want to replay both notes
-            self.replayNote = QuestionNote(
-                self.questionNote.note, self, 0+self.delay)
+            self.replayNote = QuestionNote(self.questionNote.note, self, 0 + self.delay)
 
         self.midiIO.panic()
 
     def pickNewNote(self, startingNote):
-        self.counter = self.counter+1
+        self.counter = self.counter + 1
         # TODO : make the max interval customizable
         maxInterval = 17
         offset = 0
