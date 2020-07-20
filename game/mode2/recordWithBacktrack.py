@@ -4,7 +4,7 @@ from game.autoload import Autoload
 from game.utils.customElements.buttons import *
 from game.utils.customElements.labels import *
 
-from game.mode3.recordSetupGui import RecordSetupGui
+from game.mode2.recordSetupGui import RecordSetupGui
 
 class RecordWithBacktrack:
     def __init__(self, globalRoot, app):
@@ -89,7 +89,7 @@ class RecordWithBacktrack:
 
     def cancel(self):
         self.window.destroy()
-        self.app.new_window(3)
+        self.app.new_window(2)
 
     def destroy(self):
         pass

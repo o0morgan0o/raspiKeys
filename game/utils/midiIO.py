@@ -10,13 +10,14 @@ class MidiIO:
         # define input and ouput USB midi
         # we check if the default interface is present in the list
         if midiIn in self.midoInList:
-            self.inport = mido.open_input(midiOut)
+            self.inport = mido.open_input(midiIn)
         else:
             print("default IN setting not found !, use mido[0] insted")
             self.inport = self.openInput(self.midoInList, 0)
 
         if midiOut in self.midoOutList:
             self.outport = mido.open_output(midiOut)
+            # pass
         else:
             print("default OUT setting not found !, use mido[0] insted")
             self.outport = self.openOutput(self.midoOutList, 0)
@@ -24,31 +25,32 @@ class MidiIO:
         self.resetInAndOut()
 
     def openInput(self, inputsArr, index):
-        return mido.open_input(inputsArr[index])
+        if len(inputsArr) > 0:
+            return mido.open_input(inputsArr[index])
 
     def openOutput(self, outputsArr, index):
-        return mido.open_output(outputsArr[index])
+        if len(outputsArr) > 0:
+            return mido.open_output(outputsArr[index])
 
     def resetInAndOut(self):
-        self.inport.callback = None
-        self.inport.poll()
+        try:
+            self.inport.callback = None
+            self.inport.poll()
+            self.isListening = True
 
-        self.isListening = True
+            print("TRY TO CLEAR ==========")
+            self.inport._queue._queue.mutex.acquire()
+            self.inport._queue._queue.queue.clear()
+            self.inport._queue._queue.all_tasks_done.notify_all()
+            self.inport._queue._queue.unfinished_tasks = 0
+            self.inport._queue._queue.mutex.release()
+            print("END ==========")
 
-        # try to clear pending notes
-        print("TRY TO CLEAR ==========")
-        self.inport._queue._queue.mutex.acquire()
-        self.inport._queue._queue.queue.clear()
-        self.inport._queue._queue.all_tasks_done.notify_all()
-        self.inport._queue._queue.unfinished_tasks = 0
-        self.inport._queue._queue.mutex.release()
-        print("END ==========")
-
-        # for msg in self.inport.iter_pending():
-        #    print("pending : ", msg)
-        self.showIOPorts()
-        self.outport.panic()
-        self.outport.reset()
+            self.showIOPorts()
+            self.outport.panic()
+            self.outport.reset()
+        except Exception as e:
+            print("Error in function resetInAndOut()", e)
 
     def showIOPorts(self):
         print(80*"=")
@@ -60,10 +62,18 @@ class MidiIO:
         print(80*"=")
 
     def getAllMidiInputs(self):
-        return mido.get_input_names()
+        try:
+            return mido.get_input_names()
+        except Exception as e :
+            print("Impossible to run mido_get_output_names" , e)
+            return []
 
     def getAllMidiOutputs(self):
-        return mido.get_output_names()
+        try:
+            return mido.get_output_names()
+        except Exception as e:
+            print("Impossible to run mido_get_output_names" , e)
+            return  []
 
     def setMidiInput(self, _input):
         try:
@@ -99,7 +109,10 @@ class MidiIO:
         #del self.outport
 
     def setCallback(self, callback):
-        self.inport.callback = callback
+        try:
+            self.inport.callback = callback
+        except Exception as e:
+            print("error in setCallback()", e)
 
     def sendOut(self, msgtype, note, velocity=100):
         # print("[+] sending note : ", msgtype, note, velocity)

@@ -1,5 +1,5 @@
 import tkinter as tk
-import game.env
+from game import env
 import time
 import datetime
 import json
@@ -70,7 +70,7 @@ class RecordNotesGui:
         self.window.destroy()
         self.thread.isAlive = False
         pygame.mixer.music.stop()
-        self.app.new_window(3)
+        self.app.new_window(2)
         del self
 
     def retry(self):

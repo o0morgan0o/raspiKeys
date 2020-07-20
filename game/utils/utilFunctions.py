@@ -87,8 +87,7 @@ def loadConfig():
             default_config["times_each_transpose"]=configFile["times_each_transpose"]
             default_config["nb_of_transpose_before_change"]=configFile["nb_of_transpose_before_change"]
             default_config["MIDI_interface_in"]=configFile["MIDI_interface_in"]
-            default_config["MIDI_interface_in"]=configFile["MIDI_interface_in"]
-            default_config["MIDI_interface_in"]=configFile["MIDI_interface_in"]
+            default_config["MIDI_interface_out"]=configFile["MIDI_interface_out"]
             print(configFile)
     except:
         print("No config file found")

@@ -44,3 +44,6 @@ sudo ./LCD35-show 270
 
 7. pygame
 `pip3 install pygame`
+
+
+-> run alsamixer to increase volume to 100%

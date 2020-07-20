@@ -1,7 +1,7 @@
 import tkinter as tk
 from game.autoload import Autoload
 
-from game.mode3.recordChordsGui import RecordChordsGui
+from game.mode2.recordChordsGui import RecordChordsGui
 
 from game.utils.midiToNotenames import noteName
 from game.utils.utilFunctions import getChordInterval
@@ -125,4 +125,4 @@ class RecordSetupGui:
 
     def cancel(self):
         self.window.destroy()
-        self.app.new_window(3)
+        self.app.new_window(2)

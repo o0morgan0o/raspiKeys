@@ -13,7 +13,7 @@ from game.modeOptions.modeOptionsGui import ModeOptions
 # import button styles
 from game.utils.customElements.buttons import *
 from game.autoload import Autoload
-from game.utils.audio import Sound
+from game.utils.audio import Audio
 from game.utils.utilFunctions import loadConfig
 
 from game import env
@@ -94,7 +94,7 @@ class MainApplication(tk.Frame):
         # TODO make a way to retrieve the last open tab (config file load at startup ? )
 
     def sliderMoved(self, value):
-        mSound = Sound.setVolume(value) 
+        mSound = Audio.setVolume(None, value) 
     
     # method to load a new game mode
     def new_window(self, intMode):
@@ -124,7 +124,7 @@ class MainApplication(tk.Frame):
             self.app = Mode1(self.master.body, self.config)
             self.app.activateListening()
         elif intMode == 2:
-            self.app = Mode2(self.master.body,self.config)
+            self.app = Mode2(self.master, self.master.body,self.config, self)
         elif intMode == 3:
             self.app = Mode3(self.master, self.master.body,self.config, self)
         elif intMode == 4:

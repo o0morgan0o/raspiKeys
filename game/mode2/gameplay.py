@@ -10,45 +10,59 @@ import pygame
 import game.env
 
 from game.utils.midiIO import MidiIO
-from game.utils.audio import Sound
+from game.utils.audio import Audio
 from game.autoload import Autoload
 
+from game.mode2.recordSetupGui import RecordSetupGui
+from game.mode2.recordNotesGui import RecordNotesGui
+from game.mode2.recordChordsGui import RecordChordsGui
+from game.mode2.recordWithBacktrack import RecordWithBacktrack
+
+from game.utils.canvasThread import MyThread
+from game.utils.canvasThread import MyThreadForBacktrackScreen
 
 class Game:
 
-    def __init__(self, parent,config):
+    def __init__(self, globalRoot,parent,config, app):
+        self.globalRoot = globalRoot
+        self.app = app
         self.config = config
         self.parent = parent
         self.sound = Autoload().getInstanceAudio()
+    
         self.parent.btnPlay.config(command=self.toggleBacktrack)
-        # midi io
-        # self.midiIO=Autoload().getInstance()
-        # self.midiIO.setCallback(self.handleMIDIInput)
-
         self.parent.btnRandom.config(command=self.playRandom)
-#        self.isPlaying = False
-
-        #for filename in self.tracksMp3:
-        #    self.sound.convertToWav(filename)
-
         # TODO : handle errors if non valid files are loaded
         self.tracksWav = Autoload().getTracksWav()
         self.activeSample = Autoload().getActiveSample()
         self.activeSampleIndex = Autoload().getActiveSampleIndex()
+        # self.tuple = self.sound.pickRandomSample(self.tracksWav)
+        # self.activeSample = self.tuple[0]
+        # self.activeSampleIndex=self.tuple[1]
+
         self.currentTrack = self.activeSample
 
 
         self.showRandomTracks()
         self.playBacktrack()
 
-        # we want to show the number of tracks
         nbTracksStr = "Random beat:\n{} beats in the base.".format(str(len(self.tracksWav)))
         self.parent.lblStatic1.config(text=nbTracksStr)
+        self.parent.btnLick.config(command=self.showWithOrWithoutBacktrackWindow)
 
     # def destroy(self):
     #     self.sound.unloadAudio()
     #     del self.sound
     #     del self
+    def showWithOrWithoutBacktrackWindow(self):
+        self.cancelThreads()
+        try :
+            del self.parent.recordWindow
+        except Exception as e:
+            print(e)
+        self.parent.destroy()
+        self.destroy()
+        self.globalRoot.recordWindow= RecordWithBacktrack(self.globalRoot, self.app)
 
     def showRandomTracks(self):
             self.showCurrentPlayingInLabel()
@@ -72,8 +86,6 @@ class Game:
         index = random.randint(0, len(self.tracksWav)-1)
         self.activeSampleIndex = index
         return  (self.tracksWav[index], index)
-
-
     
     def playRandom(self):
         self.activeSample = self.pickRandomSample()
@@ -111,12 +123,56 @@ class Game:
             str(len(self.tracksWav)),
             trackName, 
             str(trackLength)))
-        # while pygame.mixer.music.get_busy():
+        # thread for canvas
+        self.parent.canvas.delete("all")
+        try:
+            self.thread.isAlive=False # kill previous thread
+        except Exception as e:
+            print(e)
+        self.thread=MyThreadForBacktrackScreen("thread-canvas" , self.parent.canvas, self.sound, self.sound.currentFileLength, self)
+        self.thread.start()
 
-        # print("launching thread")
-        # self.canvasUpdateThread = MyThread(1, "ThreadCanvas", self.parent.canvas, self.sound)
-        # self.canvasUpdateThread.start()
+    def cancelThreads(self):
+        try:
+            self.thread.isAlive = False
+        except Exception as e:
+            print(e)
+        try:
+            del self.thread
+        except Exception as e:
+            print(e)
 
+        pygame.mixer.music.stop()
+
+        # try:
+        #     self.audioThread.isAlive=False
+        # except Exception as e:
+        #     print("no threads to cancel", e)
+        # # we try to kill all notes no already played
+        # try:
+        #     self.playingThreadChord.isAlive=False
+        # except Exception as e:
+        #     print("no threads to cancel", e)
+        # try:
+        #     self.playingThreadMelody.isAlive=False
+        # except Exception as e:
+        #     print("no threads to cancel", e)
+        # for signal in self.activeCustomSignals:
+        #     signal.timer.cancel()
+        # del self.activeCustomSignals
+        # self.activeCustomSignals = []
+        # self.midiIO.panic()
+
+
+    def destroy(self):
+        # self.cancelThreads()
+        pygame.mixer.music.stop()
+        # try:
+            # del self.activeCustomSignals
+            # del self.precountTimer
+        # except Exception as e:
+        #     print("error in destroy :", e)
+        del self
         
 
         

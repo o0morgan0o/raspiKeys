@@ -12,7 +12,7 @@ from game.utils.bpm import Bpm
 from game.utils.customElements.buttons import *
 from game.utils.customElements.labels import *
 
-from game.mode3.recordNotesGui import RecordNotesGui
+from game.mode2.recordNotesGui import RecordNotesGui
 
 class RecordChordsGui:
     def __init__(self, globalRoot, bassNote, chordQuality, backtrack, backtrackDuration, nbOfLoops, app):
@@ -125,7 +125,7 @@ class RecordChordsGui:
         except Exception as e:
             print(e)
         pygame.mixer.music.stop()
-        self.app.new_window(3)
+        self.app.new_window(2)
         del self
         # self.parent.cancelThreads()
         # self.parent.record

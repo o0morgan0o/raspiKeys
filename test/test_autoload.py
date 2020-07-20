@@ -1,7 +1,7 @@
 
 import unittest
 from game.autoload import Autoload
-from game.utils.audio import Sound
+from game.utils.audio import Audio
 
 class TestAutoload(unittest.TestCase):
 
@@ -25,7 +25,7 @@ class TestAutoload(unittest.TestCase):
 
     def test_getAudioInstanceReturnASound(self):
         self.instance=Autoload().getInstanceAudio()
-        self.assertIsInstance(self.instance, Sound)
+        self.assertIsInstance(self.instance, Audio)
 
     def test_getActiveSampleIsNotAnEmptyString(self):
         self.activeSample = Autoload().getActiveSample()

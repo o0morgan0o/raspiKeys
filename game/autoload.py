@@ -1,6 +1,6 @@
 import os
 from game.utils.midiIO import MidiIO
-from game.utils.audio import Sound
+from game.utils.audio import  Audio
 from game.utils.utilFunctions import loadConfig
 import sys
 import mido
@@ -17,10 +17,10 @@ class Autoload:
 
             
             self.midiIO = MidiIO(self.configIn, self.configOut)
-            self.audioPCM = Sound()
+            self.audioPCM = Audio()
             self.audioPCM.convertNewFiles()
 
-            self.sound = Sound()
+            self.sound = Audio()
             self.tracksWav=self.sound.loadBacktracksWav()
             self.activeSample = self.sound.pickRandomSample(self.tracksWav);
 
@@ -46,7 +46,15 @@ class Autoload:
 
     def getActiveSampleIndex(self):
         return self.instance.activeSample[1]
+
+    # def setActiveSample(self, sample, sampleIndex):
+    #     self.activeSample = (sample, sampleIndex)
+    # def pickRandomTrack(self):
+    #     self.activeSample =
+    # self.sound.pickRandomSample(self.tracksWav);
     
+
+
 
 
 

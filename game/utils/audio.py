@@ -1,4 +1,6 @@
+import time
 import simpleaudio as sa
+import _thread
 import soundfile
 from pydub import AudioSegment
 import os
@@ -6,7 +8,7 @@ import pygame
 from game import env
 import random
 
-class Sound:
+class Audio:
 
     def __init__(self):
         self.user_waveDir = env.USER_WAV_FOLDER
@@ -16,14 +18,16 @@ class Sound:
         self.currentFile=None
         self.currentFileLength =None
 
+        pygame.mixer.pre_init(44100, 8, 2, 1024) # may be the buffer size will need to be increased if alsa problems in the console. ...
+        pygame.mixer.init()
         pygame.init()
-#        pygame.mixer.pre_init(44100, 16, 2, 4096)
-        pygame.mixer.pre_init(44100, 8, 2, 128)
         pygame.mixer.music.set_volume(.1)
         self.isPlaying=False
 
 
     def pickRandomSample(self, tracks):
+        if len(tracks) == 0 :
+            return 
         index = random.randint(0,len(tracks) -1)
         return (tracks[index], index)
         # return  random.sample(tracks, 4)
@@ -66,11 +70,31 @@ class Sound:
         file = filename
         pygame.mixer.music.load(file)
         sound = pygame.mixer.Sound(file)
+        # pygame.mixer.music.set_pos(0)
         self.currentFile = file # we keep trace of the current file if we want to retreive it for the lick recording
         self.currentFileLength = sound.get_length()
         print("Current audio file is ... :", sound.get_length(), " ms, ", self.currentFile)
+        # _thread.start_new_thread(self.testLatency, (time.time(),))
         pygame.mixer.music.play(loops=-1)
+        print("after play")
         # pygame.mixer.music.play(loops=-1, fade_ms=200)
+
+
+# doesn't work
+    # def testLatency(self, initialTime):
+    #     print("starting thread latency")
+    #     initialTime = initialTime
+    #     isActive=True
+    #     while isActive==True:
+    #         pos = pygame.mixer.music.get_pos()
+    #         print("waiting", pos)
+    #         if pos > .1:
+    #             newTime = time.time()
+    #             deltaTime = newTime - initialTime
+    #             print(f"Soud is PLAYING !!, latency is {deltaTime*1000}")
+    #             isActive=False
+                
+
 
     def stopPlay(self):
         pygame.mixer.music.stop()
@@ -89,7 +113,7 @@ class Sound:
         print( "try unload ....")
         pygame.mixer.music.unload()
 
-    def setVolume( value):
+    def setVolume(self,value):
         print("Update sound voulme", value)
         pygame.mixer.music.set_volume(int(value)/100)
 
@@ -114,24 +138,4 @@ class Sound:
 
     def checkIsPlayingMusic(self):
         return pygame.mixer.music.get_busy()
-
-
-# s = Sound()
-# tracks = s.loadBacktracksWav()
-
-# track= tracks[0]
-# data, samplerate = soundfile.read(track)
-# print(samplerate)
-# soundfile.write('new.wav', data, samplerate, subtype="PCM_16")
-
-
-# #ss = s.convertToWav(track)
-
-# #print(ss)
-# s.simplePlay("new.wav")
-
-# while True:
-#     pass
-        
-
 
