@@ -3,6 +3,9 @@ import tkinter as tk
 from random import choice
 import sys
 
+from game.utils.images import create_image
+from PIL import Image, ImageTk
+
 # import odes
 from game.mode0.mode0gui import Mode0
 from game.mode1.mode1gui import Mode1
@@ -29,6 +32,18 @@ class MainApplication(tk.Frame):
         self.gameMode = int(self.config["default_mode"])
         self.master = master
 
+        # images
+        self.volumeImage = ImageTk.PhotoImage(Image.open(env.VOLUME_IMAGE))
+        self.configImage = ImageTk.PhotoImage(Image.open(env.SETTINGS_IMAGE))
+        self.mode0ImageBlack = ImageTk.PhotoImage(Image.open(env.MODE0_IMAGE_BLACK))
+        self.mode1ImageBlack = ImageTk.PhotoImage(Image.open(env.MODE1_IMAGE_BLACK))
+        self.mode2ImageBlack = ImageTk.PhotoImage(Image.open(env.MODE2_IMAGE_BLACK))
+        self.mode3ImageBlack = ImageTk.PhotoImage(Image.open(env.MODE3_IMAGE_BLACK))
+        self.mode0ImageWhite = ImageTk.PhotoImage(Image.open(env.MODE0_IMAGE_WHITE))
+        self.mode1ImageWhite = ImageTk.PhotoImage(Image.open(env.MODE1_IMAGE_WHITE))
+        self.mode2ImageWhite = ImageTk.PhotoImage(Image.open(env.MODE2_IMAGE_WHITE))
+        self.mode3ImageWhite = ImageTk.PhotoImage(Image.open(env.MODE3_IMAGE_WHITE))
+
         # Main Frame
         self.master.title("RaspyKeys")
         self.master.geometry("320x480")
@@ -50,23 +65,21 @@ class MainApplication(tk.Frame):
         self.master.footer = tk.Frame(self.master, bg="yellow")
         self.master.footer.place(x=0, y=430, width=320, height=50)
 
-        # TODO: make a way to load last settigns. save automatically each time a change
-        # toolbar buttons
         # ///////// btn
-        self.button1 = BtnMenu(self.master.toolbar, text="EarN")
+        self.button1 = BtnMenu(self.master.toolbar, image=self.mode0ImageBlack)
         self.button1.config(command=lambda: self.new_window(0))
         self.button1.place(x=0, y=0, width=80, height=60)
         self.original_background = self.button1.cget("background")  # get original background color
         # ///////// btn
-        self.button2 = BtnMenu(self.master.toolbar, text="EarC")
+        self.button2 = BtnMenu(self.master.toolbar, image=self.mode1ImageBlack)
         self.button2["command"] = lambda: self.new_window(1)
         self.button2.place(x=80, y=0, width=80, height=60)
         # ///////// btn
-        self.button3 = BtnMenu(self.master.toolbar, text="BkTr")
+        self.button3 = BtnMenu(self.master.toolbar, image=self.mode2ImageBlack)
         self.button3["command"] = lambda: self.new_window(2)
         self.button3.place(x=160, y=0, width=80, height=60)
         # ///////// btn
-        self.button4 = BtnMenu(self.master.toolbar, text="Lick")
+        self.button4 = BtnMenu(self.master.toolbar, image=self.mode3ImageBlack)
         self.button4["command"] = lambda: self.new_window(3)
         self.button4.place(x=240, y=0, width=80, height=60)
 
@@ -75,12 +88,12 @@ class MainApplication(tk.Frame):
         self.button5["command"] = lambda: self.new_window(4)
         self.button5.place(x=240, y=0, width=80, height=50)
 
-        # self.buttonMidiListen = BtnMenu(self.master.footer, text="MIDILis", command=self.toggleMidiListen)
-        # self.buttonMidiListen.config(background="grey", foreground="black")
-        # self.buttonMidiListen.place(x=0, y=0, width=80, height=50)
+        self.buttonVolume = BtnMenu(self.master.footer, image=self.volumeImage)
+        # self.buttonVolume.config(background="grey", foreground="black")
+        self.buttonVolume.place(x=0, y=0, width=80, height=50)
 
         self.volumeSlider = VolumeSliderScale(self.master.footer, command=self.sliderMoved)
-        self.volumeSlider.place(x=80, y=0, width=160, height=50)
+        self.volumeSlider.place(x=80, y=0, width=160, height=80)
 
         # load default volume
         volume = int(self.config["volume"])
@@ -139,22 +152,30 @@ class MainApplication(tk.Frame):
         self.button2.configure(background=self.original_background)
         self.button3.configure(background=self.original_background)
         self.button4.configure(background=self.original_background)
+        self.button1["image"] = self.mode0ImageBlack
+        self.button2["image"] = self.mode1ImageBlack
+        self.button3["image"] = self.mode2ImageBlack
+        self.button4["image"] = self.mode3ImageBlack
         self.button1["fg"] = "black"
         self.button2["fg"] = "black"
         self.button3["fg"] = "black"
         self.button4["fg"] = "black"
         if intMode == 0:
+            self.button1["image"] = self.mode0ImageWhite
             self.button1["bg"] = "black"
-            self.button1["fg"] = "white"
+            self.button1["activebackground"] = "black"
         elif intMode == 1:
+            self.button2["image"] = self.mode1ImageWhite
             self.button2["bg"] = "black"
-            self.button2["fg"] = "white"
+            self.button2["activebackground"] = "black"
         elif intMode == 2:
+            self.button3["image"] = self.mode2ImageWhite
             self.button3["bg"] = "black"
-            self.button3["fg"] = "white"
+            self.button3["activebackground"] = "black"
         elif intMode == 3:
+            self.button4["image"] = self.mode3ImageWhite
             self.button4["bg"] = "black"
-            self.button4["fg"] = "white"
+            self.button4["activebackground"] = "black"
 
     def toggleMidiListen(self):
         instance = Autoload().getInstance()

@@ -17,5 +17,20 @@ class SettingsScale(tk.Scale):
 
 class VolumeSliderScale(tk.Scale):
     def __init__(self, *args, **kwargs):
-        super(VolumeSliderScale, self).__init__(*args, troughcolor="black", font=("Courier", 12), width=45, sliderlength=55, from_=0, to=100, showvalue=0, orient=tk.HORIZONTAL, **kwargs)
+        super(VolumeSliderScale, self).__init__(
+            *args,
+            troughcolor="black",
+            highlightthickness=0,
+            bd=1,
+            font=("Courier", 12),
+            width=45,
+            sliderlength=55,
+            sliderrelief=tk.SUNKEN,
+            highlightcolor="black",
+            from_=0,
+            to=100,
+            showvalue=0,
+            orient=tk.HORIZONTAL,
+            **kwargs
+        )
 

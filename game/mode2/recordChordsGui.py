@@ -2,6 +2,8 @@ import tkinter as tk
 import threading
 import time
 import pygame
+from game import env
+from PIL import ImageTk, Image
 
 from game.autoload import Autoload
 from game.utils.canvasThread import MyThread
@@ -17,6 +19,9 @@ from game.mode2.recordNotesGui import RecordNotesGui
 
 class RecordChordsGui:
     def __init__(self, globalRoot, bassNote, chordQuality, backtrack, backtrackDuration, nbOfLoops, app):
+        # images
+        self.recImage = ImageTk.PhotoImage(Image.open(env.RECORD_IMAGE))
+
         self.app = app
         self.globalRoot = globalRoot
         self.midiIO = Autoload().getInstance()
@@ -46,13 +51,13 @@ class RecordChordsGui:
         self.window.lblRec = MyLabel18(self.window, text="")
         self.window.lblRec.config(background="black")
 
-        self.window.canvas = tk.Canvas(self.window)
+        self.window.canvas = tk.Canvas(self.window, bd=0, highlightthickness=0)
 
         # placement
         self.window.lblMessage.place(x=0, y=20, width=320, height=80)
         self.window.lblBass.place(x=0, y=120, width=320, height=50)
-        self.window.lblRec.place(x=30, y=200, width=260, height=40)
-        self.window.canvas.place(x=30, y=240, width=260, height=30)
+        self.window.lblRec.place(x=30, y=190, width=260, height=40)
+        self.window.canvas.place(x=30, y=230, width=260, height=10)
         self.window.btnCancel.place(x=20, y=280, width=140, height=160)
         # self.window.btnRetry.place(x=120, y=360, width=80, height=80)
         self.window.btnOK.place(x=160, y=280, width=140, height=160)
@@ -63,14 +68,24 @@ class RecordChordsGui:
         # self.parent.precountTimer = Bpm(self.choosenBpm, self.backtrack, self.backtrackDuration, self.nbOfLoops,  lambda: self.activateRecordingChords())
 
         self.sound.prepareBacktrackForRecord(self.backtrack)  # load the backtrack file in pygame
-        self.window.lblMessage.config(text="READY ! Start when you play a note")
+        self.window.lblMessage.config(text="READY !\n Recording will start when you play a note...")
         self.chordNotes = []
         self.isRecording = True
         self.startingTime = 0
 
     def nextWindow(self):
         self.window.destroy()
-        self.globalRoot.recordWindow = RecordNotesGui(self.globalRoot, self.choosenBpm, self.bassNote, self.chordQuality, self.backtrack, self.backtrackDuration, self.nbOfLoops, self.chordNotes, self.app)
+        self.globalRoot.recordWindow = RecordNotesGui(
+            self.globalRoot,
+            self.choosenBpm,
+            self.bassNote,
+            self.chordQuality,
+            self.backtrack,
+            self.backtrackDuration,
+            self.nbOfLoops,
+            self.chordNotes,
+            self.app,
+        )
         self.destroy()
 
     def customChordRetry(self):
@@ -83,7 +98,8 @@ class RecordChordsGui:
 
     def activateRecordingChords(self):
         # self.parent.startingTime=0 # in order to start at the first note
-        self.window.lblRec.config(text="REC.", background="red", foreground="white")
+        # self.window.lblRec.config(text="REC.", background="red", foreground="white")
+        self.window.lblRec.config(image=self.recImage)
         print("nbOfLoops :", self.nbOfLoops)
         pygame.mixer.music.stop()
         self.sound.playBacktrackForRecord(self.nbOfLoops)
@@ -93,7 +109,8 @@ class RecordChordsGui:
     def endRecording(self):
         # self.parent.recordingCustomChords=False
         self.isRecording = False
-        self.window.lblRec.config(text="Finished!", background="black", foreground="white")
+        self.window.lblRec.config(image="", text="Finished!", background="black", foreground="white")
+        self.window.lblMessage.config(text="Press 'OK' to proceed")
         self.window.btnOK.config(state="normal")
         self.window.canvas.delete("all")
         self.window.canvas.place_forget()

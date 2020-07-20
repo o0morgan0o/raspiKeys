@@ -31,7 +31,7 @@ class BtnBlack20(AllButtons):
 
 class BtnMenu(AllButtons):
     def __init__(self, *args, **kwargs):
-        super(BtnMenu, self).__init__(*args, font=("Courier", 9), **kwargs)
+        super(BtnMenu, self).__init__(*args, font=("Courier", 9), bd=0, highlightthickness=0, **kwargs)
 
 
 class BtnDefault(AllButtons):
@@ -72,4 +72,16 @@ class BtnBigButton(AllButtons):
 
 class BtnSettings(AllButtons):
     def __init__(self, *args, **kwargs):
-        super(BtnSettings, self).__init__(*args, bg="steelBlue", fg="white", width=8, height=3, wraplength=100, bd=3, relief=tk.GROOVE, foreground="black", font=("Courier", 14), **kwargs)
+        super(BtnSettings, self).__init__(
+            *args,
+            bg="steelBlue",
+            fg="white",
+            width=8,
+            height=3,
+            wraplength=100,
+            bd=3,
+            relief=tk.GROOVE,
+            foreground="black",
+            font=("Courier", 14),
+            **kwargs
+        )

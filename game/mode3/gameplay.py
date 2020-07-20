@@ -13,6 +13,9 @@ from tkinter import messagebox
 import json
 from tkinter import ttk as ttk
 import mido
+
+from PIL import Image, ImageTk
+
 from game.utils.midiIO import MidiIO
 from game.autoload import Autoload
 from game.utils.questionNote import CustomSignal
@@ -26,6 +29,10 @@ from game.utils.customElements.labels import *
 
 class Game:
     def __init__(self, globalRoot, root, config, app):
+        # images
+        self.playImage = ImageTk.PhotoImage(Image.open(env.PLAY_IMAGE))
+        self.pauseImage = ImageTk.PhotoImage(Image.open(env.PAUSE_IMAGE))
+        self.shuffleImage = ImageTk.PhotoImage(Image.open(env.SHUFFLE_IMAGE))
 
         self.midiIO = Autoload().getInstance()
         self.midiIO.setCallback(self.handleMIDIInput)
@@ -41,8 +48,8 @@ class Game:
 
         # Callbacks for buttons
         # self.root.btnRecord.config(command=self.showWithOrWithoutBacktrackWindow)
-        self.root.btnPractiseLick.config(command=self.playOneLick)
-        self.root.btnPractiseAll.config(command=self.playAll)
+        self.root.btnPractiseLick.config(image=self.playImage, command=self.playOneLick)
+        self.root.btnRandomLick.config(image=self.shuffleImage, command=self.pickRandomLick)
         self.root.btnDeleteSelected.config(command=self.deleteLick)
         self.root.btnPrev.config(command=self.previousLick)
         self.root.btnNext.config(command=self.nextLick)
@@ -126,7 +133,9 @@ class Game:
         self.root.lblNotes.config(text=self.userMessage)
         self.root.lblMessage.config(text="Lick {} / {} loaded.".format(self.currentLickIndex + 1, len(self.midiFiles)))
         if counter != -1:
-            self.root.lblFollowing.config(text="{} / {} before transpose...".format(str(counter), str(nbBeforeTranspose)), foreground="white")
+            self.root.lblFollowing.config(
+                text="{} / {} before transpose...".format(str(counter), str(nbBeforeTranspose)), foreground="white"
+            )
         else:
             self.root.lblFollowing.config(text="")
 
@@ -203,7 +212,6 @@ class Game:
         self.playingThreadMelody.start()
 
     def activateAudioThread(self, completeTraining):
-
         # self.cancelThreads()
         with open(self.currentLick, "r") as jsonfile:
             jsonLick = json.load(jsonfile)
@@ -240,18 +248,18 @@ class Game:
 
     def playOneLick(self, completeTraining=False):
         if self.isPlaying == False:
-            self.root.btnPractiseLick.config(text="STOP")
+            self.root.btnPractiseLick.config(image=self.pauseImage)
             self.isPlaying = True
             self.activateAudioThread(completeTraining)
         else:
-            self.root.btnPractiseLick.config(text="Practise Lick")
+            self.root.btnPractiseLick.config(image=self.playImage)
             self.audioThread.isAlive = False
             # del self.audioThread
             self.isPlaying = False
             self.cancelThreads()
             return
 
-    def playAll(self):
+    def pickRandomLick(self):
         # load a new random sample
         self.loadASample(random.randint(0, len(self.midiFiles) - 1))
         self.playOneLick(completeTraining=True)
@@ -345,7 +353,6 @@ class BackTrackThread(threading.Thread):
     def run(self):
         print("Running thread...")
 
-        # TODO: problem here with delay, it would probably be better to make my own function
         while self.isAlive == True:
 
             for event in pygame.event.get():
@@ -379,7 +386,8 @@ class BackTrackThread(threading.Thread):
                         self.counter = -1
 
             timeT = int(round(time.time() * 1000)) - self.time0
-            self.checkMelody(timeT, self.transpose)
+            if self.counter == 0:
+                self.checkMelody(timeT, self.transpose)
             self.checkChords(timeT, self.transpose)
 
         # def playMelody(self):
@@ -391,11 +399,11 @@ class BackTrackThread(threading.Thread):
             if timeT >= self.ChordNoteOnTiming[self.ChordIndexNoteOn]:
                 noteToPlay = self.ChordNoteOnNotes[self.ChordIndexNoteOn]
                 velocity = self.ChordNoteOnVelocity[self.ChordIndexNoteOn]
-                print("note on", noteToPlay, velocity)
-                t1 = time.time()
+                # print("note on", noteToPlay, velocity)
+                # t1 = time.time()
                 self.parent.midiIO.sendOut("note_on", noteToPlay + transpose, velocity)
-                t2 = time.time()
-                print("time loosed: ", t2 - t1)
+                # t2 = time.time()
+                # print("time loosed: ", t2 - t1)
                 self.ChordIndexNoteOn += 1
         if self.ChordIndexNoteOff <= len(self.ChordNoteOffTiming) - 1:
             if timeT >= self.ChordNoteOffTiming[self.ChordIndexNoteOff]:
@@ -408,11 +416,11 @@ class BackTrackThread(threading.Thread):
             if timeT >= self.MelodyNoteOnTiming[self.MelodyIndexNoteOn]:
                 noteToPlay = self.MelodyNoteOnNotes[self.MelodyIndexNoteOn]
                 velocity = self.MelodyNoteOnVelocity[self.MelodyIndexNoteOn]
-                print("note on", noteToPlay, velocity)
-                t1 = time.time()
+                # print("note on", noteToPlay, velocity)
+                # t1 = time.time()
                 self.parent.midiIO.sendOut("note_on", noteToPlay + transpose, velocity)
-                t2 = time.time()
-                print("time loosed: ", t2 - t1)
+                # t2 = time.time()
+                # print("time loosed: ", t2 - t1)
                 self.MelodyIndexNoteOn += 1
         if self.MelodyIndexNoteOff <= len(self.MelodyNoteOffTiming) - 1:
             if timeT >= self.MelodyNoteOffTiming[self.MelodyIndexNoteOff]:

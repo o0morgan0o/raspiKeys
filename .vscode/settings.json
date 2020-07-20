@@ -9,5 +9,5 @@
   "editor.formatOnSave": true,
   "python.formatting.provider": "black",
   "python.formatting.blackPath": "/home/pi/.local/bin/black",
-  "python.formatting.blackArgs": ["--line-length", "300"]
+  "python.formatting.blackArgs": ["--line-length", "140"]
 }

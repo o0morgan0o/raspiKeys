@@ -19,13 +19,13 @@ class Mode2:
         self.gameFrame.config(bg=env.COL_BG)
 
         self.gameFrame.lblStatic1 = MyLabel12(self.gameFrame, text="")
-        self.gameFrame.btnPlay = BtnBlack20(self.gameFrame, text="Play")
-        self.gameFrame.btnRandom = BtnBlack20(self.gameFrame, text="Random")
+        self.gameFrame.btnPlay = BtnBlack20(self.gameFrame, text="Play", activebackground="black")
+        self.gameFrame.btnRandom = BtnBlack20(self.gameFrame, text="Random", activebackground="black")
         self.gameFrame.labelCurrent = MyLabel10(self.gameFrame, text="", wraplength=300)
         self.gameFrame.labelCurrent.config(background="white", foreground="black")
-        self.gameFrame.btnLick = BtnBlack20(self.gameFrame, text="Record Lick on this drumLoop", wraplength="280")
+        self.gameFrame.btnLick = BtnBlack20(self.gameFrame, text="Record Lick on this drumLoop", wraplength="280", activebackground="black")
 
-        self.gameFrame.canvas = tk.Canvas(self.gameFrame)
+        self.gameFrame.canvas = tk.Canvas(self.gameFrame, bd=0, highlightthickness=0)
 
         self.placeElements()
         self.game = Game(self.globalRoot, self.gameFrame, config, self.app)

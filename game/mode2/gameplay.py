@@ -7,8 +7,9 @@ import mido
 import simpleaudio as sa
 import tkinter as tk
 import pygame
-import game.env
+from game import env
 
+from PIL import Image, ImageTk
 from game.utils.midiIO import MidiIO
 from game.utils.audio import Audio
 from game.autoload import Autoload
@@ -27,6 +28,12 @@ class Game:
     def __init__(
         self, globalRoot, parent, config, app,
     ):
+
+        # images
+        self.playImage = ImageTk.PhotoImage(Image.open(env.PLAY_IMAGE))
+        self.pauseImage = ImageTk.PhotoImage(Image.open(env.PAUSE_IMAGE))
+        self.shuffleImage = ImageTk.PhotoImage(Image.open(env.SHUFFLE_IMAGE))
+
         self.midiIO = Autoload().getInstance()
         self.midiIO.setCallback(self.handleMIDIInput)
         self.globalRoot = globalRoot
@@ -52,6 +59,7 @@ class Game:
         nbTracksStr = "Random beat:\n{} beats in the base.".format(str(len(self.tracksWav)))
         self.parent.lblStatic1.config(text=nbTracksStr)
         self.parent.btnLick.config(command=self.showWithOrWithoutBacktrackWindow)
+        self.parent.btnRandom.config(text="", image=self.shuffleImage)
 
         # recording variables
 
@@ -125,16 +133,20 @@ class Game:
 
     def stopBacktrack(self):
         self.sound.stopPlay()
-        self.parent.btnPlay.config(text="Play")
+        self.parent.btnPlay.config(image=self.playImage)
 
     def playBacktrack(self):
         self.sound.simplePlay(self.currentTrack)
         self.sound.isPlaying = True
-        self.parent.btnPlay.config(text="Stop")
+        self.parent.btnPlay.config(image=self.pauseImage)
         trackInfo = self.sound.getCurrentTrack()
         trackName = trackInfo[0].split("/")[-1]
         trackLength = "{0:.2f}".format(trackInfo[1])
-        self.parent.labelCurrent.config(text="Currently Playing ({} / {}):\n{}\n({} sec length)".format(self.sound.activeSample[1], str(len(self.sound.tracksWav)), trackName, str(trackLength),))
+        self.parent.labelCurrent.config(
+            text="Currently Playing ({} / {}):\n{}\n({} sec length)".format(
+                self.sound.activeSample[1], str(len(self.sound.tracksWav)), trackName, str(trackLength),
+            )
+        )
         # thread for canvas
         self.parent.canvas.delete("all")
         try:

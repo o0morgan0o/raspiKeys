@@ -5,6 +5,7 @@ import datetime
 import json
 import os
 import pygame
+from PIL import Image, ImageTk
 
 from game.utils.questionNote import CustomSignal
 from game.autoload import Autoload
@@ -17,6 +18,9 @@ from game.utils.customElements.labels import *
 
 class RecordNotesGui:
     def __init__(self, globalRoot, choosenBpm, bassNote, chordQuality, backtrack, backtrackDuration, nbOfLoops, chordNotes, app):
+        # images
+        self.recImage = ImageTk.PhotoImage(Image.open(env.RECORD_IMAGE))
+
         self.app = app
         self.globalRoot = globalRoot
         self.midiIO = Autoload().getInstance()
@@ -49,7 +53,7 @@ class RecordNotesGui:
         self.window.btnSave = BtnBlack12(self.window, text="Save", command=lambda: self.saveMidi())
         # self.window.btnSave.config(state="disabled")
 
-        self.window.canvas = tk.Canvas(self.window)
+        self.window.canvas = tk.Canvas(self.window, bd=0, highlightthickness=0)
 
         self.window.lbl1.place(x=0, y=40, width=320, height=80)
         self.window.lbl2.place(x=0, y=120, width=320, height=60)
@@ -59,7 +63,7 @@ class RecordNotesGui:
         self.window.btnRetry.place(x=120, y=310, width=80, height=130)
         self.window.btnSave.place(x=200, y=310, width=100, height=130)
 
-        self.window.canvas.place(x=20, y=290, width=280, height=30)
+        self.window.canvas.place(x=20, y=290, width=280, height=10)
 
         self.isRecording = False
         self.precountTimer = Bpm(self.choosenBpm, self.backtrack, self.backtrackDuration, self.nbOfLoops, lambda: self.activateRecording())
@@ -76,25 +80,20 @@ class RecordNotesGui:
     def reset(self):
         self.cancelThreads()
         self.melodyNotes = []
-        self.customSignals =[]
-        self.window.lbl1.config(text="Please record now...")
+        self.customSignals = []
+        self.window.lbl1.config(text="Record Melody after the ticks")
         self.stringNotes = ""
-        self.window.lblRec.config(text="")
-        self.isRecording=False
+        self.window.lblRec.config(image="")
+        self.isRecording = False
         self.precountTimer = Bpm(self.choosenBpm, self.backtrack, self.backtrackDuration, self.nbOfLoops, lambda: self.activateRecording())
         self.startingTime = 0
 
     def retry(self):
         self.reset()
-        # self.window.destroy()
-        # self.__init__(self, self.globalRoot, self.choosenBpm, self.bassNote, self.chordQuality, self.backtrackDuration, self.nbOfLoops, self.chordNotes, self.app)
-        # self.parent.cancelThreads()
-        # self.parent.startingTime=0
-        # self.parent.recordedNotes=[]
-        # self.parent.stringNotes =""
-        # self.window.lbl3.config(text="Notes : ")
-        # self.parent.precountTimer = Bpm(self.choosenBpm, self.backtrack, self.backtrackDuration,self.nbOfLoops, lambda: self.activateRecordingNotes())
-        # self.window.lblRec.config(background="black", text="")
+        self.window.canvas.delete("all")
+        self.window.canvas.place_forget()
+        self.window.canvas = tk.Canvas(self.window, bd=0, highlightthickness=0)
+        self.window.canvas.place(x=20, y=290, width=280, height=10)
 
     def saveMidi(self):
         # self.parent.createJson(self.bassNote, self.chordQuality, self.backtrack, self.backtrackDuration,self.nbOfLoops)
@@ -163,14 +162,15 @@ class RecordNotesGui:
         for note in self.chordNotes:
             self.customSignals.append(CustomSignal(self, note["type"], note["note"], note["velocity"], note["time"]))
         self.isRecording = True
-        self.window.lblRec.config(background="red", foreground="white", text="REC.")
+        self.window.lblRec.config(image=self.recImage)
         self.thread = MyThread("thread-canvas", self.window.canvas, self.audioInstance, self.backtrackDuration * self.nbOfLoops, self)
         self.thread.start()
         # self.parent.recordingNotes = True
 
     def endRecording(self):
         # self.parent.recordingNotes=False
-        self.window.lblRec.config(background="black", foreground="white", text="Finished!")
+        self.window.lblRec.config(image="")
+        self.window.lbl1.config(text="Click 'Save' to save the lick in the library.")
         self.window.canvas.delete("all")
         # self.window.btnSave.config(state="normal")
         self.window.canvas.place_forget()
