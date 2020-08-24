@@ -1,0 +1,156 @@
+{
+    "bass": 48,
+    "type": "dom7",
+    "backtrack": "/home/pi/raspiKeys/res/backtracks/processed_wav/Groove Loop_18 (16th notes) 90 BPM.wav",
+    "backtrackDuration": 7.995192527770996,
+    "nbOfLoops": 2,
+    "chord_notes": [
+        {
+            "type": "note_on",
+            "note": 58,
+            "velocity": 54,
+            "time": 0
+        },
+        {
+            "type": "note_on",
+            "note": 52,
+            "velocity": 54,
+            "time": 0
+        },
+        {
+            "type": "note_on",
+            "note": 55,
+            "velocity": 49,
+            "time": 2
+        },
+        {
+            "type": "note_on",
+            "note": 48,
+            "velocity": 41,
+            "time": 30
+        },
+        {
+            "type": "note_off",
+            "note": 55,
+            "velocity": 83,
+            "time": 4916
+        },
+        {
+            "type": "note_off",
+            "note": 52,
+            "velocity": 72,
+            "time": 5020
+        },
+        {
+            "type": "note_off",
+            "note": 58,
+            "velocity": 90,
+            "time": 5036
+        },
+        {
+            "type": "note_off",
+            "note": 48,
+            "velocity": 64,
+            "time": 5192
+        },
+        {
+            "type": "note_on",
+            "note": 48,
+            "velocity": 50,
+            "time": 5470
+        },
+        {
+            "type": "note_on",
+            "note": 53,
+            "velocity": 39,
+            "time": 5472
+        },
+        {
+            "type": "note_on",
+            "note": 52,
+            "velocity": 46,
+            "time": 5474
+        },
+        {
+            "type": "note_on",
+            "note": 57,
+            "velocity": 33,
+            "time": 5486
+        },
+        {
+            "type": "note_off",
+            "note": 53,
+            "velocity": 94,
+            "time": 10098
+        },
+        {
+            "type": "note_off",
+            "note": 52,
+            "velocity": 58,
+            "time": 10142
+        },
+        {
+            "type": "note_off",
+            "note": 57,
+            "velocity": 88,
+            "time": 10175
+        },
+        {
+            "type": "note_off",
+            "note": 48,
+            "velocity": 65,
+            "time": 10478
+        },
+        {
+            "type": "note_on",
+            "note": 58,
+            "velocity": 55,
+            "time": 10751
+        },
+        {
+            "type": "note_on",
+            "note": 52,
+            "velocity": 48,
+            "time": 10754
+        },
+        {
+            "type": "note_on",
+            "note": 55,
+            "velocity": 48,
+            "time": 10775
+        },
+        {
+            "type": "note_on",
+            "note": 48,
+            "velocity": 35,
+            "time": 10808
+        },
+        {
+            "type": "note_off",
+            "note": 55,
+            "velocity": 87,
+            "time": 15506
+        },
+        {
+            "type": "note_off",
+            "note": 52,
+            "velocity": 52,
+            "time": 15661
+        },
+        {
+            "type": "note_off",
+            "note": 58,
+            "velocity": 79,
+            "time": 15732
+        },
+        {
+            "type": "note_off",
+            "note": 48,
+            "velocity": 41,
+            "time": 15887
+        }
+    ],
+    "notes": [],
+    "volumeBacktrack": 1.0,
+    "additional_latency": 0
+}

@@ -19,7 +19,8 @@ from game.utils.midiToNotenames import noteName
 from game.utils.midiToNotenames import noteNameFull
 
 
-""" the mode 0 is for eartraining on a SINGLE INTERVAL """ 
+""" the mode 0 is for eartraining on a SINGLE INTERVAL """
+
 
 class Game:
     def __init__(self, parent, config):
@@ -52,6 +53,8 @@ class Game:
         self.changeAllBg("black")
         self.parent.btnSkip.configure(command=self.skip)
 
+        self.maxInterval = 12
+
     def toggleGlobalListen(self):
         if self.globalIsListening == True:
             self.globalIsListening = False
@@ -62,9 +65,7 @@ class Game:
 
     def skip(self):
         try:
-            self.parent.label2["text"] = "It was ;-)\n{}".format(
-                formatOutputInterval(self.questionNote.note - self.startingNote)
-            )
+            self.parent.label2["text"] = "It was ;-)\n{}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
             self.parent.label2["bg"] = "orange"
             # if we gave the good answer, we want a new note
             self.changeGameState("waitingUserInput")
@@ -90,12 +91,8 @@ class Game:
         elif newstate == "waitingUserInput":
             self.parent.label1["text"] = "Pick a starting Note"
             self.gameState = "waitingUserInput"
-            percentage = (
-                int((self.score / self.counter) * 100) if (self.counter != 0) else 0
-            )
-            self.parent.label3["text"] = "{}/{} ({}%)".format(
-                self.score, self.counter, percentage
-            )
+            percentage = int((self.score / self.counter) * 100) if (self.counter != 0) else 0
+            self.parent.label3["text"] = "{}/{} ({}%)".format(self.score, self.counter, percentage)
         elif newstate == "listen":
             # self.parent["bg"] = "orange"
             # self.changeAllBg("orange")
@@ -135,44 +132,9 @@ class Game:
         currentNote = self.waitingNotes[mNote]
         currentNote.resetTimer(offset)
 
-    def handleMIDIInput(self, msg):
-        # used for the midiListening button
-        if (
-            Autoload().getInstance().isListening == False
-        ):  # check if user has midi  listen
-            return
-        if self.globalIsListening == False:
-            return
-        # Needed because we still receive signals even if the class is destroyed
-        if self.isListening == False:
-            print("[--] Ignoring queue message...", msg, self.isListening)
-            return
-
-        print("[-]receiving something", msg, self.isListening)
-        if msg.type == "note_on":
-            # we test according to the gamestate
-
-            if self.gameState == "waitingUserInput":
-                self.changeGameState("listen")
-                self.startingNote = msg.note
-                # pick a random note
-                questionNote = self.pickNewNote(self.startingNote)
-                self.questionNote = QuestionNote(questionNote, self, self.delay)
-                # show the note on the ui
-                self.lblUserShow = noteNameFull(self.startingNote) + "-> "
-                self.parent.lblNote.config(text=self.lblUserShow)
-
-            elif self.gameState == "waitingUserAnswer":
-                if msg.note == self.startingNote:
-                    # we want to ignore the starting note for the user.
-                    return
-                self.checkAnswer(msg.note)  # we check the answer
-
     def checkAnswer(self, answer):
         if answer == self.questionNote.note:
-            self.parent.label2["text"] = "correct ;-)\n{}".format(
-                formatOutputInterval(self.questionNote.note - self.startingNote)
-            )
+            self.parent.label2["text"] = "correct ;-)\n{}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
             self.parent.label2["bg"] = "green"
             self.parent.lblNoteUser["text"] = noteNameFull(answer)
             self.parent.lblNoteUser["fg"] = "green"
@@ -186,9 +148,7 @@ class Game:
             self.melodies.playWinMelody()
             time.sleep(0.4)
         else:
-            self.parent.label2["text"] = "incorrect\nA: {}".format(
-                formatOutputInterval(answer - self.startingNote)
-            )
+            self.parent.label2["text"] = "incorrect\nA: {}".format(formatOutputInterval(answer - self.startingNote))
             self.questionNote.isFirstTry = False
             self.parent.label2["bg"] = "red"
             self.parent.lblNoteUser["text"] = noteNameFull(answer)
@@ -210,7 +170,7 @@ class Game:
     def pickNewNote(self, startingNote):
         self.counter = self.counter + 1
         # TODO : make the max interval customizable
-        maxInterval = 17
+        maxInterval = self.maxInterval
         offset = 0
         while offset == 0:  # we dont want the same note than the starting note
             offset = random.randint(-maxInterval, maxInterval)
@@ -228,3 +188,34 @@ class Game:
         self.parent.label1["fg"] = "white"
         self.parent.label2["fg"] = "white"
         self.parent.label3["fg"] = "white"
+
+    def handleMIDIInput(self, msg):
+        # used for the midiListening button
+        if Autoload().getInstance().isListening == False:  # check if user has midi  listen
+            return
+        if self.globalIsListening == False:
+            return
+        # Needed because we still receive signals even if the class is destroyed
+        if self.isListening == False:
+            print("[--] Ignoring queue message...", msg, self.isListening)
+            return
+
+        print("[-]receiving something", msg, self.isListening)
+        if msg.type == "note_on" and msg.velocity > 10:
+            # we test according to the gamestate
+
+            if self.gameState == "waitingUserInput":
+                self.changeGameState("listen")
+                self.startingNote = msg.note
+                # pick a random note
+                questionNote = self.pickNewNote(self.startingNote)
+                self.questionNote = QuestionNote(questionNote, self, self.delay)
+                # show the note on the ui
+                self.lblUserShow = noteNameFull(self.startingNote) + "-> "
+                self.parent.lblNote.config(text=self.lblUserShow)
+
+            elif self.gameState == "waitingUserAnswer":
+                if msg.note == self.startingNote:
+                    # we want to ignore the starting note for the user.
+                    return
+                self.checkAnswer(msg.note)  # we check the answer

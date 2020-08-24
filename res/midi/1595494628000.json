@@ -1,0 +1,138 @@
+{
+    "bass": 44,
+    "type": "major",
+    "backtrack": "/home/pi/raspiKeys/res/backtracks/processed_wav/49.wav",
+    "backtrackDuration": 6.0,
+    "nbOfLoops": 2,
+    "chord_notes": [
+        {
+            "type": "note_on",
+            "note": 65,
+            "velocity": 46,
+            "time": 0
+        },
+        {
+            "type": "note_on",
+            "note": 58,
+            "velocity": 38,
+            "time": 5
+        },
+        {
+            "type": "note_on",
+            "note": 46,
+            "velocity": 45,
+            "time": 33
+        },
+        {
+            "type": "note_on",
+            "note": 53,
+            "velocity": 43,
+            "time": 37
+        },
+        {
+            "type": "note_on",
+            "note": 56,
+            "velocity": 37,
+            "time": 41
+        },
+        {
+            "type": "note_on",
+            "note": 61,
+            "velocity": 30,
+            "time": 73
+        },
+        {
+            "type": "note_on",
+            "note": 64,
+            "velocity": 51,
+            "time": 3058
+        },
+        {
+            "type": "note_on",
+            "note": 58,
+            "velocity": 53,
+            "time": 3063
+        },
+        {
+            "type": "note_on",
+            "note": 55,
+            "velocity": 40,
+            "time": 3082
+        },
+        {
+            "type": "note_on",
+            "note": 51,
+            "velocity": 48,
+            "time": 3087
+        },
+        {
+            "type": "note_on",
+            "note": 67,
+            "velocity": 41,
+            "time": 3104
+        },
+        {
+            "type": "note_on",
+            "note": 60,
+            "velocity": 38,
+            "time": 5927
+        },
+        {
+            "type": "note_on",
+            "note": 63,
+            "velocity": 41,
+            "time": 5994
+        },
+        {
+            "type": "note_on",
+            "note": 44,
+            "velocity": 45,
+            "time": 6046
+        },
+        {
+            "type": "note_on",
+            "note": 67,
+            "velocity": 35,
+            "time": 6059
+        },
+        {
+            "type": "note_on",
+            "note": 70,
+            "velocity": 55,
+            "time": 6104
+        },
+        {
+            "type": "note_on",
+            "note": 44,
+            "velocity": 36,
+            "time": 8976
+        },
+        {
+            "type": "note_on",
+            "note": 60,
+            "velocity": 33,
+            "time": 9035
+        },
+        {
+            "type": "note_on",
+            "note": 63,
+            "velocity": 25,
+            "time": 9039
+        },
+        {
+            "type": "note_on",
+            "note": 55,
+            "velocity": 33,
+            "time": 9051
+        },
+        {
+            "type": "note_on",
+            "note": 67,
+            "velocity": 25,
+            "time": 9123
+        }
+    ],
+    "notes": [],
+    "volumeBacktrack": 1.0,
+    "additional_latency": 0
+}

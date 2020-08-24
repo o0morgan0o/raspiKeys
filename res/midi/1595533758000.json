@@ -1,0 +1,264 @@
+{
+    "bass": 37,
+    "type": "minor",
+    "backtrack": "/home/pi/raspiKeys/res/backtracks/processed_wav/Groove Loop_18 120 BPM.wav",
+    "backtrackDuration": 8.0,
+    "nbOfLoops": 1,
+    "chord_notes": [
+        {
+            "type": "note_on",
+            "note": 66,
+            "velocity": 48,
+            "time": 0
+        },
+        {
+            "type": "note_on",
+            "note": 39,
+            "velocity": 39,
+            "time": 9
+        },
+        {
+            "type": "note_on",
+            "note": 58,
+            "velocity": 36,
+            "time": 19
+        },
+        {
+            "type": "note_on",
+            "note": 63,
+            "velocity": 43,
+            "time": 19
+        },
+        {
+            "type": "note_on",
+            "note": 61,
+            "velocity": 40,
+            "time": 22
+        },
+        {
+            "type": "note_on",
+            "note": 51,
+            "velocity": 28,
+            "time": 35
+        },
+        {
+            "type": "note_off",
+            "note": 39,
+            "velocity": 82,
+            "time": 1472
+        },
+        {
+            "type": "note_off",
+            "note": 61,
+            "velocity": 83,
+            "time": 1505
+        },
+        {
+            "type": "note_off",
+            "note": 58,
+            "velocity": 74,
+            "time": 1589
+        },
+        {
+            "type": "note_off",
+            "note": 51,
+            "velocity": 87,
+            "time": 1593
+        },
+        {
+            "type": "note_on",
+            "note": 56,
+            "velocity": 41,
+            "time": 2093
+        },
+        {
+            "type": "note_on",
+            "note": 44,
+            "velocity": 49,
+            "time": 2102
+        },
+        {
+            "type": "note_on",
+            "note": 60,
+            "velocity": 50,
+            "time": 2110
+        },
+        {
+            "type": "note_on",
+            "note": 51,
+            "velocity": 55,
+            "time": 2113
+        },
+        {
+            "type": "note_off",
+            "note": 60,
+            "velocity": 81,
+            "time": 3511
+        },
+        {
+            "type": "note_off",
+            "note": 56,
+            "velocity": 79,
+            "time": 3584
+        },
+        {
+            "type": "note_off",
+            "note": 63,
+            "velocity": 90,
+            "time": 3598
+        },
+        {
+            "type": "note_off",
+            "note": 44,
+            "velocity": 80,
+            "time": 3621
+        },
+        {
+            "type": "note_off",
+            "note": 51,
+            "velocity": 83,
+            "time": 3651
+        },
+        {
+            "type": "note_on",
+            "note": 37,
+            "velocity": 41,
+            "time": 4132
+        },
+        {
+            "type": "note_on",
+            "note": 61,
+            "velocity": 32,
+            "time": 4133
+        },
+        {
+            "type": "note_on",
+            "note": 49,
+            "velocity": 46,
+            "time": 4137
+        },
+        {
+            "type": "note_on",
+            "note": 60,
+            "velocity": 57,
+            "time": 4139
+        },
+        {
+            "type": "note_on",
+            "note": 65,
+            "velocity": 41,
+            "time": 4154
+        },
+        {
+            "type": "note_off",
+            "note": 49,
+            "velocity": 57,
+            "time": 5803
+        },
+        {
+            "type": "note_off",
+            "note": 37,
+            "velocity": 60,
+            "time": 5805
+        },
+        {
+            "type": "note_off",
+            "note": 60,
+            "velocity": 71,
+            "time": 5829
+        },
+        {
+            "type": "note_off",
+            "note": 65,
+            "velocity": 67,
+            "time": 5848
+        },
+        {
+            "type": "note_off",
+            "note": 61,
+            "velocity": 59,
+            "time": 5863
+        },
+        {
+            "type": "note_off",
+            "note": 66,
+            "velocity": 60,
+            "time": 5923
+        },
+        {
+            "type": "note_on",
+            "note": 37,
+            "velocity": 60,
+            "time": 6047
+        },
+        {
+            "type": "note_on",
+            "note": 66,
+            "velocity": 35,
+            "time": 6066
+        },
+        {
+            "type": "note_on",
+            "note": 60,
+            "velocity": 37,
+            "time": 6070
+        },
+        {
+            "type": "note_on",
+            "note": 61,
+            "velocity": 33,
+            "time": 6072
+        },
+        {
+            "type": "note_on",
+            "note": 65,
+            "velocity": 46,
+            "time": 6080
+        },
+        {
+            "type": "note_on",
+            "note": 49,
+            "velocity": 39,
+            "time": 6095
+        },
+        {
+            "type": "note_off",
+            "note": 61,
+            "velocity": 90,
+            "time": 7819
+        },
+        {
+            "type": "note_off",
+            "note": 49,
+            "velocity": 91,
+            "time": 7821
+        },
+        {
+            "type": "note_off",
+            "note": 60,
+            "velocity": 87,
+            "time": 7830
+        },
+        {
+            "type": "note_off",
+            "note": 65,
+            "velocity": 94,
+            "time": 7847
+        },
+        {
+            "type": "note_off",
+            "note": 37,
+            "velocity": 85,
+            "time": 7852
+        },
+        {
+            "type": "note_off",
+            "note": 66,
+            "velocity": 88,
+            "time": 7866
+        }
+    ],
+    "notes": [],
+    "volumeBacktrack": 0.796875,
+    "additional_latency": 0
+}

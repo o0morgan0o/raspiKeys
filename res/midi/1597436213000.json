@@ -1,0 +1,306 @@
+{
+    "bass": 55,
+    "type": "minor",
+    "backtrack": "/home/pi/raspiKeys/res/backtracks/processed_wav/Groove Loop_06 56 BPM.wav",
+    "backtrackDuration": 4.307210922241211,
+    "nbOfLoops": 5,
+    "chord_notes": [
+        {
+            "type": "note_on",
+            "note": 65,
+            "velocity": 37,
+            "time": 0
+        },
+        {
+            "type": "note_on",
+            "note": 58,
+            "velocity": 38,
+            "time": 2
+        },
+        {
+            "type": "note_on",
+            "note": 55,
+            "velocity": 56,
+            "time": 40
+        },
+        {
+            "type": "note_on",
+            "note": 57,
+            "velocity": 38,
+            "time": 2222
+        },
+        {
+            "type": "note_on",
+            "note": 67,
+            "velocity": 24,
+            "time": 2226
+        },
+        {
+            "type": "note_on",
+            "note": 61,
+            "velocity": 54,
+            "time": 2234
+        },
+        {
+            "type": "note_on",
+            "note": 60,
+            "velocity": 47,
+            "time": 4354
+        },
+        {
+            "type": "note_on",
+            "note": 69,
+            "velocity": 38,
+            "time": 4365
+        },
+        {
+            "type": "note_on",
+            "note": 65,
+            "velocity": 40,
+            "time": 4377
+        },
+        {
+            "type": "note_on",
+            "note": 62,
+            "velocity": 44,
+            "time": 4383
+        },
+        {
+            "type": "note_on",
+            "note": 68,
+            "velocity": 47,
+            "time": 5438
+        },
+        {
+            "type": "note_on",
+            "note": 61,
+            "velocity": 50,
+            "time": 5449
+        },
+        {
+            "type": "note_on",
+            "note": 59,
+            "velocity": 36,
+            "time": 5461
+        },
+        {
+            "type": "note_on",
+            "note": 65,
+            "velocity": 34,
+            "time": 5462
+        },
+        {
+            "type": "note_on",
+            "note": 63,
+            "velocity": 44,
+            "time": 6574
+        },
+        {
+            "type": "note_on",
+            "note": 58,
+            "velocity": 30,
+            "time": 6587
+        },
+        {
+            "type": "note_on",
+            "note": 67,
+            "velocity": 35,
+            "time": 6587
+        },
+        {
+            "type": "note_on",
+            "note": 62,
+            "velocity": 45,
+            "time": 6613
+        },
+        {
+            "type": "note_on",
+            "note": 67,
+            "velocity": 40,
+            "time": 7619
+        },
+        {
+            "type": "note_on",
+            "note": 57,
+            "velocity": 50,
+            "time": 7621
+        },
+        {
+            "type": "note_on",
+            "note": 63,
+            "velocity": 43,
+            "time": 7632
+        },
+        {
+            "type": "note_on",
+            "note": 62,
+            "velocity": 57,
+            "time": 7634
+        },
+        {
+            "type": "note_on",
+            "note": 62,
+            "velocity": 40,
+            "time": 8709
+        },
+        {
+            "type": "note_on",
+            "note": 65,
+            "velocity": 28,
+            "time": 8720
+        },
+        {
+            "type": "note_on",
+            "note": 58,
+            "velocity": 35,
+            "time": 8728
+        },
+        {
+            "type": "note_on",
+            "note": 57,
+            "velocity": 33,
+            "time": 8730
+        },
+        {
+            "type": "note_on",
+            "note": 65,
+            "velocity": 39,
+            "time": 9820
+        },
+        {
+            "type": "note_on",
+            "note": 57,
+            "velocity": 40,
+            "time": 9821
+        },
+        {
+            "type": "note_on",
+            "note": 62,
+            "velocity": 36,
+            "time": 9830
+        },
+        {
+            "type": "note_on",
+            "note": 60,
+            "velocity": 52,
+            "time": 9846
+        },
+        {
+            "type": "note_on",
+            "note": 67,
+            "velocity": 31,
+            "time": 10812
+        },
+        {
+            "type": "note_on",
+            "note": 64,
+            "velocity": 35,
+            "time": 10825
+        },
+        {
+            "type": "note_on",
+            "note": 61,
+            "velocity": 34,
+            "time": 10827
+        },
+        {
+            "type": "note_on",
+            "note": 57,
+            "velocity": 1,
+            "time": 11206
+        },
+        {
+            "type": "note_on",
+            "note": 57,
+            "velocity": 39,
+            "time": 12988
+        },
+        {
+            "type": "note_on",
+            "note": 62,
+            "velocity": 36,
+            "time": 13018
+        },
+        {
+            "type": "note_on",
+            "note": 65,
+            "velocity": 28,
+            "time": 13029
+        },
+        {
+            "type": "note_on",
+            "note": 60,
+            "velocity": 38,
+            "time": 13034
+        },
+        {
+            "type": "note_on",
+            "note": 64,
+            "velocity": 41,
+            "time": 15124
+        },
+        {
+            "type": "note_on",
+            "note": 56,
+            "velocity": 38,
+            "time": 15138
+        },
+        {
+            "type": "note_on",
+            "note": 60,
+            "velocity": 57,
+            "time": 15159
+        },
+        {
+            "type": "note_on",
+            "note": 62,
+            "velocity": 27,
+            "time": 15179
+        },
+        {
+            "type": "note_on",
+            "note": 64,
+            "velocity": 34,
+            "time": 17295
+        },
+        {
+            "type": "note_on",
+            "note": 55,
+            "velocity": 44,
+            "time": 17316
+        },
+        {
+            "type": "note_on",
+            "note": 60,
+            "velocity": 40,
+            "time": 17327
+        },
+        {
+            "type": "note_on",
+            "note": 60,
+            "velocity": 38,
+            "time": 19401
+        },
+        {
+            "type": "note_on",
+            "note": 64,
+            "velocity": 33,
+            "time": 19406
+        },
+        {
+            "type": "note_on",
+            "note": 53,
+            "velocity": 33,
+            "time": 19439
+        },
+        {
+            "type": "note_on",
+            "note": 57,
+            "velocity": 39,
+            "time": 19449
+        }
+    ],
+    "notes": [],
+    "volumeBacktrack": 1.0,
+    "additional_latency": 0
+}

@@ -1,0 +1,84 @@
+{
+    "bass": 43,
+    "type": "minor",
+    "backtrack": "/home/pi/raspiKeys/res/backtracks/processed_wav/grahamcentralstation-thejam2.wav",
+    "backtrackDuration": 4.352380752563477,
+    "nbOfLoops": 5,
+    "chord_notes": [
+        {
+            "type": "note_on",
+            "note": 43,
+            "velocity": 65,
+            "time": 0
+        },
+        {
+            "type": "note_on",
+            "note": 45,
+            "velocity": 66,
+            "time": 2233
+        },
+        {
+            "type": "note_on",
+            "note": 38,
+            "velocity": 52,
+            "time": 4420
+        },
+        {
+            "type": "note_on",
+            "note": 37,
+            "velocity": 60,
+            "time": 5480
+        },
+        {
+            "type": "note_on",
+            "note": 36,
+            "velocity": 72,
+            "time": 6559
+        },
+        {
+            "type": "note_on",
+            "note": 41,
+            "velocity": 60,
+            "time": 7675
+        },
+        {
+            "type": "note_on",
+            "note": 46,
+            "velocity": 61,
+            "time": 8772
+        },
+        {
+            "type": "note_on",
+            "note": 45,
+            "velocity": 71,
+            "time": 10941
+        },
+        {
+            "type": "note_on",
+            "note": 50,
+            "velocity": 70,
+            "time": 13125
+        },
+        {
+            "type": "note_on",
+            "note": 40,
+            "velocity": 52,
+            "time": 15304
+        },
+        {
+            "type": "note_on",
+            "note": 45,
+            "velocity": 59,
+            "time": 17482
+        },
+        {
+            "type": "note_on",
+            "note": 38,
+            "velocity": 72,
+            "time": 19637
+        }
+    ],
+    "notes": [],
+    "volumeBacktrack": 0.796875,
+    "additional_latency": 0
+}

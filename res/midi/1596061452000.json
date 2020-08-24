@@ -1,0 +1,156 @@
+{
+    "bass": 36,
+    "type": "major",
+    "backtrack": "/home/pi/raspiKeys/res/backtracks/processed_wav/Jack_Mcduff_-_Hunk_O'_Funk_(1).wav",
+    "backtrackDuration": 5.262063503265381,
+    "nbOfLoops": 2,
+    "chord_notes": [
+        {
+            "type": "note_on",
+            "note": 38,
+            "velocity": 61,
+            "time": 0
+        },
+        {
+            "type": "note_off",
+            "note": 38,
+            "velocity": 82,
+            "time": 666
+        },
+        {
+            "type": "note_on",
+            "note": 43,
+            "velocity": 72,
+            "time": 750
+        },
+        {
+            "type": "note_off",
+            "note": 43,
+            "velocity": 51,
+            "time": 1197
+        },
+        {
+            "type": "note_on",
+            "note": 36,
+            "velocity": 70,
+            "time": 1286
+        },
+        {
+            "type": "note_off",
+            "note": 36,
+            "velocity": 50,
+            "time": 2276
+        },
+        {
+            "type": "note_on",
+            "note": 38,
+            "velocity": 78,
+            "time": 2754
+        },
+        {
+            "type": "note_off",
+            "note": 38,
+            "velocity": 87,
+            "time": 3168
+        },
+        {
+            "type": "note_on",
+            "note": 31,
+            "velocity": 64,
+            "time": 3429
+        },
+        {
+            "type": "note_off",
+            "note": 31,
+            "velocity": 72,
+            "time": 3750
+        },
+        {
+            "type": "note_on",
+            "note": 36,
+            "velocity": 51,
+            "time": 3899
+        },
+        {
+            "type": "note_off",
+            "note": 36,
+            "velocity": 87,
+            "time": 4865
+        },
+        {
+            "type": "note_on",
+            "note": 38,
+            "velocity": 73,
+            "time": 5321
+        },
+        {
+            "type": "note_off",
+            "note": 38,
+            "velocity": 62,
+            "time": 5777
+        },
+        {
+            "type": "note_on",
+            "note": 43,
+            "velocity": 55,
+            "time": 5991
+        },
+        {
+            "type": "note_off",
+            "note": 43,
+            "velocity": 83,
+            "time": 6386
+        },
+        {
+            "type": "note_on",
+            "note": 36,
+            "velocity": 65,
+            "time": 6458
+        },
+        {
+            "type": "note_off",
+            "note": 36,
+            "velocity": 83,
+            "time": 7578
+        },
+        {
+            "type": "note_on",
+            "note": 38,
+            "velocity": 66,
+            "time": 7945
+        },
+        {
+            "type": "note_off",
+            "note": 38,
+            "velocity": 58,
+            "time": 8572
+        },
+        {
+            "type": "note_on",
+            "note": 31,
+            "velocity": 49,
+            "time": 8647
+        },
+        {
+            "type": "note_off",
+            "note": 31,
+            "velocity": 84,
+            "time": 9079
+        },
+        {
+            "type": "note_on",
+            "note": 36,
+            "velocity": 68,
+            "time": 9129
+        },
+        {
+            "type": "note_off",
+            "note": 36,
+            "velocity": 90,
+            "time": 10246
+        }
+    ],
+    "notes": [],
+    "volumeBacktrack": 1.0,
+    "additional_latency": 0
+}

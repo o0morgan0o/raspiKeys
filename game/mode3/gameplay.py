@@ -347,7 +347,7 @@ class BackTrackThread(threading.Thread):
 
         self.counter = 0
         print("Initialisation AUDIO THREAD")
-        self.nbBeforeTranspose = 4
+        self.nbBeforeTranspose = 2
         self.parent.showUserInfo(self.transpose, self.counter + 1, self.nbBeforeTranspose)
 
     def run(self):
