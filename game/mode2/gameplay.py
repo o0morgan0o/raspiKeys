@@ -48,8 +48,8 @@ class Game:
         # CLICK LISTENERS
         self.parent.btnPlay.config(command=self.toggleBacktrack)
         self.parent.btnRandom.config(command=self.playRandom)
-        self.parent.btnMetro.config(
-            command=lambda: self.pickRandomSampleInCategory("metro"))
+        self.parent.btnHouse.config(
+            command=lambda: self.pickRandomSampleInCategory("house"))
         self.parent.btnJazz.config(
             command=lambda: self.pickRandomSampleInCategory("jazz"))
         self.parent.btnLatin.config(
@@ -57,7 +57,7 @@ class Game:
         self.parent.btnHipHop.config(
             command=lambda: self.pickRandomSampleInCategory("hiphop"))
 
-        # this is a list which regroups all 4 folders (metro , jazz ,latin, hiphop)
+        # this is a list which regroups all 4 folders (house , jazz ,latin, hiphop)
         self.tracksWav = self.sound.tracksWav
 
         self.parent.btnLick.config(

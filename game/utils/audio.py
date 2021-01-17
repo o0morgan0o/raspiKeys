@@ -21,7 +21,7 @@ class Audio:
 
         # initialisation des array contenant les tracks
         self.tracksWav = lambda: None
-        self.tracksWav.metro = []
+        self.tracksWav.house = []
         self.tracksWav.jazz = []
         self.tracksWav.latin = []
         self.tracksWav.hiphop = []
@@ -31,7 +31,7 @@ class Audio:
 
     def initialize(self):
         self.loadBacktracksWav()
-        self.pickRandomSample("metro")
+        self.pickRandomSample("house")
 
         # may be the buffer size will need to be increased if alsa problems in the console. ...
 
@@ -44,9 +44,9 @@ class Audio:
 
     def pickRandomSample(self, category):
         selectedFolder = None
-        if category == "metro":
-            self.activeFolder = "metro"
-            selectedFolder = self.tracksWav.metro
+        if category == "house":
+            self.activeFolder = "house"
+            selectedFolder = self.tracksWav.house
         elif category == "jazz":
             self.activeFolder = "jazz"
             selectedFolder = self.tracksWav.jazz
@@ -89,10 +89,10 @@ class Audio:
         pygame.mixer.music.play()
 
     def loadBacktracksWav(self):
-        path_to_search = os.path.join(self.processed_waveDir, "metro")
+        path_to_search = os.path.join(self.processed_waveDir, "house")
         if(os.path.exists(path_to_search)):
             for filename in os.listdir(path_to_search):
-                self.tracksWav.metro.append(
+                self.tracksWav.house.append(
                     os.path.join(path_to_search, filename))
 
         path_to_search = os.path.join(self.processed_waveDir, "jazz")
@@ -128,7 +128,8 @@ class Audio:
             # _thread.start_new_thread(self.testLatency, (time.time(),))
             pygame.mixer.music.play(loops=-1, fade_ms=200)
             print("after play")
-        except Exception:
+        except Exception as e:
+            print(e)
             print("can't play file !!")
         # pygame.mixer.music.play(loops=-1, fade_ms=200)
 

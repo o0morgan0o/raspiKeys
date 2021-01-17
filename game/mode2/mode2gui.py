@@ -26,8 +26,8 @@ class Mode2:
         self.gameFrame.canvas = tk.Canvas(
             self.gameFrame, bd=0, highlightthickness=0)
 
-        self.gameFrame.btnMetro = BtnBlack20(
-            self.gameFrame, text="Metro", activebackground="black")
+        self.gameFrame.btnHouse = BtnBlack20(
+            self.gameFrame, text="House", activebackground="black")
         self.gameFrame.btnLatin = BtnBlack20(
             self.gameFrame, text="Latin", activebackground="black")
         self.gameFrame.btnJazz = BtnBlack20(
@@ -40,7 +40,7 @@ class Mode2:
 
     def placeElements(self):
         yplacement = 20
-        self.gameFrame.btnMetro.place(x=10, y=yplacement, width=140, height=80)
+        self.gameFrame.btnHouse.place(x=10, y=yplacement, width=140, height=80)
         self.gameFrame.btnLatin.place(
             x=170, y=yplacement, width=140, height=80)
         # self.gameFrame.lblStatic1.place(
