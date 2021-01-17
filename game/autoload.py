@@ -12,9 +12,9 @@ class Autoload:  # Class used for singleton pattern, for storing global midiIO c
             self.configOut = self.config["MIDI_interface_out"]
             print("default interface :", self.configIn, self.configOut)
             self.midiIO = MidiIO(self.configIn, self.configOut)
-            self.audioPCM = Audio()
-            self.audioPCM.convertNewFiles()
             self.sound = Audio()
+            self.sound.initialize()
+
     instance = None
 
     def __init__(self):

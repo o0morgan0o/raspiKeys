@@ -15,6 +15,7 @@ class Audio:
         self.metroTick = env.METRO_TICK_FILE
         self.currentFile = None
         self.currentFileLength = None
+        self.convertNewFiles()
 
         # self.tracksWav = self.loadBacktracksWav()
 
@@ -27,7 +28,6 @@ class Audio:
 
         self.activeSample = None
         self.activeFolder = None
-        # TODO make initialize
 
     def initialize(self):
         self.loadBacktracksWav()
@@ -59,6 +59,7 @@ class Audio:
         else:
             # TODO : handle error here
             print("unknown category !")
+            return
         if len(selectedFolder) == 0:
             return
         index = random.randint(0, len(selectedFolder) - 1)
@@ -67,6 +68,8 @@ class Audio:
 
     def convertNewFiles(self):
         # we try to convert all files put by the user. It is needed because we only want PCM 16 bits
+        # TODO This should not work because of refactorization between to multiple folders
+        # TODO make test to this to easier implementation
         print(self.user_waveDir)
         for filename in os.listdir(self.user_waveDir):
             filenameFull = os.path.join(self.user_waveDir, filename)
@@ -90,27 +93,30 @@ class Audio:
         if(os.path.exists(path_to_search)):
             for filename in os.listdir(path_to_search):
                 self.tracksWav.metro.append(
-                    os.path.join(self.processed_waveDir, filename))
+                    os.path.join(path_to_search, filename))
+
         path_to_search = os.path.join(self.processed_waveDir, "jazz")
         if(os.path.exists(path_to_search)):
             for filename in os.listdir(path_to_search):
                 self.tracksWav.jazz.append(
-                    os.path.join(self.processed_waveDir, filename))
+                    os.path.join(path_to_search, filename))
+
         path_to_search = os.path.join(self.processed_waveDir, "latin")
         if(os.path.exists(path_to_search)):
             for filename in os.listdir(path_to_search):
                 self.tracksWav.latin.append(
-                    os.path.join(self.processed_waveDir, filename))
+                    os.path.join(path_to_search, filename))
+
         path_to_search = os.path.join(self.processed_waveDir, "hiphop")
         if(os.path.exists(path_to_search)):
             for filename in os.listdir(path_to_search):
                 self.tracksWav.hiphop.append(
-                    os.path.join(self.processed_waveDir, filename))
+                    os.path.join(path_to_search, filename))
 
-    def simplePlay(self, filename):
+    def simplePlay(self):
         try:
 
-            file = filename
+            file = self.activeSample[0]
             pygame.mixer.music.load(file)
             sound = pygame.mixer.Sound(file)
             # pygame.mixer.music.set_pos(0)

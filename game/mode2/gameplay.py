@@ -45,26 +45,24 @@ class Game:
         self.parent = parent
         self.sound = Autoload().getInstanceAudio()
 
+        # CLICK LISTENERS
         self.parent.btnPlay.config(command=self.toggleBacktrack)
         self.parent.btnRandom.config(command=self.playRandom)
+        self.parent.btnMetro.config(
+            command=lambda: self.pickRandomSampleInCategory("metro"))
+        self.parent.btnJazz.config(
+            command=lambda: self.pickRandomSampleInCategory("jazz"))
+        self.parent.btnLatin.config(
+            command=lambda: self.pickRandomSampleInCategory("latin"))
+        self.parent.btnHipHop.config(
+            command=lambda: self.pickRandomSampleInCategory("hiphop"))
+
+        # this is a list which regroups all 4 folders (metro , jazz ,latin, hiphop)
         self.tracksWav = self.sound.tracksWav
-        # self.activeSample = self.sound.activeSample[0]
-        # self.activeSampleIndex = self.sound.activeSample[1]
-        # self.tuple = self.sound.pickRandomSample(self.tracksWav)
-        # self.activeSample = self.tuple[0]
-        # self.activeSampleIndex=self.tuple[1]
 
-        if self.sound.activeSample is not None:  # condition necessary if we have an empty list of sounds
-            self.currentTrack = self.sound.activeSample[0]
-            self.showRandomTracks()
-            self.playBacktrack()
-
-            # nbTracksStr = "Random beat:\n{} beats in the base.".format(
-            # str(len(self.tracksWav)))
-            # self.parent.lblStatic1.config(text=nbTracksStr)
-            self.parent.btnLick.config(
-                command=self.showWithOrWithoutBacktrackWindow)
-            self.parent.btnRandom.config(text="", image=self.shuffleImage)
+        self.parent.btnLick.config(
+            command=self.showWithOrWithoutBacktrackWindow)
+        self.parent.btnRandom.config(text="", image=self.shuffleImage)
 
         # recording variables
 
@@ -103,25 +101,21 @@ class Game:
     def changeTrack(self, index):
         try:
             self.stopBacktrack()
-        except:
+        except Exception:
             print("cant stop track during changeTrack.")
-
         self.currentTrack = self.activeSample[index]
         self.playBacktrack()
         self.showCurrentPlayingInLabel()
         self.sound.isPlaying = True
 
-    # def pickRandomSample(self,):
-    #     index = random.randint(0, len(self.tracksWav) - 1,)
-    #     self.activeSampleIndex = index
-    #     return (
-    #         self.tracksWav[index],
-    #         index,
-    #     )
+    def pickRandomSampleInCategory(self, category):
+        print(category)
+        self.sound.pickRandomSample(category)
+        self.playBacktrack()
 
     def playRandom(self):
         self.sound.pickRandomSample()
-        # self.activeSample =
+        # TODO should display somewhere the number of files in the category and the index
         self.showRandomTracks()
         if self.sound.isPlaying == True:
             self.sound.stopPlay()
@@ -145,18 +139,18 @@ class Game:
         self.parent.btnPlay.config(image=self.playImage)
 
     def playBacktrack(self):
-        self.sound.simplePlay(self.currentTrack)
+        self.sound.simplePlay()
         self.sound.isPlaying = True
         self.parent.btnPlay.config(image=self.pauseImage)
         trackInfo = self.sound.getCurrentTrack()
         trackName = trackInfo[0].split("/")[-1]
         trackLength = "{0:.2f}".format(trackInfo[1])
-        self.parent.labelCurrent.config(
-            text="Currently Playing ({} / {}):\n{}\n({} sec length)".format(
-                self.sound.activeSample[1], str(
-                    len(self.sound.tracksWav)), trackName, str(trackLength),
-            )
-        )
+        # self.parent.labelCurrent.config(
+        #     text="Currently Playing ({} / {}):\n{}\n({} sec length)".format(
+        #         self.sound.activeSample[1], str(
+        #             len(self.sound.tracksWav)), trackName, str(trackLength),
+        #     )
+        # )
         # thread for canvas
         self.parent.canvas.delete("all")
         try:
@@ -181,15 +175,6 @@ class Game:
     def destroy(self):
         print("trying cancel thread")
         self.cancelThreads()
-        # pass
-        # self.cancelThreads()
-        # pygame.mixer.music.stop()
-        # try:
-        # del self.activeCustomSignals
-        # del self.precountTimer
-        # except Exception as e:
-        #     print("error in destroy :", e)
-        # del self
 
     def handleMIDIInput(self, msg):
         print(msg)

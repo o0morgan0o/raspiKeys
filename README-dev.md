@@ -2,7 +2,6 @@
 
 // Commentaires Janvier 2021: Nouvelles implémentation
 
-- TODO : Mettre en écran d'acceuil le backtrack batterie.
 - TODO : Mettre par défault un métronome setté randomly entre 50 et 100 bpm. Bouttons + et - pour variation de 10 bpm.
 - TODO : pouvoir bookmarquer des fichiers drums.
 - TODO : pouvoir sélectionner les fichiers drums à utiliser. (founction à implémenter dans options).
