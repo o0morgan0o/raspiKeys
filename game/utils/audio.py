@@ -1,6 +1,3 @@
-import time
-import simpleaudio as sa
-import _thread
 import soundfile
 from pydub import AudioSegment
 import os
@@ -19,9 +16,22 @@ class Audio:
         self.currentFile = None
         self.currentFileLength = None
 
-        self.tracksWav = self.loadBacktracksWav()
+        # self.tracksWav = self.loadBacktracksWav()
+
+        # initialisation des array contenant les tracks
+        self.tracksWav = lambda: None
+        self.tracksWav.metro = []
+        self.tracksWav.jazz = []
+        self.tracksWav.latin = []
+        self.tracksWav.hiphop = []
+
         self.activeSample = None
-        self.pickRandomSample()
+        self.activeFolder = None
+        # TODO make initialize
+
+    def initialize(self):
+        self.loadBacktracksWav()
+        self.pickRandomSample("metro")
 
         # may be the buffer size will need to be increased if alsa problems in the console. ...
 
@@ -32,13 +42,27 @@ class Audio:
 
         self.isPlaying = False
 
-    def pickRandomSample(self):
-
-        if len(self.tracksWav) == 0:
+    def pickRandomSample(self, category):
+        selectedFolder = None
+        if category == "metro":
+            self.activeFolder = "metro"
+            selectedFolder = self.tracksWav.metro
+        elif category == "jazz":
+            self.activeFolder = "jazz"
+            selectedFolder = self.tracksWav.jazz
+        elif category == "latin":
+            self.activeFolder = "latin"
+            selectedFolder = self.tracksWav.latin
+        elif category == "hiphop":
+            self.activeFolder = "hiphop"
+            selectedFolder = self.tracksWav.hiphop
+        else:
+            # TODO : handle error here
+            print("unknown category !")
+        if len(selectedFolder) == 0:
             return
-        index = random.randint(0, len(self.tracksWav) - 1)
-        self.activeSample = (self.tracksWav[index], index)
-
+        index = random.randint(0, len(selectedFolder) - 1)
+        self.activeSample = (selectedFolder[index], index)
         # TODO: trigger this function on boutton pressed by user in the config to reload wav or mp3 files
 
     def convertNewFiles(self):
@@ -52,7 +76,7 @@ class Audio:
                 outfile = os.path.join(self.processed_waveDir, filename)
                 soundfile.write(outfile, data, samplerate, subtype="PCM_16")
                 print("done")
-            except:
+            except Exception:
                 print("error during conversion", filename)
 
     def loadTick(self):
@@ -62,27 +86,44 @@ class Audio:
         pygame.mixer.music.play()
 
     def loadBacktracksWav(self):
-        print("trying to load backtracks")
-        tracks = []
-        for filename in os.listdir(self.processed_waveDir):
-            # print(filename)
-            tracks.append(os.path.join(self.processed_waveDir, filename))
-
-        # print(tracks)
-        return tracks
+        path_to_search = os.path.join(self.processed_waveDir, "metro")
+        if(os.path.exists(path_to_search)):
+            for filename in os.listdir(path_to_search):
+                self.tracksWav.metro.append(
+                    os.path.join(self.processed_waveDir, filename))
+        path_to_search = os.path.join(self.processed_waveDir, "jazz")
+        if(os.path.exists(path_to_search)):
+            for filename in os.listdir(path_to_search):
+                self.tracksWav.jazz.append(
+                    os.path.join(self.processed_waveDir, filename))
+        path_to_search = os.path.join(self.processed_waveDir, "latin")
+        if(os.path.exists(path_to_search)):
+            for filename in os.listdir(path_to_search):
+                self.tracksWav.latin.append(
+                    os.path.join(self.processed_waveDir, filename))
+        path_to_search = os.path.join(self.processed_waveDir, "hiphop")
+        if(os.path.exists(path_to_search)):
+            for filename in os.listdir(path_to_search):
+                self.tracksWav.hiphop.append(
+                    os.path.join(self.processed_waveDir, filename))
 
     def simplePlay(self, filename):
-        file = filename
-        pygame.mixer.music.load(file)
-        sound = pygame.mixer.Sound(file)
-        # pygame.mixer.music.set_pos(0)
-        # we keep trace of the current file if we want to retreive it for the lick recording
-        self.currentFile = file
-        self.currentFileLength = sound.get_length()
-        print("Current audio file is ... :", sound.get_length(), " ms, ", self.currentFile)
-        # _thread.start_new_thread(self.testLatency, (time.time(),))
-        pygame.mixer.music.play(loops=-1, fade_ms=200)
-        print("after play")
+        try:
+
+            file = filename
+            pygame.mixer.music.load(file)
+            sound = pygame.mixer.Sound(file)
+            # pygame.mixer.music.set_pos(0)
+            # we keep trace of the current file if we want to retreive it for the lick recording
+            self.currentFile = file
+            self.currentFileLength = sound.get_length()
+            print("Current audio file is ... :",
+                  sound.get_length(), " ms, ", self.currentFile)
+            # _thread.start_new_thread(self.testLatency, (time.time(),))
+            pygame.mixer.music.play(loops=-1, fade_ms=200)
+            print("after play")
+        except Exception:
+            print("can't play file !!")
         # pygame.mixer.music.play(loops=-1, fade_ms=200)
 
     # doesn't work
@@ -109,7 +150,8 @@ class Audio:
         exportName = os.path.splitext(baseName)[0]
         exportName = "out.wav"
         print("outname ", exportName)
-        sound.export(os.path.join(self.waveDir, exportName), format="wav", bitrate="16k")
+        sound.export(os.path.join(self.waveDir, exportName),
+                     format="wav", bitrate="16k")
 
         return exportName
 

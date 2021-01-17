@@ -1,46 +1,30 @@
 import unittest
 from game.utils.audio import Audio
-import pygame
+import os
+from game import env
 
 
 class TestAudio(unittest.TestCase):
     def setUp(self):
-        pass
+        self.audio = Audio()
 
-    def test_emptyTest(self):
-        self.assertEqual(0, 0)
+    def test_loadBacktracksWavOfEmptyFolder(self):
+        self.audio.processed_waveDir = env.TEST_ROOT_DIR_PROCESSED_EMPTY_FOLDER
+        self.audio.loadBacktracksWav()
+        self.assertEquals(self.audio.tracksWav.metro, [])
+        self.assertEquals(self.audio.tracksWav.latin, [])
+        self.assertEquals(self.audio.tracksWav.jazz, [])
+        self.assertEquals(self.audio.tracksWav.hiphop, [])
 
-    def test_whenSoundIsCreatedMixerVolumeIsSetToVolLow(self):
-        self.sound = Audio()
-        # .3 is choose arbitraty because .1 is not always correctly rounded
-        self.assertLess(round(pygame.mixer.music.get_volume()), .3)
+    def test_loadBacktracksWav_With_One_Metro_File(self):
+        self.audio.processed_waveDir = env.TEST_ROOT_DIR_PROCESSED_WAV_FOLDER
+        self.audio.loadBacktracksWav()
+        self.assertEquals(len(self.audio.tracksWav.metro), 1)
+        self.assertEquals(len(self.audio.tracksWav.latin), 0)
+        self.assertEquals(len(self.audio.tracksWav.jazz), 0)
+        self.assertEquals(len(self.audio.tracksWav.hiphop), 0)
+        self.assertEquals(self.audio.tracksWav.metro[0], os.path.join(
+            self.audio.processed_waveDir, "metro1.wav"))
 
-    def test_pickRandomSampleOfAnEmptyArrayDontRaiseError(self):
-        self.sound = Audio()
-        try:
-            self.sound.pickRandomSample([])
-        except Exception:
-            self.fail("pickRandomSample([]) raised Exception unexpectedly !")
-
-    # def test_loadAndPlayMetronomeTick(self):
-    #     self.tick = Sound().metroTick
-    #     try:
-    #         pygame.mixer.music.load(self.tick)
-    #     except Exception:
-    #         self.fail(
-    #             "pygame.mixer.music.load(self.metroTick) raised Exception unexpectedly!")
-    #     try:
-    #         pygame.mixer.music.play()
-    #     except Exception:
-    #         self.fail("pygame.mixer.music.play() raised Exception unexpectedly!")
-
-    def test_setVolumeOver100ShouldMakeVolume100(self):
-        newVolume = 150
-        self.sound = Audio()
-        self.sound.setVolume(newVolume)
-        realVolume = pygame.mixer.music.get_volume()
-        self.assertLessEqual(round(realVolume), round(1))
-
-
-if __name__ == "__main__":
-    unittest.main()
+    def tearDown(self):
+        del self.audio

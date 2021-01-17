@@ -28,6 +28,8 @@ class Game:
     def __init__(
         self, globalRoot, parent, config, app,
     ):
+        self.currentTrack = None
+        self.tracksWav = None
 
         # images
         self.playImage = ImageTk.PhotoImage(Image.open(env.PLAY_IMAGE))
@@ -52,14 +54,17 @@ class Game:
         # self.activeSample = self.tuple[0]
         # self.activeSampleIndex=self.tuple[1]
 
-        self.currentTrack = self.sound.activeSample[0]
-        self.showRandomTracks()
-        self.playBacktrack()
+        if self.sound.activeSample is not None:  # condition necessary if we have an empty list of sounds
+            self.currentTrack = self.sound.activeSample[0]
+            self.showRandomTracks()
+            self.playBacktrack()
 
-        nbTracksStr = "Random beat:\n{} beats in the base.".format(str(len(self.tracksWav)))
-        self.parent.lblStatic1.config(text=nbTracksStr)
-        self.parent.btnLick.config(command=self.showWithOrWithoutBacktrackWindow)
-        self.parent.btnRandom.config(text="", image=self.shuffleImage)
+            # nbTracksStr = "Random beat:\n{} beats in the base.".format(
+            # str(len(self.tracksWav)))
+            # self.parent.lblStatic1.config(text=nbTracksStr)
+            self.parent.btnLick.config(
+                command=self.showWithOrWithoutBacktrackWindow)
+            self.parent.btnRandom.config(text="", image=self.shuffleImage)
 
         # recording variables
 
@@ -85,7 +90,8 @@ class Game:
             print(e)
         self.parent.destroy()
         self.destroy()
-        self.globalRoot.recordWindow = RecordWithBacktrack(self.globalRoot, self.app,)
+        self.globalRoot.recordWindow = RecordWithBacktrack(
+            self.globalRoot, self.app,)
 
     def showRandomTracks(self,):
         self.showCurrentPlayingInLabel()
@@ -147,7 +153,8 @@ class Game:
         trackLength = "{0:.2f}".format(trackInfo[1])
         self.parent.labelCurrent.config(
             text="Currently Playing ({} / {}):\n{}\n({} sec length)".format(
-                self.sound.activeSample[1], str(len(self.sound.tracksWav)), trackName, str(trackLength),
+                self.sound.activeSample[1], str(
+                    len(self.sound.tracksWav)), trackName, str(trackLength),
             )
         )
         # thread for canvas
@@ -156,7 +163,8 @@ class Game:
             self.thread.isAlive = False  # kill previous thread
         except Exception as e:
             print(e)
-        self.thread = MyThreadForBacktrackScreen("thread-canvas", self.parent.canvas, self.sound, self.sound.currentFileLength, self,)
+        self.thread = MyThreadForBacktrackScreen(
+            "thread-canvas", self.parent.canvas, self.sound, self.sound.currentFileLength, self,)
         self.thread.start()
 
     def cancelThreads(self):
