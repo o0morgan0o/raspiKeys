@@ -22,6 +22,9 @@ from game.utils.utilFunctions import loadConfig
 
 from game import env
 
+# TODO improvements
+# - It would be nice to have a server running for uploading musics,
+# - Folder in backtracks view could be made automatically according to all files in folder
 
 class MainApplication(tk.Frame):
     # definition de la fenetre g)lobale
@@ -63,7 +66,7 @@ class MainApplication(tk.Frame):
 
         self.master.body = tk.Frame(self.master, bg="orange")
         self.master.footer = tk.Frame(self.master, bg="yellow")
-        self.master.footer.place(x=0, y=430, width=320, height=50)
+        self.master.footer.place(x=0, y=400, width=320, height=80)
 
         # ///////// btn
         self.button1 = BtnMenu(self.master.toolbar, image=self.mode0ImageBlack)
@@ -86,18 +89,25 @@ class MainApplication(tk.Frame):
         self.master.footer.columnconfigure((0, 1, 2), weight=1)
         self.button5 = BtnMenu(self.master.footer, text="Opts")
         self.button5["command"] = lambda: self.new_window(4)
-        self.button5.place(x=240, y=0, width=80, height=50)
+        self.button5.place(x=240, y=0, width=80, height=80)
 
-        self.buttonVolume = BtnMenu(self.master.footer, image=self.volumeImage)
-        # self.buttonVolume.config(background="grey", foreground="black")
-        self.buttonVolume.place(x=0, y=0, width=80, height=50)
 
-        self.volumeSlider = VolumeSliderScale(self.master.footer, command=self.sliderMoved)
-        self.volumeSlider.place(x=80, y=0, width=160, height=80)
+        # self.volumeSlider = VolumeSliderScale(self.master.footer, command=self.sliderMoved)
+        # self.volumeSlider.place(x=80, y=0, width=160, height=80)
 
         # load default volume
         volume = int(self.config["volume"])
-        self.volumeSlider.set(volume)
+        # self.volumeSlider.set(volume)
+
+        # replace slider with new button volumes
+        self.btnVolumeMinus = BtnBlack20(self.master.footer, text="-", activebackground="black")
+        self.btnVolumeMinus.place(x=0,y=0,width=120,height=80)
+        self.btnVolumeMinus.config(command= lambda: self.changeVolume(-.2))
+
+        self.btnVolumePlus = BtnBlack20(self.master.footer, text="+", activebackground="black")
+        self.btnVolumePlus.place(x=120, y=0, width=120, height=80)
+        self.btnVolumePlus.config(command= lambda: self.changeVolume(.2))
+    
 
         # storage of the current Game Classe
         self.currentGameClass = None
@@ -106,6 +116,14 @@ class MainApplication(tk.Frame):
         # Load default Screen
         self.new_window(self.gameMode)
         # TODO make a way to retrieve the last open tab (config file load at startup ? )
+
+    def changeVolume(self, offset ):
+        actualVol = Audio.getVolume()
+        if actualVol + offset <= 0.01:
+            Audio.setVolume(None,0)
+        else:
+            Audio.setVolume(None, actualVol + offset )
+
 
     def sliderMoved(self, value):
         mSound = Audio.setVolume(None, value)
@@ -121,7 +139,7 @@ class MainApplication(tk.Frame):
         print("Creating new window")
         # recreation of the body frame (middle frame)
         self.master.body = tk.Frame(self.master, bg="green")
-        self.master.body.place(x=0, y=60, width=320, height=370)
+        self.master.body.place(x=0, y=60, width=320, height=340)
 
         try:
             del self.app
@@ -141,7 +159,7 @@ class MainApplication(tk.Frame):
         elif intMode == 3:
             self.app = Mode3(self.master, self.master.body, self.config, self)
         elif intMode == 4:
-            self.app = ModeOptions(self.master.body, self.config, self.volumeSlider, self)
+            self.app = ModeOptions(self.master.body, self.config,  self)
         else:
             return
 

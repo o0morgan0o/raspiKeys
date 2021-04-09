@@ -38,7 +38,7 @@ class Audio:
         pygame.mixer.pre_init(44100, -16, 2, 1024)
         pygame.mixer.init()
         pygame.init()
-        pygame.mixer.music.set_volume(0.1)
+        pygame.mixer.music.set_volume(0.6)
 
         self.isPlaying = False
 
@@ -166,9 +166,14 @@ class Audio:
         print("try unload ....")
         pygame.mixer.music.unload()
 
+    def getVolume():
+        actualVol= pygame.mixer.music.get_volume()
+        print('Getting actual volume ...' , actualVol)
+        return actualVol
+
     def setVolume(self, value):
-        print("Update sound voulme", value)
-        pygame.mixer.music.set_volume(int(value) / 100)
+        print("Updating sound volume ...", value)
+        pygame.mixer.music.set_volume(value)
 
     def getCurrentTrack(self):
         return (self.currentFile, self.currentFileLength)

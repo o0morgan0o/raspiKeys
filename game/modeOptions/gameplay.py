@@ -8,8 +8,7 @@ from game import env
 
 
 class Game:
-    def __init__(self, parent, config, volumeSlider):
-        self.volumeSlider = volumeSlider  # necessary to save the volume in the config
+    def __init__(self, parent, config):
         # get audio instance to be sure the audio is loaded
         self.audio = Autoload().getInstanceAudio()
         self.midiIO = Autoload().getInstance()
@@ -30,9 +29,8 @@ class Game:
         nb_of_transpose_before_change = self.parent.slider2_2.get()
         midi_in = self.midiIO.inport.name
         midi_out = self.midiIO.outport.name
-        volume = self.volumeSlider.get()
 
-        print("sett ", question_delay, difficulty, midi_in, volume)
+        print("sett ", question_delay, difficulty, midi_in )
         obj = {
             "default_mode": default_mode,
             "question_delay": question_delay,
@@ -42,7 +40,6 @@ class Game:
             "MIDI_interface_in": midi_in,
             "MIDI_interface_out": midi_out,
             "midi_hotkey": 50,
-            "volume": volume,
         }
         json_object = json.dumps(obj, indent=4)
         print("trying to save...", json_object)
