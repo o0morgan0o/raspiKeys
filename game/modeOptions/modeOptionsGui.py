@@ -7,7 +7,7 @@ from game.utils.customElements.scales import *
 
 
 class ModeOptions:
-    def __init__(self, gameFrame, config, volumeSlider, parent):
+    def __init__(self, gameFrame, config, parent):
         self.parent = parent
         print("launching game 4 -------------- ")
         self.gameFrame = gameFrame
@@ -33,7 +33,7 @@ class ModeOptions:
 
         self.placeElements()
 
-        self.game = Game(self.gameFrame, config, volumeSlider)
+        self.game = Game(self.gameFrame, config)
 
     def updateConfig(self, value):
         difficulty = self.gameFrame.slider1_2.get()

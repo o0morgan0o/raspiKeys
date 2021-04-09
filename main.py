@@ -102,11 +102,11 @@ class MainApplication(tk.Frame):
         # replace slider with new button volumes
         self.btnVolumeMinus = BtnBlack20(self.master.footer, text="-", activebackground="black")
         self.btnVolumeMinus.place(x=0,y=0,width=120,height=80)
-        self.btnVolumeMinus.config(command= lambda: self.changeVolume(-.2))
+        self.btnVolumeMinus.config(command= lambda: self.changeVolume(-.2), font=("Courier", 40))
 
         self.btnVolumePlus = BtnBlack20(self.master.footer, text="+", activebackground="black")
         self.btnVolumePlus.place(x=120, y=0, width=120, height=80)
-        self.btnVolumePlus.config(command= lambda: self.changeVolume(.2))
+        self.btnVolumePlus.config(command= lambda: self.changeVolume(.2), font=("Courier", 40))
     
 
         # storage of the current Game Classe
