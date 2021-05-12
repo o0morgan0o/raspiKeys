@@ -18,7 +18,7 @@ class Audio:
         self.convertNewFiles()
 
         # self.tracksWav = self.loadBacktracksWav()
-
+        self.realMetro=None
         # initialisation des array contenant les tracks
         self.tracksWav = lambda: None
         self.tracksWav.house = []
@@ -114,8 +114,8 @@ class Audio:
                     os.path.join(path_to_search, filename))
 
     def simplePlay(self):
+        self.stopPlay()
         try:
-
             file = self.activeSample[0]
             pygame.mixer.music.load(file)
             sound = pygame.mixer.Sound(file)
@@ -147,8 +147,47 @@ class Audio:
     #             print(f"Soud is PLAYING !!, latency is {deltaTime*1000}")
     #             isActive=False
 
+    def playRealMetro(self,bpm_asked):
+        # the metro is handle a little differently than files it is considered as a sound (and not a music)
+        # the sample is created and loop indefinitely.
+        self.stopPlay()
+        self.unloadAudio()
+        bpm=bpm_asked # just for example
+        # we must first calculate the length of 1 bar / 4 (1 tick + 1 space)
+        tick_duration = 60.0/bpm # this value is in seconds
+        # we must calculate the total length of the buffer according to audio
+        # 1 sec = 44100 samples  * 2 channels => 88200 samples
+        # we then determine the number of samples needed
+        samples_needed = tick_duration * 44100 * 2 * 2
+
+        bpmTick = pygame.mixer.Sound(file=self.metroTick)
+        raw_array = bpmTick.get_raw()
+        tick_sample_length = len(raw_array)
+        if tick_sample_length < samples_needed:
+            how_many_samples_missing = int(samples_needed-tick_sample_length)
+            print('missing samples ', how_many_samples_missing)
+            empty_bytes = bytes(how_many_samples_missing)
+            raw_array += empty_bytes
+        
+        # here we can construct 1 bar
+        raw_array += raw_array # (2ticks)
+        raw_array+=raw_array # (4 ticks)
+        # and a second bar
+        raw_array+=raw_array # (8 ticks)
+        # double again
+        raw_array+=raw_array # (8 ticks)
+        # and again
+        raw_array+=raw_array # (8 ticks)
+        self.realMetro = pygame.mixer.Sound(buffer=raw_array)
+        self.realMetro.set_volume(0.1)
+        self.realMetro.play(-1)
+
     def stopPlay(self):
         pygame.mixer.music.stop()
+        try:
+            self.realMetro.stop()
+        except Exception as e:
+            print('')
 
     def convertToWav(self, filename):
         sound = AudioSegment.from_file(filename, format="wav")
@@ -174,6 +213,13 @@ class Audio:
     def setVolume(self, value):
         print("Updating sound volume ...", value)
         pygame.mixer.music.set_volume(value)
+        try:
+            self.realMetro.set_volume(value)
+        except Exception as e:
+            print('cannot change volume of metronome')
+    
+    # def setMetroVolume(value):
+        # self.realMetro.set_volume(value)
 
     def getCurrentTrack(self):
         return (self.currentFile, self.currentFileLength)

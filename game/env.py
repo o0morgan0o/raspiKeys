@@ -17,6 +17,7 @@ PROCESSED_WAV_FOLDER = os.path.join(
 METRO_TICK_FILE = os.path.join(ROOT_DIR, "res", "metro", "tick.wav")
 MIDI_FOLDER = os.path.join(ROOT_DIR, "res", "midi")
 CONFIG_FILE = os.path.join(ROOT_DIR, "config.json")
+CONFIG_METRO_BPM = os.path.join(ROOT_DIR, "metroBpm")
 
 VOLUME_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "volume.png")
 SETTINGS_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "settingsBlack.png")

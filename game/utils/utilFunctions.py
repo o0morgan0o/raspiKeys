@@ -115,6 +115,7 @@ def loadConfig():
     default_config["MIDI_interface_out"] = ""
     default_config["midi_hotkey"] = 50
     default_config["volume"] = 80
+    default_config["metroBpm"]=91
 
     configFilePath = env.CONFIG_FILE
     configFile = ""
@@ -130,6 +131,7 @@ def loadConfig():
             default_config["MIDI_interface_out"] = configFile["MIDI_interface_out"]
             default_config["volume"] = configFile["volume"]
             default_config["default_folder"] = configFile["default_folder"]
+            default_config["metroBpm"] = configFile["metroBpm"]
             print(configFile)
     except:
         print("No config file found")

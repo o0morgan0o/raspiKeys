@@ -30,7 +30,7 @@ class Game:
         midi_in = self.midiIO.inport.name
         midi_out = self.midiIO.outport.name
 
-        print("sett ", question_delay, difficulty, midi_in )
+        print("settings: ", question_delay, difficulty, midi_in )
         obj = {
             "default_mode": default_mode,
             "question_delay": question_delay,
