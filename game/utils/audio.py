@@ -179,7 +179,6 @@ class Audio:
         # and again
         raw_array+=raw_array # (8 ticks)
         self.realMetro = pygame.mixer.Sound(buffer=raw_array)
-        self.realMetro.set_volume(0.1)
         self.realMetro.play(-1)
 
     def stopPlay(self):

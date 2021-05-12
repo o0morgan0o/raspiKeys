@@ -1,4 +1,6 @@
 import tkinter as tk
+from glob import glob
+import os
 
 from game.mode2.gameplay import Game
 from game import env
@@ -26,6 +28,10 @@ class Mode2:
         self.gameFrame.canvas = tk.Canvas(
             self.gameFrame, bd=0, highlightthickness=0)
 
+        # getting all folders in user wav
+        self.wav_folders= self.getAllWavFolders()
+        print('found folders : ', self.wav_folders)
+
         # Metro btn
         self.gameFrame.btnMetro = BtnBlack20( self.gameFrame, text="Metro", activebackground="black")
         self.gameFrame.btnBpmMinus=BtnBlack20(self.gameFrame,text="-",activebackground="black")
@@ -33,17 +39,23 @@ class Mode2:
 
         self.gameFrame.btnSwitchPage=BtnBlack20(self.gameFrame, text=">>", activebackground="black")
 
-        self.gameFrame.btnHouse = BtnBlack20(
-            self.gameFrame, text="House", activebackground="black")
-        self.gameFrame.btnLatin = BtnBlack20(
-            self.gameFrame, text="Latin", activebackground="black")
-        self.gameFrame.btnJazz = BtnBlack20(
-            self.gameFrame, text="Jazz", activebackground="black")
-        self.gameFrame.btnHipHop = BtnBlack20(
-            self.gameFrame, text="H.H.", activebackground="black")
+        self.gameFrame.wav_buttons =[]
+        for folder in self.wav_folders:
+            all_files_in_folder = glob(env.PROCESSED_WAV_FOLDER + '/' + folder +'/*')
+            button_text = folder + "\n("+str(len(all_files_in_folder)) +")"
+            self.gameFrame.wav_buttons.append(BtnBlack20(self.gameFrame,text=button_text , activebackground="black"))
+
 
         self.placeElements()
         self.game = Game(self.globalRoot, self.gameFrame, config, app)
+
+    def getAllWavFolders(self):
+        raw_wav_folders = glob(env.PROCESSED_WAV_FOLDER + '/*/')
+        wav_folders=[]
+        for folder in raw_wav_folders:
+            wav_folders.append(folder.split('/')[-2])
+        return wav_folders
+
 
     def placeElements(self):
         yplacement = 20
@@ -51,28 +63,20 @@ class Mode2:
         self.gameFrame.btnBpmMinus.place(x=130, y=yplacement,width=90, height=80)
         self.gameFrame.btnBpmPlus.place(x=220, y=yplacement,width=90, height=80)
 
-        yplacement+= 100
-        self.gameFrame.btnHouse.place(x=10, y=yplacement, width=140, height=80)
-        self.gameFrame.btnLatin.place( x=170, y=yplacement, width=140, height=80)
-        # self.gameFrame.lblStatic1.place(
-        #     x=0, y=yplacement, width=320, height=40)
-        yplacement += 100
-        self.gameFrame.btnJazz.place(x=10, y=yplacement, width=140, height=80)
-        # self.gameFrame.labelCurrent.place(
-        #     x=0, y=yplacement, width=340, height=80)
-        self.gameFrame.btnSwitchPage.place(x=170, y=yplacement, width=140,height=80)
+        counter=0
+        for button in self.gameFrame.wav_buttons:
+            if counter ==0:
+                button.place(x=10, y=120, width=140, height=80)
+            elif counter == 1:
+                button.place(x=170, y=120, width=140, height=80)
+            elif counter == 2 :
+                button.place(x=10, y=220, width=140, height=80)
+            elif counter >= 3:
+                button.place(x=-200,y=0, width=140, height=80)
+            counter += 1
+        self.gameFrame.btnSwitchPage.place(x=170, y=220, width=140,height=80)
 
-
-        # self.gameFrame.canvas.place(x=20, y=yplacement, width=280, height=20)
-        #============
-        # PAGE 2
-        self.gameFrame.btnHipHop.place( x=-200, y=yplacement, width=140, height=80)
-        self.gameFrame.btnPlay.place(x=-200, y=yplacement, width=140, height=80)
-        self.gameFrame.btnLick.place(x=-200, y=yplacement, width=140, height=80)
-        #============
-        yplacement += 100
-        self.gameFrame.canvas.place(x=0, y=yplacement, width=320, height=10)
-        # self.gameFrame.btnRandom.place(x=170, y=yplacement, width=140, height=80)
+        self.gameFrame.canvas.place(x=0, y=320, width=320, height=10)
 
     # def destroy(self):
     # self.game.destroy()

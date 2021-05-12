@@ -120,11 +120,9 @@ class MainApplication(tk.Frame):
     def changeVolume(self, offset ):
         actualVol = Audio.getVolume()
         if actualVol + offset <= 0.01:
-            # Audio.setVolume(None,0)
             Autoload().getInstanceAudio().setVolume(0)
         else:
             Autoload().getInstanceAudio().setVolume(actualVol+offset)
-            # Audio.setVolume(None, actualVol + offset )
 
 
     def sliderMoved(self, value):

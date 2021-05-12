@@ -58,16 +58,11 @@ class Game:
         self.parent.btnRandom.config(command=self.playRandom)
         self.parent.btnSwitchPage.config(command=self.switchPage)
 
-
-        self.parent.btnHouse.config(
-            command=lambda: self.pickRandomSampleInCategory("house"))
-        self.parent.btnJazz.config(
-            command=lambda: self.pickRandomSampleInCategory("jazz"))
-        self.parent.btnLatin.config(
-            command=lambda: self.pickRandomSampleInCategory("latin"))
-        self.parent.btnHipHop.config(
-            command=lambda: self.pickRandomSampleInCategory("hiphop")
-            )
+        for i in range(0,len(self.parent.wav_buttons)):
+            button=self.parent.wav_buttons[i]
+            # we must extract the part with number of tracks to only keep the category
+            button_text=button['text'].split('\n')[0]
+            button.config(command=lambda button_text=button_text:self.pickRandomSampleInCategory(button_text))
 
         # this is a list which regroups all 4 folders (house , jazz ,latin, hiphop)
         self.tracksWav = self.sound.tracksWav
@@ -95,32 +90,56 @@ class Game:
 
     def switchPage(self,):
         self.page += 1
-        if self.page >= 2:
+        nb_pages_theorical = int((len(self.parent.wav_buttons) - 0.1) / 3)+1 # this is the theorical number of pages (3 elements by page)
+        print('theorical pages : ', nb_pages_theorical)
+
+        for button in self.parent.wav_buttons:
+            button.place(x=-200, y=0)
+
+        if self.page >= nb_pages_theorical:
             self.page=0
         
         if self.page ==0:
+            self.parent.btnPlay.place(x=-200)
+            self.parent.btnLick.place(x=-200)
+
             self.parent.btnMetro.place(x=10, y=20)
             self.parent.btnBpmMinus.place(x=130, y=20)
             self.parent.btnBpmPlus.place(x=220, y=20)
-            self.parent.btnHouse.place(x=10, y=120)
-            self.parent.btnLatin.place(x=170, y=120)
-            self.parent.btnJazz.place(x=10, y=220)
 
-            self.parent.btnPlay.place(x=-200)
-            self.parent.btnLick.place(x=-200)
-            self.parent.btnHipHop.place(x=-200)
+            counter= 0
+            start_index=0
+            for button in self.parent.wav_buttons:
+                if (start_index + counter) < len(self.parent.wav_buttons):
+                    if counter ==0 :
+                        button.place(x=10, y=120)
+                    elif counter == 1:
+                        button.place(x=170, y=120)
+                    elif counter==2:
+                        button.place(x=10, y=220)
+                    counter+=1
+
         
-        elif self.page ==1:
-            self.parent.btnPlay.place(x=10,y=20)
-            self.parent.btnLick.place(x=170,y=20)
-            self.parent.btnHipHop.place(x=10, y=120)
-
+        elif self.page >=1:
             self.parent.btnMetro.place(x=-200)
             self.parent.btnBpmMinus.place(x=-200)
             self.parent.btnBpmPlus.place(x=-200)
-            self.parent.btnHouse.place(x=-200)
-            self.parent.btnLatin.place(x=-200)
-            self.parent.btnJazz.place(x=-200)
+
+            self.parent.btnPlay.place(x=10,y=20, width=140, height=80)
+            self.parent.btnLick.place(x=170,y=20, width=140, height=80)
+
+            counter= 0
+            start_index=self.page*3
+            for i in range(0,3):
+                if (start_index + counter) < len(self.parent.wav_buttons):
+                    if counter ==0 :
+                        self.parent.wav_buttons[start_index+counter].place(x=10, y=120)
+                    elif counter == 1:
+                        self.parent.wav_buttons[start_index+counter].place(x=170, y=120)
+                    elif counter==2:
+                        self.parent.wav_buttons[start_index+counter].place(x=10, y=220)
+                    counter+=1
+
 
     
 
