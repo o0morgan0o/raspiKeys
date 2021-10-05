@@ -1,2 +1,2 @@
 #!/bin/bash
-kill -KILL $(ps aux | grep python3 | head -n 1| awk '{print $2}')
+kill -9 $(ps aux | grep python3 |  awk '{print $2}')

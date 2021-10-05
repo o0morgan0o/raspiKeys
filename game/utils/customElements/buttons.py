@@ -26,7 +26,7 @@ class BtnBlack12(AllButtons):
 
 class BtnBlack20(AllButtons):
     def __init__(self, *args, **kwargs):
-        super(BtnBlack20, self).__init__(*args, font=(myfont, 20), **kwargs, background="black", foreground="white", activeforeground="yellow")
+        super(BtnBlack20, self).__init__(*args, font=(myfont, 20), **kwargs, background="black", foreground="white",)
 
 
 class BtnMenu(AllButtons):

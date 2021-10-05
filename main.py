@@ -49,9 +49,10 @@ class MainApplication(tk.Frame):
 
         # Main Frame
         self.master.title("RaspyKeys")
-        self.master.geometry("320x480")
+        self.master.geometry("%sx%s" % (env.FULL_SCREEN_W, env.FULL_SCREEN_H))
         self.frame = None
-        self.master.body = None
+        self.master.bodyleft = None
+        self.master.bodyright= None
 
         # if(tag == "pi"): # to run at fullscreen if we get the "pi" tag
         # self.master.attributes( "-fullscreen", True)
@@ -60,31 +61,35 @@ class MainApplication(tk.Frame):
         self.master.bind("<Escape>", lambda event: self.master.quit())
 
         # toolbar
-        self.master.toolbar = tk.Frame(self.master, bg=env.COL_TOOLBG,)
-        self.master.toolbar.place(x=0, y=0, width=320, height=60)
+        # self.master.toolbar = tk.Frame(self.master, bg=env.COL_TOOLBG,)
+        self.master.background = tk.Frame(self.master, bg="red")
+        self.master.background.place(x=0,y=0,width=env.FULL_SCREEN_W,height=env.FULL_SCREEN_H)
+
+        self.master.toolbar = tk.Frame(self.master)
+        self.master.toolbar.place(x=0, y=0, width=320, height=80)
         #        self.master.toolbar.pack(side=tk.TOP, fill=tk.X)
 
-        self.master.body = tk.Frame(self.master, bg="orange")
-        self.master.footer = tk.Frame(self.master, bg="yellow")
+        self.master.bodyleft = tk.Frame(self.master)
+        self.master.footer = tk.Frame(self.master)
         self.master.footer.place(x=0, y=400, width=320, height=80)
 
         # ///////// btn
         self.button1 = BtnMenu(self.master.toolbar, image=self.mode0ImageBlack)
         self.button1.config(command=lambda: self.new_window(0))
-        self.button1.place(x=0, y=0, width=80, height=60)
+        self.button1.place(x=0, y=0, width=80, height=80)
         self.original_background = self.button1.cget("background")  # get original background color
         # ///////// btn
         self.button2 = BtnMenu(self.master.toolbar, image=self.mode1ImageBlack)
         self.button2["command"] = lambda: self.new_window(1)
-        self.button2.place(x=80, y=0, width=80, height=60)
+        self.button2.place(x=80, y=0, width=80, height=80)
         # ///////// btn
         self.button3 = BtnMenu(self.master.toolbar, image=self.mode2ImageBlack)
         self.button3["command"] = lambda: self.new_window(2)
-        self.button3.place(x=160, y=0, width=80, height=60)
+        self.button3.place(x=160, y=0, width=80, height=80)
         # ///////// btn
         self.button4 = BtnMenu(self.master.toolbar, image=self.mode3ImageBlack)
         self.button4["command"] = lambda: self.new_window(3)
-        self.button4.place(x=240, y=0, width=80, height=60)
+        self.button4.place(x=240, y=0, width=80, height=80)
 
         self.master.footer.columnconfigure((0, 1, 2), weight=1)
         self.button5 = BtnMenu(self.master.footer, text="Opts")
@@ -108,7 +113,6 @@ class MainApplication(tk.Frame):
         self.btnVolumePlus.place(x=120, y=0, width=120, height=80)
         self.btnVolumePlus.config(command= lambda: self.changeVolume(.2), font=("Courier", 40))
     
-
         # storage of the current Game Classe
         self.currentGameClass = None
 
@@ -132,14 +136,19 @@ class MainApplication(tk.Frame):
     def new_window(self, intMode):
         self.audioInstance = Autoload().getInstanceAudio()  # in order to create the first instance of audio file
         try:
-            self.master.body.destroy()
+            self.master.bodyleft.destroy()
+            self.master.bodyright.destroy()
             del self.app
         except:
             print("no window to destroy, recreation ...", intMode)
         print("Creating new window")
         # recreation of the body frame (middle frame)
-        self.master.body = tk.Frame(self.master, bg="green")
-        self.master.body.place(x=0, y=60, width=320, height=340)
+        self.master.bodyleft = tk.Frame(self.master, bg="#070707" )
+        self.master.bodyleft.place(x=0, y=70, width=env.LEFT_SCREEN_W, height=env.LEFT_SCREEN_H)
+        self.master.bodyright = tk.Frame(self.master, bg="black")
+        # self.master.bodyright = tk.Frame(self.master, bg="yellow")
+        self.master.bodyright.place(x=env.LEFT_SCREEN_W, y=0,width=env.RIGHT_SCREEN_W, height=env.RIGHT_SCREEN_H)
+        
 
         try:
             del self.app
@@ -148,18 +157,18 @@ class MainApplication(tk.Frame):
             pass
 
         if intMode == 0:
-            self.app = Mode0(self.master.body, self.config)
+            self.app = Mode0(self.master.bodyleft,self.master.bodyright, self.config)
             # specific to mode0 bc in order to skip all midi notes during another mode
             self.app.activateListening()
         elif intMode == 1:
-            self.app = Mode1(self.master.body, self.config)
+            self.app = Mode1(self.master.bodyleft, self.config)
             self.app.activateListening()
         elif intMode == 2:
-            self.app = Mode2(self.master, self.master.body, self.config, self)
+            self.app = Mode2(self.master, self.master.bodyleft, self.config, self)
         elif intMode == 3:
-            self.app = Mode3(self.master, self.master.body, self.config, self)
+            self.app = Mode3(self.master, self.master.bodyleft, self.config, self)
         elif intMode == 4:
-            self.app = ModeOptions(self.master.body, self.config,  self)
+            self.app = ModeOptions(self.master.bodyleft,self.master.bodyright, self.config,  self)
         else:
             return
 

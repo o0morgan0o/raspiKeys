@@ -1,9 +1,8 @@
 import time
 import threading
+from game import env
 import random
 from threading import Timer
-import mido
-import simpleaudio as sa
 
 from game.utils.waitingNote import WaitingNote
 from game.utils.questionNote import QuestionNote
@@ -23,12 +22,14 @@ from game.utils.midiToNotenames import noteNameFull
 
 
 class Game:
-    def __init__(self, parent, config):
+    def __init__(self, parentLeft,parentRight, config):
         self.config = config
-        self.parent = parent
+        self.parentLeft = parentLeft
+        self.parentRight = parentRight
         # print("config mode 0 ",config)
         self.delay = float(config["question_delay"]) / 100
         self.isListening = False
+        self.velocity = 100
 
         # variable for user score
         self.counter = 0
@@ -51,22 +52,35 @@ class Game:
         self.startingNote = -1
 
         self.changeAllBg("black")
-        self.parent.btnSkip.configure(command=self.skip)
+        self.parentRight.btnSkip.configure(command=self.skip)
+        self.parentLeft.slInterval.configure(command=self.changeIntervalSize)
+        self.parentLeft.slMidiVolume.configure(command=self.changeMidiVolume)
 
         self.maxInterval = 12
+
+    def changeIntervalSize(self, value):
+        newValue = int(value)
+        self.parentLeft.lblInterval.config(text="Interval Size : +-%s" % newValue)
+        self.maxInterval = newValue
+
+    def changeMidiVolume(self, value):
+        newValue = int(value)
+        self.parentLeft.lblMidiVolume.config(text="Midi Volume : %s" % newValue)
+        self.velocity=newValue
+
 
     def toggleGlobalListen(self):
         if self.globalIsListening == True:
             self.globalIsListening = False
-            self.parent.btnListen.configure(text="ListenOFF")
+            self.parentRight.btnListen.configure(text="ListenOFF")
         else:
             self.globalIsListening = True
-            self.parent.btnListen.configure(text="ListenON")
+            self.parentRight.btnListen.configure(text="ListenON")
 
     def skip(self):
         try:
-            self.parent.label2["text"] = "It was ;-)\n{}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
-            self.parent.label2["bg"] = "orange"
+            self.parentRight.result["text"] = "It was ;-)\n{}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
+            self.parentRight.result["bg"] = "orange"
             # if we gave the good answer, we want a new note
             self.changeGameState("waitingUserInput")
         except:
@@ -89,24 +103,24 @@ class Game:
         if newstate == "notStarted":
             pass
         elif newstate == "waitingUserInput":
-            self.parent.label1["text"] = "Pick a starting Note"
+            self.parentRight.pickNote["text"] = "Pick a starting Note"
             self.gameState = "waitingUserInput"
             percentage = int((self.score / self.counter) * 100) if (self.counter != 0) else 0
-            self.parent.label3["text"] = "{}/{} ({}%)".format(self.score, self.counter, percentage)
+            self.parentRight.score["text"] = "{}/{} ({}%)".format(self.score, self.counter, percentage)
         elif newstate == "listen":
-            # self.parent["bg"] = "orange"
+            # self.parentRight["bg"] = "orange"
             # self.changeAllBg("orange")
-            self.parent.label1["text"] = "Listen ..."
-            self.parent.label2["text"] = ""
-            self.parent.label2["bg"] = "black"
-            self.parent.lblNoteUser["text"] = ""
+            self.parentRight.pickNote["text"] = "Listen ..."
+            self.parentRight.result["text"] = ""
+            self.parentRight.result["bg"] = "black"
+            self.parentRight.lblNoteUser["text"] = ""
             self.gameState = "listen"
             self.isListening = False
         elif newstate == "waitingUserAnswer":
             self.isListening = True
-            # self.parent["bg"] = "blue"
+            # self.parentRight["bg"] = "blue"
             # self.changeAllBg("blue")
-            self.parent.label1["text"] = "What is your answer ?"
+            self.parentRight.pickNote["text"] = "What is your answer ?"
             self.gameState = "waitingUserAnswer"
 
     # init a 128 array of WaitingNote in order to store all the timers
@@ -119,25 +133,26 @@ class Game:
     def noteOff(self, note):
         if self.isListening == False:
             return
-        self.midiIO.sendOut("note_off", note)
+        self.midiIO.sendOut("note_off", note, self.velocity)
 
     # prepare the future midi noteOff it is stored in waitingNotes list
 
-    def prepareNoteOut(self, mNote, offset=0):
+    def prepareNoteOut(self, mNote, offset=0,):
         if self.gameState == "waitingUserInput":
             self.changeGameState("listen")
         elif self.gameState == "listen":
             self.changeGameState("waitingUserAnswer")
-        self.midiIO.sendOut("note_on", mNote)  # send note on
+        self.midiIO.sendOut("note_on", mNote, self.velocity)  # send note on
         currentNote = self.waitingNotes[mNote]
         currentNote.resetTimer(offset)
 
     def checkAnswer(self, answer):
+        self.parentRight.lblNoteUser.lift()
         if answer == self.questionNote.note:
-            self.parent.label2["text"] = "correct ;-)\n{}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
-            self.parent.label2["bg"] = "green"
-            self.parent.lblNoteUser["text"] = noteNameFull(answer)
-            self.parent.lblNoteUser["fg"] = "green"
+            self.parentRight.result["text"] = "correct ;-)\n{}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
+            self.parentRight.result["bg"] = "green"
+            self.parentRight.lblNoteUser["text"] = noteNameFull(answer)
+            self.parentRight.lblNoteUser["fg"] = "green"
             if self.questionNote.isFirstTry:
                 self.score = self.score + 1
 
@@ -148,11 +163,11 @@ class Game:
             self.melodies.playWinMelody()
             time.sleep(0.4)
         else:
-            self.parent.label2["text"] = "incorrect\nA: {}".format(formatOutputInterval(answer - self.startingNote))
+            self.parentRight.result["text"] = "incorrect\nA: {}".format(formatOutputInterval(answer - self.startingNote))
             self.questionNote.isFirstTry = False
-            self.parent.label2["bg"] = "red"
-            self.parent.lblNoteUser["text"] = noteNameFull(answer)
-            self.parent.lblNoteUser["fg"] = "red"
+            self.parentRight.result["bg"] = "red"
+            self.parentRight.lblNoteUser["text"] = noteNameFull(answer)
+            self.parentRight.lblNoteUser["fg"] = "red"
 
             # time.sleep(1)
             # self.melodies.playLooseMelody()
@@ -164,7 +179,8 @@ class Game:
             self.replayNote = QuestionNote(self.startingNote, self, 0)
             # i want to replay both notes
             self.replayNote = QuestionNote(self.questionNote.note, self, 0 + self.delay)
-
+        # self.parentRight.result.place(x=20, y=210, width=env.RIG)
+        self.parentRight.lblNoteUser.lower()
         self.midiIO.panic()
 
     def pickNewNote(self, startingNote):
@@ -180,14 +196,15 @@ class Game:
         self.prepareNoteOut
 
     def changeAllBg(self, newColor):
-        self.parent.label1["bg"] = newColor
-        self.parent.label2["bg"] = newColor
-        self.parent.label3["bg"] = newColor
-        self.parent.lblNote["bg"] = newColor
-        self.parent.lblNote["fg"] = "white"
-        self.parent.label1["fg"] = "white"
-        self.parent.label2["fg"] = "white"
-        self.parent.label3["fg"] = "white"
+        self.parentRight.result["bg"] = newColor
+        self.parentRight.score["bg"] = newColor
+        self.parentRight.lblNote["bg"] = newColor
+        self.parentRight.lblNote["fg"] = "white"
+        self.parentRight.result["fg"] = "white"
+        self.parentRight.score["fg"] = "white"
+
+        self.parentRight.pickNote["bg"] = newColor
+        self.parentRight.pickNote["fg"] = "white"
 
     def handleMIDIInput(self, msg):
         # used for the midiListening button
@@ -211,8 +228,8 @@ class Game:
                 questionNote = self.pickNewNote(self.startingNote)
                 self.questionNote = QuestionNote(questionNote, self, self.delay)
                 # show the note on the ui
-                self.lblUserShow = noteNameFull(self.startingNote) + "-> "
-                self.parent.lblNote.config(text=self.lblUserShow)
+                self.lblUserShow = noteNameFull(self.startingNote) 
+                self.parentRight.lblNote.config(text=self.lblUserShow)
 
             elif self.gameState == "waitingUserAnswer":
                 if msg.note == self.startingNote:

@@ -1,4 +1,3 @@
-#!/bin/bash
 ### BEGIN INIT INFO
 # Provides: raspikeys
 # Required-Start: $all
@@ -10,10 +9,11 @@
 
 # aconnect -x
 # ulimit -s 2000
-# export DISPLAY=:0
+#export DISPLAY=:0
 # xdotool mousemove 1000 1000
-/home/pi/rapiKeys/killPi.sh
+/home/pi/raspiKeys/killPi.sh
 # /home/pi/raspiKeys/main.py --runDevice=pi
-xinit
+/home/pi/raspiKeys/main.py &
+#xinit
 
 

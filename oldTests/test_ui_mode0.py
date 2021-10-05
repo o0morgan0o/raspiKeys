@@ -11,7 +11,7 @@ class TestUIMode0(unittest.TestCase):
         self.app = MainApplication(self.root, "")
         self.app.new_window(0)
         self.gui = self.app.app
-        self.gameplay = self.gui.game
+        self.gameplay = self.gui.dd
 
     def test_emptyTest(self):
         self.assertEqual(0, 0)

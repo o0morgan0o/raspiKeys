@@ -24,6 +24,7 @@ class RecordWithBacktrack:
 
 
         self.currentTrack = self.audioInstance.getCurrentTrack()
+        self.category = self.audioInstance.activeFolder
         trackName=self.currentTrack[0].split("/")[-1]
         trackLength="{0:.2f}".format(self.currentTrack[1])
 

@@ -8,7 +8,7 @@ myfont="Courier"
 class AllLabels(tk.Label):
   def __init__(self,*args,**kwargs):
     super(AllLabels,self).__init__(*args, 
-    # activebackground="red",
+    # activebackground="black",
     **kwargs)
 
 

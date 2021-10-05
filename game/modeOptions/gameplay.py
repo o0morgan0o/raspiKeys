@@ -8,25 +8,25 @@ from game import env
 
 
 class Game:
-    def __init__(self, parent, config):
+    def __init__(self, parentLeft, parentRight, config):
         # get audio instance to be sure the audio is loaded
         self.audio = Autoload().getInstanceAudio()
         self.midiIO = Autoload().getInstance()
 
         self.config = config
-        self.parent = parent
-        self.parent.btnConfig.config(command=self.openMidiPanel)
+        self.parentRight = parentRight
+        self.parentRight.btnConfig.config(command=self.openMidiPanel)
 
         self.loadInitialSettings()
-        self.parent.btnSaveDefault.config(command=self.saveConfig)
+        self.parentRight.btnSaveDefault.config(command=self.saveConfig)
 
     def saveConfig(self):
         # we must get all the parameters used in the app
         default_mode = 0  # for this time, default mode is hardcoded
-        question_delay = self.parent.slider1_1.get()
-        difficulty = self.parent.slider1_2.get()
-        times_each_transpose = self.parent.slider2_1.get()
-        nb_of_transpose_before_change = self.parent.slider2_2.get()
+        question_delay = self.parentRight.slider1_1.get()
+        difficulty = self.parentRight.slider1_2.get()
+        times_each_transpose = self.parentRight.slider2_1.get()
+        nb_of_transpose_before_change = self.parentRight.slider2_2.get()
         midi_in = self.midiIO.inport.name
         midi_out = self.midiIO.outport.name
 
@@ -40,6 +40,8 @@ class Game:
             "MIDI_interface_in": midi_in,
             "MIDI_interface_out": midi_out,
             "midi_hotkey": 50,
+            "mode0_intervalSize": 10,
+            "mode0_midiVolume" : 100
         }
         json_object = json.dumps(obj, indent=4)
         print("trying to save...", json_object)
@@ -55,15 +57,21 @@ class Game:
 
     def openMidiPanel(self):
         print("opening settings")
-        self.window = tk.Toplevel(self.parent, cursor="none")
+        self.window = tk.Toplevel(self.parentRight, cursor="none")
         self.window.attributes("-topmost", True)
-        self.window.config(background="black")
-        self.window.geometry("320x480")
+        self.window.config(background="yellow")
+        self.window.geometry("%sx%s" % (env.FULL_SCREEN_W,env.FULL_SCREEN_H))
         yplacement = 10
         label = LblSettings(self.window, text="click on your midi IN device:")
-        label.place(x=0, y=yplacement, width=320, height=30)
+        label.place(x=0, y=yplacement, width=200, height=30)
 
-        self.labelCurrentIn = LblSettings(self.window, text="actual In is : " + self.midiIO.inport.name)
+        self.labelCurrentIn = LblSettings(self.window)
+        try:
+            self.labelCurrentIn.config(text="actual In is : " + self.midiIO.inport.name)
+        except:
+            self.labelCurrentIn.config(text="Can \'t retrieve info")
+
+
         yplacement += 30
         self.labelCurrentIn.place(x=0, y=yplacement, width=320, height=30)
 
@@ -89,7 +97,12 @@ class Game:
         label2 = LblSettings(self.window, text="click on your midi OUT device:")
         label2.place(x=0, y=yplacement, width=320, height=30)
 
-        self.labelCurrentOut = LblSettings(self.window, text="actual out is : " + self.midiIO.outport.name)
+        self.labelCurrentOut = LblSettings(self.window)
+        try:
+            self.labelCurrentOut.config(text="actual out is " + self.midiIO.outport.name)
+        except:
+            self.labelCurrentOut.config(text="Can\'t retrieve out !")
+
         yplacement += 30
         self.labelCurrentOut.place(x=0, y=yplacement, width=320, height=30)
 
@@ -130,5 +143,5 @@ class Game:
     def loadInitialSettings(self):
         value = int(self.config["question_delay"])
         print(value)
-        self.parent.slider1_1.set(value)
+        self.parentRight.slider1_1.set(value)
 

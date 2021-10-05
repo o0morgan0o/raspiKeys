@@ -1,44 +1,74 @@
 import tkinter as tk 
+from game import env
 from game.mode0.gameplay import Game
 
 from game.utils.customElements.buttons import *
 from game.utils.customElements.labels import *
+from game.utils.customElements.scales import SettingsScale
 
 class Mode0:
-    def __init__(self,gameFrame, config):
-        print( "launching game 0 -------------- ")
-        self.gameFrame = gameFrame
-        self.gameFrame.pack_propagate(0)
+    def __init__(self,gameFrameLeft,gameFrameRight, config):
+        print( "launchiOg game 0 -------------- ")
+        self.gameFrameLeft = gameFrameLeft
+        self.gameFrameRight=gameFrameRight
+        self.gameFrameLeft.pack_propagate(0)
 
         
 
         # TODO : make custom fonts
+
+        self.gameFrameLeft.lblInterval= MyLabel18(self.gameFrameLeft)
+        self.gameFrameLeft.lblInterval.config(font=("Courier", 12), text="Interval section:")
+        self.gameFrameLeft.lblMidiVolume = MyLabel18(self.gameFrameLeft)
+        self.gameFrameLeft.lblMidiVolume.config(font=("Courier", 12), text="Midi Volume:")
+
+        self.gameFrameLeft.slInterval = SettingsScale(self.gameFrameLeft, from_=3, to=18, orient=tk.HORIZONTAL) #command=self.updateConfig)
+        self.gameFrameLeft.slInterval.config(showvalue=0)
+        self.gameFrameLeft.slMidiVolume = SettingsScale(self.gameFrameLeft, from_=1, to=127, orient=tk.HORIZONTAL) #command=self.updateConfig)
+        self.gameFrameLeft.slMidiVolume.config(showvalue=0)
+
         # definition of sizes and fonts
-        self.gameFrame.label1 = MyLabel18(self.gameFrame) # for user instructions
-        self.gameFrame.label2 = MyLabel18(self.gameFrame,padx=10, pady=10) # for "correct" or "incorrect"response
-        self.gameFrame.label2.config(font=("Courier", 18, "bold"))
-        self.gameFrame.label3 = MyLabel30(self.gameFrame,) # for global score
-        self.gameFrame.btnSkip = BtnBlack20(self.gameFrame,text= "SKIP >")
-        self.gameFrame.lblNote = MyLabel40(self.gameFrame)
-        self.gameFrame.lblNote.config(font=("Courier", 40, "bold"))
-        self.gameFrame.lblNoteUser=MyLabel40(self.gameFrame)
-        self.gameFrame.lblNoteUser.config(font=("Courier", 40, "bold"))
+        self.gameFrameRight.pickNote = MyLabel18(self.gameFrameRight) # for user instructions
+        self.gameFrameRight.pickNote.config(font=("Courier", 24))
+        self.gameFrameRight.result = MyLabel18(self.gameFrameRight,padx=10, pady=10) # for "correct" or "incorrect"response
+        self.gameFrameRight.result.config(font=("Courier", 18, "bold"), text="")
+        self.gameFrameRight.score = MyLabel30(self.gameFrameRight,) # for global score
+        self.gameFrameRight.score.config(font=("Courier", 10, "bold"), text="SCORE")
+
+        self.gameFrameRight.btnSkip = BtnBlack20(self.gameFrameRight,text= "SKIP >")
+        self.gameFrameRight.btnSkip.config(bd=0, highlightthickness=0)
+        self.gameFrameRight.lblNote = MyLabel40(self.gameFrameRight, justify="right")
+        self.gameFrameRight.lblNote.config(font=("Courier", 120, "bold"), text="?")
+        self.gameFrameRight.lblNoteUser=MyLabel40(self.gameFrameRight)
+        self.gameFrameRight.lblNoteUser.config(font=("Courier", 120, "bold"), text="",justify="left")
+
 
         # placement of differents labels
         self.placeElements()
 
-        self.game = Game(self.gameFrame, config)
+        self.game = Game(self.gameFrameLeft,self.gameFrameRight, config)
         
 
     def placeElements(self):
-        self.gameFrame.configure(bg="black") # should be invisible
-        self.gameFrame.label1.place(x=0, y=10, width=320, height=50)
-        self.gameFrame.label3.place(x=0,y=65, width=320, height=50)
-        self.gameFrame.lblNote.place(x=30,y=110,width=200,height=80)
-        self.gameFrame.lblNoteUser.place(x=200,y=110, width=100,height=80)
-        self.gameFrame.label2.place(x=0, y=190,width=320,height=70)
-        self.gameFrame.btnSkip.place(x=90,y=280,width=140, height=60)
 
+        yoffset=160
+        self.gameFrameLeft.lblInterval.place(x=20, y=yoffset, width=env.LEFT_SCREEN_W-40,height=30)
+        yoffset+= 40
+        self.gameFrameLeft.slInterval.place(x=20,y=yoffset,width=env.LEFT_SCREEN_W-40,height=30)
+        yoffset+= 40
+        self.gameFrameLeft.lblMidiVolume.place(x=20, y=yoffset, width=env.LEFT_SCREEN_W-40,height=30)
+        yoffset+= 40
+        self.gameFrameLeft.slMidiVolume.place(x=20,y=yoffset,width=env.LEFT_SCREEN_W-40,height=30)
+
+        # self.gameFrameRight.configure(bg="red") # should be invisible
+        # self.gameFrameRight.result.place(x=0, y=0,width=env.RIGHT_SCREEN_W,height=80)
+        self.gameFrameRight.pickNote.place(x=0, y=30, width=env.RIGHT_SCREEN_W, height=40)
+        self.gameFrameRight.lblNoteUser.place(x=0,y=140, width=env.RIGHT_SCREEN_W)
+        self.gameFrameRight.lblNote.place(x=0,y=140,width=env.RIGHT_SCREEN_W)
+        self.gameFrameRight.lblNote.lift()
+        self.gameFrameRight.btnSkip.place(x=0,y=350,width=env.RIGHT_SCREEN_W, height=60)
+        self.gameFrameRight.score.place(x=0,y=420, width=env.RIGHT_SCREEN_W, height=60)
+        
 
     def __del__(self):
         print("trying destroy Mode 0")
