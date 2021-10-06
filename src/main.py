@@ -22,6 +22,7 @@ from game.utils.utilFunctions import loadConfig
 
 from game import env
 
+
 # TODO improvements
 # - It would be nice to have a server running for uploading musics,
 # - Folder in backtracks view could be made automatically according to all files in folder
@@ -29,11 +30,14 @@ from game import env
 class MainApplication(tk.Frame):
     # definition de la fenetre g)lobale
 
-    def __init__(self, master, tag=""):
+    def __init__(self, master, tag="", **kw):
 
+        super().__init__(master, **kw)
         self.config = loadConfig()
         self.gameMode = int(self.config["default_mode"])
         self.master = master
+        self.app = None
+        self.audioInstance = None
 
         # images
         self.volumeImage = ImageTk.PhotoImage(Image.open(env.VOLUME_IMAGE))
@@ -51,8 +55,8 @@ class MainApplication(tk.Frame):
         self.master.title("RaspyKeys")
         self.master.geometry("%sx%s" % (env.FULL_SCREEN_W, env.FULL_SCREEN_H))
         self.frame = None
-        self.master.bodyleft = None
-        self.master.bodyright= None
+        self.master.bodyLeft = None
+        self.master.bodyRight = None
 
         # if(tag == "pi"): # to run at fullscreen if we get the "pi" tag
         # self.master.attributes( "-fullscreen", True)
@@ -63,13 +67,13 @@ class MainApplication(tk.Frame):
         # toolbar
         # self.master.toolbar = tk.Frame(self.master, bg=env.COL_TOOLBG,)
         self.master.background = tk.Frame(self.master, bg="red")
-        self.master.background.place(x=0,y=0,width=env.FULL_SCREEN_W,height=env.FULL_SCREEN_H)
+        self.master.background.place(x=0, y=0, width=env.FULL_SCREEN_W, height=env.FULL_SCREEN_H)
 
         self.master.toolbar = tk.Frame(self.master)
         self.master.toolbar.place(x=0, y=0, width=320, height=80)
         #        self.master.toolbar.pack(side=tk.TOP, fill=tk.X)
 
-        self.master.bodyleft = tk.Frame(self.master)
+        self.master.bodyLeft = tk.Frame(self.master)
         self.master.footer = tk.Frame(self.master)
         self.master.footer.place(x=0, y=400, width=320, height=80)
 
@@ -96,7 +100,6 @@ class MainApplication(tk.Frame):
         self.button5["command"] = lambda: self.new_window(4)
         self.button5.place(x=240, y=0, width=80, height=80)
 
-
         # self.volumeSlider = VolumeSliderScale(self.master.footer, command=self.sliderMoved)
         # self.volumeSlider.place(x=80, y=0, width=160, height=80)
 
@@ -106,13 +109,13 @@ class MainApplication(tk.Frame):
 
         # replace slider with new button volumes
         self.btnVolumeMinus = BtnBlack20(self.master.footer, text="-", activebackground="black")
-        self.btnVolumeMinus.place(x=0,y=0,width=120,height=80)
-        self.btnVolumeMinus.config(command= lambda: self.changeVolume(-.2), font=("Courier", 40))
+        self.btnVolumeMinus.place(x=0, y=0, width=120, height=80)
+        self.btnVolumeMinus.config(command=lambda: self.changeVolume(-.2), font=("Courier", 40))
 
         self.btnVolumePlus = BtnBlack20(self.master.footer, text="+", activebackground="black")
         self.btnVolumePlus.place(x=120, y=0, width=120, height=80)
-        self.btnVolumePlus.config(command= lambda: self.changeVolume(.2), font=("Courier", 40))
-    
+        self.btnVolumePlus.config(command=lambda: self.changeVolume(.2), font=("Courier", 40))
+
         # storage of the current Game Classe
         self.currentGameClass = None
 
@@ -121,13 +124,12 @@ class MainApplication(tk.Frame):
         self.new_window(self.gameMode)
         # TODO make a way to retrieve the last open tab (config file load at startup ? )
 
-    def changeVolume(self, offset ):
-        actualVol = Audio.getVolume()
-        if actualVol + offset <= 0.01:
+    def changeVolume(self, offset):
+        actual_vol = Audio.getVolume()
+        if actual_vol + offset <= 0.01:
             Autoload().getInstanceAudio().setVolume(0)
         else:
-            Autoload().getInstanceAudio().setVolume(actualVol+offset)
-
+            Autoload().getInstanceAudio().setVolume(actual_vol + offset)
 
     def sliderMoved(self, value):
         mSound = Audio.setVolume(None, value)
@@ -136,19 +138,18 @@ class MainApplication(tk.Frame):
     def new_window(self, intMode):
         self.audioInstance = Autoload().getInstanceAudio()  # in order to create the first instance of audio file
         try:
-            self.master.bodyleft.destroy()
-            self.master.bodyright.destroy()
+            self.master.bodyLeft.destroy()
+            self.master.bodyRight.destroy()
             del self.app
         except:
             print("no window to destroy, recreation ...", intMode)
         print("Creating new window")
         # recreation of the body frame (middle frame)
-        self.master.bodyleft = tk.Frame(self.master, bg="#070707" )
-        self.master.bodyleft.place(x=0, y=70, width=env.LEFT_SCREEN_W, height=env.LEFT_SCREEN_H)
-        self.master.bodyright = tk.Frame(self.master, bg="black")
+        self.master.bodyLeft = tk.Frame(self.master, bg="#070707")
+        self.master.bodyLeft.place(x=0, y=70, width=env.LEFT_SCREEN_W, height=env.LEFT_SCREEN_H)
+        self.master.bodyRight = tk.Frame(self.master, bg="black")
         # self.master.bodyright = tk.Frame(self.master, bg="yellow")
-        self.master.bodyright.place(x=env.LEFT_SCREEN_W, y=0,width=env.RIGHT_SCREEN_W, height=env.RIGHT_SCREEN_H)
-        
+        self.master.bodyRight.place(x=env.LEFT_SCREEN_W, y=0, width=env.RIGHT_SCREEN_W, height=env.RIGHT_SCREEN_H)
 
         try:
             del self.app
@@ -157,18 +158,18 @@ class MainApplication(tk.Frame):
             pass
 
         if intMode == 0:
-            self.app = Mode0(self.master.bodyleft,self.master.bodyright, self.config)
+            self.app = Mode0(self.master.bodyLeft, self.master.bodyRight, self.config)
             # specific to mode0 bc in order to skip all midi notes during another mode
             self.app.activateListening()
         elif intMode == 1:
-            self.app = Mode1(self.master.bodyleft, self.config)
+            self.app = Mode1(self.master.bodyLeft, self.config)
             self.app.activateListening()
         elif intMode == 2:
-            self.app = Mode2(self.master, self.master.bodyleft, self.config, self)
+            self.app = Mode2(self.master, self.master.bodyLeft, self.config, self)
         elif intMode == 3:
-            self.app = Mode3(self.master, self.master.bodyleft, self.config, self)
+            self.app = Mode3(self.master, self.master.bodyLeft, self.config, self)
         elif intMode == 4:
-            self.app = ModeOptions(self.master.bodyleft,self.master.bodyright, self.config,  self)
+            self.app = ModeOptions(self.master.bodyLeft, self.master.bodyRight, self.config, self)
         else:
             return
 
@@ -215,13 +216,15 @@ class MainApplication(tk.Frame):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        tag = sys.argv[1].split("=")[1]
-    else:
-        tag = ""
-        print("Program runned with no arguments...")
+    # if len(sys.argv) > 1:
+    #     tag = sys.argv[1].split("=")[1]
+    # else:
+    #     tag = ""
+    #     print("Program runned with no arguments...")
     root = tk.Tk()
-    root.config(cursor="none")
-    MainApplication(root, tag)
+    # root.config(cursor="none")
+    root.config()
+    # MainApplication(root, tag)
+    MainApplication(root)
 
     root.mainloop()

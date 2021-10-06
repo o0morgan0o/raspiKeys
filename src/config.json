@@ -1,0 +1,14 @@
+{
+    "default_mode": 0,
+    "question_delay": 50,
+    "difficulty": 50,
+    "times_each_transpose": 4,
+    "nb_of_transpose_before_change": 4,
+    "MIDI_interface_in": "",
+    "MIDI_interface_out": "",
+    "midi_hotkey": 50,
+    "volume": 80,
+    "metroBpm": 91,
+    "mode0IntervalOffset": 15,
+    "mode0MidiVolume": 28
+}
