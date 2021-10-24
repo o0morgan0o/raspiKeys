@@ -102,6 +102,7 @@ def getChordInterval(type):
         return [0, 4, 10]
 
 
+
 def saveMode0IntervalOffset(value):
     newConfig = loadConfig()
     newConfig["mode0IntervalOffset"] = int(value)

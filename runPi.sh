@@ -13,7 +13,7 @@
 # xdotool mousemove 1000 1000
 /home/pi/raspiKeys/killPi.sh
 # /home/pi/raspiKeys/main.py --runDevice=pi
-/home/pi/raspiKeys/main.py &
+/home/pi/raspiKeys/src/main.py &
 #xinit
 
 

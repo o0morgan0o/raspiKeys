@@ -18,19 +18,19 @@ class QuestionNote:
 
 
 class CustomNote:
-    def __init__(self,  parent, note, delayOn, noteDuration):
+    def __init__(self,  parent, note, delayOn, noteDuration, velocity=100):
         # print("TRIGGER CUSTOM .................")
         self.noteOnDelay = delayOn
         self.noteOffDelay= noteDuration
         self.parent = parent
         self.note = note
-        self.timer = Timer(self.noteOnDelay, lambda: self.prepareNoteIn(self.note))
+        self.timer = Timer(self.noteOnDelay, lambda: self.prepareNoteIn(self.note, velocity))
 
         self.timer.start()
 
-    def prepareNoteIn(self, note):
+    def prepareNoteIn(self, note, velocity):
         # print("prepare note in")
-        self.parent.midiIO.sendOut("note_on", self.note)
+        self.parent.midiIO.sendOut("note_on", self.note, velocity)
         tout = Timer(self.noteOffDelay, lambda: self.prepareNoteOut(self.note))
         tout.start()
 
@@ -45,10 +45,10 @@ class Melody:
     def __init__(self, parent):
         self.parent = parent
 
-    def playWinMelody(self):
-        CustomNote(self.parent, 50, .0,.09)
-        CustomNote(self.parent, 53, .1,.09)
-        CustomNote(self.parent, 58, .2,.09)
+    def playWinMelody(self, velocity):
+        CustomNote(self.parent, 50, .0,.09, velocity),
+        CustomNote(self.parent, 53, .1,.09, velocity),
+        CustomNote(self.parent, 58, .2,.09, velocity)
 
 
     def playLooseMelody(self):

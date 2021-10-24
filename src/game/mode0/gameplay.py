@@ -18,6 +18,7 @@ from game.utils.questionNote import Melody
 from game.utils.midiToNotenames import noteName
 from game.utils.midiToNotenames import noteNameFull
 
+from game.utils.utilFunctions import *
 
 """ the mode 0 is for eartraining on a SINGLE INTERVAL """
 
@@ -30,7 +31,10 @@ class Game:
         # print("config mode 0 ",config)
         self.delay = float(config["question_delay"]) / 100
         self.isListening = False
+
         self.velocity = 100
+        self.velocity= int(self.parentLeft.slMidiVolume.get())
+        self.maxInterval = int(self.parentLeft.slInterval.get())
 
         # variable for user score
         self.counter = 0
@@ -57,7 +61,6 @@ class Game:
         self.parentLeft.slInterval.configure(command=self.changeIntervalSize)
         self.parentLeft.slMidiVolume.configure(command=self.changeMidiVolume)
 
-        self.maxInterval = 12
 
     def changeIntervalSize(self, value):
         newValue = int(value)
@@ -164,7 +167,9 @@ class Game:
             # if we gave the good answer, we want a new note
             self.changeGameState("waitingUserInput")
             time.sleep(0.4)
-            self.melodies.playWinMelody()
+            print("velocity: " + str(self.velocity))
+            self.parentRight.lblNote["text"]= ""
+            self.melodies.playWinMelody(self.velocity)
             time.sleep(0.4)
         else:
             self.parentRight.result["text"] = "incorrect\nA: {}".format(formatOutputInterval(answer - self.startingNote))
@@ -181,8 +186,10 @@ class Game:
             self.changeGameState("listen")
             # i want to replay both notes
             self.replayNote = QuestionNote(self.startingNote, self, 0)
+
             # i want to replay both notes
             self.replayNote = QuestionNote(self.questionNote.note, self, 0 + self.delay)
+            time.sleep(0.4)
         # self.parentRight.result.place(x=20, y=210, width=env.RIG)
         self.parentRight.lblNoteUser.lower()
         self.midiIO.panic()
