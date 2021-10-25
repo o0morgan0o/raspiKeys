@@ -165,7 +165,6 @@ def loadConfig():
             default_config["mode0IntervalOffset"] = configFile["mode0IntervalOffset"]
             default_config["mode0MidiVolume"] = configFile["mode0MidiVolume"]
             print(configFile)
-    except:
-        print("No config file found")
-    # print("loaded config is " , config)
+    except OSError as e:
+        print("No config file found", e)
     return default_config

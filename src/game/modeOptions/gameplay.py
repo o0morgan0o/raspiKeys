@@ -1,11 +1,11 @@
 import tkinter as tk
 from tkinter import messagebox
-from game.utils.customElements.labels import *
-from game.utils.customElements.buttons import *
-from game.utils.utilFunctions import *
-from game.autoload import Autoload
+from src.game.utils.customElements.labels import *
+from src.game.utils.customElements.buttons import *
+from src.game.utils.utilFunctions import *
+from src.game.autoload import Autoload
 import json
-from game import env
+from src.game import env
 
 
 class Game:
