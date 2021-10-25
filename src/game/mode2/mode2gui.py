@@ -1,4 +1,5 @@
 import tkinter as tk
+from pathlib import Path
 from glob import glob
 import os
 
@@ -49,11 +50,20 @@ class Mode2:
         self.placeElements()
         self.game = Game(self.globalRoot, self.gameFrame, config, app)
 
-    def getAllWavFolders(self):
+    @staticmethod
+    def getAllWavFolders():
         raw_wav_folders = glob(env.PROCESSED_WAV_FOLDER + '/*/')
         wav_folders=[]
+        # We want to extract just the names of the folders for the display
         for folder in raw_wav_folders:
-            wav_folders.append(folder.split('/')[-2])
+            # check if we are running on windows(dev) or linux(prod)
+            if os.name == 'nt':
+                wav_folders.append(folder.split('\\')[-2])
+            elif os.name == 'posix':
+                wav_folders.append(folder.split('/')[-2])
+            else :
+                raise Exception("Unknown operating system")
+
         return wav_folders
 
 

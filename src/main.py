@@ -28,7 +28,7 @@ from game import env
 # - Folder in backtracks view could be made automatically according to all files in folder
 
 class MainApplication(tk.Frame):
-    # definition de la fenetre g)lobale
+    # definition de la fenetre globale
 
     def __init__(self, master, tag="", **kw):
 
