@@ -23,8 +23,8 @@ python3 -m unittest
 # test TODO
 # =============
 # - modeOptions.py
-# - mode0gui.py
-# - mode1gui.py
+# - earTrainingNoteView.py
+# - earTrainingChordView.py
 # - mode2gui.py
 # - mode3gui.py
 # - gameplay0.py

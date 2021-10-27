@@ -1,14 +1,14 @@
 {
     "default_mode": 0,
-    "question_delay": 50,
+    "question_delay": 825,
     "difficulty": 50,
     "times_each_transpose": 4,
     "nb_of_transpose_before_change": 4,
-    "MIDI_interface_in": "",
-    "MIDI_interface_out": "",
+    "MIDI_interface_in": "USB-MIDI 1",
+    "MIDI_interface_out": "UMC1820 MIDI Out 1",
     "midi_hotkey": 50,
-    "volume": 80,
+    "audio_volume": 42,
+    "midi_volume": 94,
     "metroBpm": 91,
-    "mode0IntervalOffset": 15,
-    "mode0MidiVolume": 28
+    "max_interval_question_note": 6
 }

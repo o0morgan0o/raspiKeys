@@ -1,32 +1,47 @@
-from game.utils.midiIO import MidiIO
-from game.utils.audio import Audio
-from game.utils.utilFunctions import loadConfig
+import mido
+
+from src.game.utils.midiIO import MidiIO
+from src.game.utils.audio import Audio
+from src.game.utils.config import getMidiInterfaceIn, getMidiInterfaceOut
 
 
-class Autoload:  # Class used for singleton pattern, for storing global midiIO config
-    class __Autoload:
-        def __init__(self):
-            # audio instance of midiIO
-            self.config = loadConfig()
-            self.configIn = self.config["MIDI_interface_in"]
-            self.configOut = self.config["MIDI_interface_out"]
-            print("default interface :", self.configIn, self.configOut)
-            self.midiIO = MidiIO(self.configIn, self.configOut)
-            self.sound = Audio()
-            self.sound.initialize()
+class Autoload:
+    """Class used for singleton pattern, for storing global midiIO config"""
 
-    instance = None
+    __instance = None
 
     def __init__(self):
-        if not Autoload.instance:
-            Autoload.instance = Autoload.__Autoload()
+        if Autoload.__instance is not None:
+            raise Exception("ERROR !!: Don't instantiate Autoload class, use get_instance method.")
+
+        print("initialization...")
+        self.configIn = getMidiInterfaceIn()
+        self.configOut = getMidiInterfaceOut()
+        # we try to handle midi config if config values are null for any reason
+        if self.configIn == "":
+            try:
+                self.configIn = mido.get_input_names()[0]
+            except BaseException as e:
+                print("ERROR: No midi input listed in mido !!")
+        if self.configOut == "":
+            try:
+                self.configOut = mido.get_output_names()[0]
+            except BaseException as e:
+                print("ERROR: No midi output listed in mido !!")
+        print("default interface :", self.configIn, self.configOut)
+        self.midiIO = MidiIO(self.configIn, self.configOut)
+        self.sound = Audio()
+        self.sound.initialize()
+
+    @staticmethod
+    def get_instance():
+        if Autoload.__instance is None:
             print("Creation of instance")
-        else:
-            print("Recuperation of instance")
-            pass
+            Autoload.__instance = Autoload()
+        return Autoload.__instance
 
-    def getInstance(self):
-        return self.instance.midiIO
+    def getMidiInstance(self):
+        return self.midiIO
 
-    def getInstanceAudio(self):
-        return self.instance.sound
+    def getAudioInstance(self):
+        return self.sound

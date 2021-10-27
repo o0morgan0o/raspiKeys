@@ -1,10 +1,10 @@
 from threading import Timer
 import pygame
-from game.autoload import Autoload
+from src.game.autoload import Autoload
 
 class Bpm:
     def __init__(self, bpm, backtrack, backtrackDuration, nbOfLoops,callback):
-        self.sound = Autoload().getInstanceAudio()
+        self.sound = Autoload.get_instance().getAudioInstance()
         self.sound.loadTick()
         self.backtrack = backtrack
         self.backtrackDuration=backtrackDuration

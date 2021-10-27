@@ -1,19 +1,17 @@
-import tkinter as Tk
-from src.game import env
-from src.game.mode0.gameplay import Game
-from src.game.navbar.navbar import GameNames
+from src.game.Views.navbarView import GameNames
+from src.game.autoload import Autoload
 
 from src.game.utils.customElements.buttons import *
 from src.game.utils.customElements.labels import *
-from src.game.utils.customElements.scales import SettingsScale
-from src.game.utils.utilFunctions import *
+from src.game.ViewModels.earTrainingNoteViewModel import EarTrainingNoteViewModel
 
 
-class Mode0:
+class EarTrainingNoteView:
     def __init__(self, master, game_frame: tk.Frame, config: dict):
         print("launching game {}".format(GameNames.GAME_EAR_TRAINING_NOTE))
+        self.config = config
         self.master = master
-        self.game = None
+        self.viewModel = None
         self.gameFrame = game_frame
 
         DEFAULT_PADDING = 3
@@ -25,14 +23,11 @@ class Mode0:
         self.gameFrame.grid_columnconfigure(0, weight=1, pad=DEFAULT_PADDING)
         self.gameFrame.grid_columnconfigure(1, weight=1, pad=DEFAULT_PADDING)
 
-        self.slInterval = tk.Scale(self.gameFrame, from_=3, to=18, orient=tk.HORIZONTAL, width=40, label="Interval Max", showvalue=0)  # command=self.updateConfig)
+        self.slInterval = tk.Scale(self.gameFrame, from_=3, to=18, orient=tk.HORIZONTAL, width=40, label="Interval Max", showvalue=0)
         self.slInterval.grid(row=0, column=0, sticky=tk.EW, padx=(10, 10))
 
-        self.slDelay = tk.Scale(self.gameFrame, from_=3, to=18, orient=tk.HORIZONTAL, width=40, label="Note Delay" ,showvalue=0)  # command=self.updateConfig)
-        self.slDelay.grid(row=0, column=1, sticky=tk.EW, padx=(10,10))
-
-        # self.slInterval.set(int(config["mode0IntervalOffset"]))
-        # self.slInterval.config(showvalue=0)
+        self.slDelay = tk.Scale(self.gameFrame, from_=200, to=1000, orient=tk.HORIZONTAL, width=40, label="Note Delay", showvalue=0)
+        self.slDelay.grid(row=0, column=1, sticky=tk.EW, padx=(10, 10))
 
         self.pickNote = MyLabel18(self.gameFrame)  # for user instructions
         self.pickNote.config(font=("Courier", 24), text="pickNote")
@@ -64,8 +59,8 @@ class Mode0:
 
         self.score = MyLabel30(self.gameFrame, )  # for global score
         self.score.config(font=("Courier", 10, "bold"), text="SCORE")
-        # self.score.grid(row=2, sticky=tk.SW)
         self.score.grid(row=current_row, columnspan=2)
+
         current_row += 1
 
         #
@@ -87,7 +82,10 @@ class Mode0:
         # placement of differents labels
         # self.placeElements()
 
-        # self.game = Game(self.gameFrameLeft, self.gameFrameRight, config)
+        self.viewModel = EarTrainingNoteViewModel(self)
+        self.slInterval.bind("<ButtonRelease-1>", self.viewModel.updateSliderIntervalCallback)
+        self.slDelay.bind("<ButtonRelease-1>", self.viewModel.updateSliderDelayCallback)
+        # self.game = EarTrainingNoteViewModel(self, self.config)
 
     def placeElements(self):
         pass
@@ -111,10 +109,11 @@ class Mode0:
         # self.gameFrameRight.btnSkip.place(x=0, y=350, width=env.RIGHT_SCREEN_W, height=60)
         # self.gameFrameRight.score.place(x=0, y=420, width=env.RIGHT_SCREEN_W, height=60)
 
-    def activateListening(self):
-        self.master.isListening = True
+    # def activateListening(self):
+    # self.master.isListening = True
 
     def __del__(self):
-        print("trying destroy Mode 0")
-        if self.game is not None:
-            self.game.destroy()
+        pass
+        # print("trying destroy Mode 0")
+        # if self.game is not None:
+        #     self.game.destroy()

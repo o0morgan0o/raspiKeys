@@ -5,19 +5,19 @@ from threading import Timer
 import mido
 import simpleaudio as sa
 
-from game.utils.waitingNote import WaitingNote
-from game.utils.questionNote import QuestionNote
-from game.utils.midiIO import MidiIO
-from game.utils.utilFunctions import formatOutputInterval
-from game.utils.midiChords import MidiChords
-from game.utils.questionNote import CustomNote
-from game.utils.questionNote import Melody
-from game.utils.questionNote import CustomSignal
+from src.game.utils.waitingNote import WaitingNote
+from src.game.utils.questionNote import QuestionNote
+from src.game.utils.midiIO import MidiIO
+from src.game.utils.utilFunctions import formatOutputInterval
+from src.game.utils.midiChords import MidiChords
+from src.game.utils.questionNote import CustomNote
+from src.game.utils.questionNote import Melody
+from src.game.utils.questionNote import CustomSignal
 
-from game.autoload import Autoload
+from src.game.autoload import Autoload
 
-from game.utils.midiToNotenames import noteNameFull
-from game.utils.midiToNotenames import noteName
+from src.game.utils.midiToNotenames import noteNameFull
+from src.game.utils.midiToNotenames import noteName
 
 """ the mode 1 is for eartraining on a CHORD INTERVAL
 """
@@ -40,7 +40,7 @@ class Game:
         self.stopGame = False
         self.waitingNotes = []
 
-        self.midiIO = Autoload().getInstance()  # open connections and ports
+        self.midiIO = Autoload.get_instance().getMidiInstance()  # open connections and ports
         self.midiIO.setCallback(self.handleMIDIInput)
 
         # gamestate is used to know when the user is guessing
@@ -254,7 +254,7 @@ class Game:
         return canvasW / w
 
     def handleMIDIInput(self, msg):
-        if Autoload().getInstance().isListening == False:
+        if Autoload.get_instance().getMidiInstance().isListening == False:
             return
         if self.globalIsListening == False:
             return

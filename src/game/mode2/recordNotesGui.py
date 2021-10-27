@@ -23,9 +23,9 @@ class RecordNotesGui:
 
         self.app = app
         self.globalRoot = globalRoot
-        self.midiIO = Autoload().getInstance()
+        self.midiIO = Autoload.get_instance().getMidiInstance()
         self.midiIO.setCallback(self.handleMIDIInput)
-        self.audioInstance = Autoload().getInstanceAudio()
+        self.audioInstance = Autoload.get_instance().getAudioInstance()
         self.backtrack = backtrack
         self.backtrackDuration = backtrackDuration
         self.nbOfLoops = nbOfLoops

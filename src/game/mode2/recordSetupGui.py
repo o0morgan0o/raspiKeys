@@ -15,7 +15,7 @@ class RecordSetupGui:
     def __init__(self, globalRoot, backtrackFile, backtrackDuration, nbOfLoops, app):
         self.app = app
         self.globalRoot = globalRoot
-        self.midiIO = Autoload().getInstance()
+        self.midiIO = Autoload.get_instance().getMidiInstance()
         self.midiIO.setCallback(self.handleMIDIInput)
         self.backtrackFile = backtrackFile
         self.backtrackDuration = backtrackDuration

@@ -1,130 +1,141 @@
-
 import mido
 
 
 class MidiIO:
-    def __init__(self, midiIn, midiOut):
+
+    def __init__(self, midi_in: str, midi_out: str):
+        self.isListening = True
         self.midoInList = self.getAllMidiInputs()
         self.midoOutList = self.getAllMidiOutputs()
-        print("list:", self.midoInList, self.midoOutList)
-        # define input and ouput USB midi
-        # we check if the default interface is present in the list
-        if midiIn in self.midoInList:
-            self.inport = mido.open_input(midiIn)
-        else:
-            print("default IN setting not found !, use mido[0] insted")
-            self.inport = self.openInput(self.midoInList, 0)
+        self.midiVolume = 100
 
-        if midiOut in self.midoOutList:
-            self.outport = mido.open_output(midiOut)
-            # pass
+        print("mido MIDI I/O initial list:", self.midoInList, self.midoOutList)
+        # we check if the default interface is present in the list
+        if midi_in in self.midoInList:
+            self.in_port = mido.open_input(midi_in)
         else:
-            print("default OUT setting not found !, use mido[0] insted")
-            self.outport = self.openOutput(self.midoOutList, 0)
+            print("default midi_in_interface config not found !, use mido_in[0] instead")
+            self.in_port = self.openInput(self.midoInList, 0)
+
+        if midi_out in self.midoOutList:
+            self.out_port = mido.open_output(midi_out)
+        else:
+            print("default midi_out_interface config not found !, use mido_out[0] instead")
+            self.out_port = self.openOutput(self.midoOutList, 0)
 
         self.resetInAndOut()
 
-    def openInput(self, inputsArr, index):
-        if len(inputsArr) > 0:
-            return mido.open_input(inputsArr[index])
+    def setMidiVolume(self, midi_volume: int):
+        self.midiVolume = midi_volume
 
-    def openOutput(self, outputsArr, index):
-        if len(outputsArr) > 0:
-            return mido.open_output(outputsArr[index])
+    def getMidiVolume(self) -> int:
+        return self.midiVolume
 
     def resetInAndOut(self):
         try:
-            self.inport.callback = None
-            self.inport.poll()
-            self.isListening = True
+            self.in_port.callback = None
+            self.in_port.poll()
 
-            print("TRY TO CLEAR ==========")
-            self.inport._queue._queue.mutex.acquire()
-            self.inport._queue._queue.queue.clear()
-            self.inport._queue._queue.all_tasks_done.notify_all()
-            self.inport._queue._queue.unfinished_tasks = 0
-            self.inport._queue._queue.mutex.release()
+            print("===== MIDO RESET =====")
+            self.in_port._queue._queue.mutex.acquire()
+            self.in_port._queue._queue.queue.clear()
+            self.in_port._queue._queue.all_tasks_done.notify_all()
+            self.in_port._queue._queue.unfinished_tasks = 0
+            self.in_port._queue._queue.mutex.release()
             print("END ==========")
 
             self.showIOPorts()
-            self.outport.panic()
-            self.outport.reset()
-        except Exception as e:
+            self.out_port.panic()
+            self.out_port.reset()
+        except BaseException as e:
             print("Error in function resetInAndOut()", e)
 
     def showIOPorts(self):
-        print(80*"=")
-        # ['Midi Through:Midi Through Port-0 14:0', 'USB-MIDI:USB-MIDI MIDI 1 24:0']
-        print("Availables inputs: ", mido.get_input_names())
-        print("Availables outputs: ", mido.get_output_names())
-        print("<== Selected input is {}".format(self.inport))
-        print("==> Selected output is {}".format(self.outport))
-        print(80*"=")
-
-    def getAllMidiInputs(self):
-        try:
-            return mido.get_input_names()
-        except Exception as e :
-            print("Impossible to run mido_get_output_names" , e)
-            return []
-
-    def getAllMidiOutputs(self):
-        try:
-            return mido.get_output_names()
-        except Exception as e:
-            print("Impossible to run mido_get_output_names" , e)
-            return  []
+        print(80 * "=")
+        print("Available inputs: ", mido.get_input_names())
+        print("Available outputs: ", mido.get_output_names())
+        print("<== Selected input is {}".format(self.in_port))
+        print("==> Selected output is {}".format(self.out_port))
+        print(80 * "=")
 
     def setMidiInput(self, _input):
         try:
-            self.inport.close()
-        except Exception as e:
+            self.in_port.close()
+        except BaseException as e:
             print("can't close input port.", e)
         try:
-            self.inport = mido.open_input(_input)
-        except Exception as e:
+            self.in_port = mido.open_input(_input)
+        except BaseException as e:
             print("error setting input port", e)
         self.resetInAndOut()
 
     def setMidiOutput(self, _output):
         try:
-            self.outport.close()
-        except Exception as e:
+            self.out_port.close()
+        except BaseException as e:
             print("can't close output port", e)
         try:
-            self.outport = mido.open_output(_output)
-        except Exception as e:
+            self.out_port = mido.open_output(_output)
+        except BaseException as e:
             print("error setting output port", e)
         self.resetInAndOut()
 
     def destroy(self):
-        self.inport.callback = None
-        self.outport.panic()
+        self.in_port.callback = None
+        self.out_port.panic()
         # close ports
-        self.outport.close()
-        self.inport.close()
-        # print("is closed output? : ",self.outport.closed)
-        # print("is closed input? : ",self.inport.closed)
-        #del self.inport
-        #del self.outport
+        self.out_port.close()
+        self.in_port.close()
 
     def setCallback(self, callback):
         try:
-            self.inport.callback = callback
+            self.in_port.callback = callback
         except Exception as e:
             print("error in setCallback()", e)
 
-    def sendOut(self, msgtype, note, velocity=100):
-        # print("[+] sending note : ", msgtype, note, velocity)
-        msg = mido.Message(msgtype, note=note, velocity=velocity)
-        self.outport.send(msg)
+    def sendOut(self, msg_type, note: int, velocity: int = 100):
+        # print("[+] sending note : ", msg_type, note, velocity)
+        msg = mido.Message(msg_type, note=note, velocity=velocity)
+        self.out_port.send(msg)
 
     def panic(self):
-        self.outport.panic()
+        self.out_port.panic()
 
-    def toggleListening(self):
-        if self.isListening == True:
-            self.isListening = False
-        else:
-            self.isListening = True
+    # def setMidiListening(self):
+
+    def getListeningState(self) -> bool:
+        return self.isListening
+
+    def setListening(self, is_listening: bool):
+        self.isListening = is_listening
         print("isListening ? ", self.isListening)
+        # if self.isListening:
+        #     self.isListening = False
+        # else:
+        #     self.isListening = True
+
+    @staticmethod
+    def getAllMidiInputs():
+        try:
+            return mido.get_input_names()
+        except BaseException as e:
+            print("Impossible to run mido_get_input_names", e)
+            return []
+
+    @staticmethod
+    def getAllMidiOutputs():
+        try:
+            return mido.get_output_names()
+        except BaseException as e:
+            print("Impossible to run mido_get_output_names", e)
+            return []
+
+    @staticmethod
+    def openInput(inputs_arr: dict, index: int):
+        if len(inputs_arr) > 0:
+            return mido.open_input(inputs_arr[index])
+
+    @staticmethod
+    def openOutput(outputs_arr, index):
+        if len(outputs_arr) > 0:
+            return mido.open_output(outputs_arr[index])

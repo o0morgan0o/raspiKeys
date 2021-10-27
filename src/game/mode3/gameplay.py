@@ -1,30 +1,18 @@
-import datetime
-import random
-import pygame
-from game.utils.bpm import Bpm
-from threading import Timer
-import threading
-import random
-import os
-from game import env
-import time
-import tkinter as tk
-from tkinter import messagebox
 import json
-from tkinter import ttk as ttk
-import mido
+import os
+import random
+import threading
+import time
+from tkinter import messagebox
 
+import pygame
 from PIL import Image, ImageTk
-
-from game.utils.midiIO import MidiIO
-from game.autoload import Autoload
-from game.utils.questionNote import CustomSignal
-from game.utils.midiToNotenames import noteName
-from game.utils.utilFunctions import getChordInterval
-from game.utils.utilFunctions import formatOutputInterval
-
-from game.utils.customElements.buttons import *
-from game.utils.customElements.labels import *
+from src.game import env
+from src.game.autoload import Autoload
+from src.game.utils.customElements.buttons import *
+from src.game.utils.customElements.labels import *
+from src.game.utils.midiToNotenames import noteName
+from src.game.utils.utilFunctions import formatOutputInterval
 
 
 class Game:
@@ -34,7 +22,7 @@ class Game:
         self.pauseImage = ImageTk.PhotoImage(Image.open(env.PAUSE_IMAGE))
         self.shuffleImage = ImageTk.PhotoImage(Image.open(env.SHUFFLE_IMAGE))
 
-        self.midiIO = Autoload().getInstance()
+        self.midiIO = Autoload.get_instance().getMidiInstance()
         self.midiIO.setCallback(self.handleMIDIInput)
 
         self.isPlaying = False
@@ -59,8 +47,8 @@ class Game:
         self.fileIndex = 0
         self.recordNotes = None
 
-        self.midiIO = Autoload().getInstance()
-        self.audioInstance = Autoload().getInstanceAudio()
+        self.midiIO = Autoload.get_instance().getMidiInstance()
+        self.audioInstance = Autoload.get_instance().getAudioInstance()
         # self.midiIO.setCallback(self.handleMIDIInput)
 
         self.bassNote = 0

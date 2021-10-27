@@ -24,9 +24,9 @@ class RecordChordsGui:
 
         self.app = app
         self.globalRoot = globalRoot
-        self.midiIO = Autoload().getInstance()
+        self.midiIO = Autoload.get_instance().getMidiInstance()
         self.midiIO.setCallback(self.handleMIDIInput)
-        self.audioInstance = Autoload().getInstanceAudio()
+        self.audioInstance = Autoload.get_instance().getAudioInstance()
         self.backtrack = backtrack
         self.backtrackDuration = backtrackDuration
         self.nbOfLoops = nbOfLoops
@@ -34,7 +34,7 @@ class RecordChordsGui:
         self.bassNote = bassNote
         self.choosenBpm = 90
 
-        self.sound = Autoload().getInstanceAudio()
+        self.sound = Autoload.get_instance().getAudioInstance()
         self.window = tk.Toplevel(self.globalRoot, cursor="none")
         self.window.attributes("-fullscreen", True)
         self.window.geometry("320x480")

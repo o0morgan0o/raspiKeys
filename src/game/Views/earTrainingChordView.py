@@ -1,8 +1,9 @@
 import tkinter as tk
-from game.mode1.gameplay import Game
+from src.game.Views.earTrainingNoteView import EarTrainingNoteView
+from src.game.Views.mode2gui import Game
 
-from game.utils.customElements.buttons import *
-from game.utils.customElements.labels import *
+from src.game.utils.customElements.buttons import *
+from src.game.utils.customElements.labels import *
 
 
 class Mode1:

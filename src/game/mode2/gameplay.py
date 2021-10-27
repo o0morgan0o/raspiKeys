@@ -39,7 +39,7 @@ class Game:
         self.shuffleImage = ImageTk.PhotoImage(Image.open(env.SHUFFLE_IMAGE))
         self.page=0
 
-        self.midiIO = Autoload().getInstance()
+        self.midiIO = Autoload.get_instance().getMidiInstance()
         self.midiIO.setCallback(self.handleMIDIInput)
         self.globalRoot = globalRoot
         self.app = app
@@ -48,7 +48,7 @@ class Game:
         self.isPlayingMetro=False
 
         self.parent = parent
-        self.sound = Autoload().getInstanceAudio()
+        self.sound = Autoload.get_instance().getAudioInstance()
 
         # CLICK LISTENERS
         self.parent.btnPlay.config(command=self.toggleBacktrack)
