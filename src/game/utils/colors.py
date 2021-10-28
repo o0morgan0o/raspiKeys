@@ -1,5 +1,7 @@
 class Colors:
-    primary = "black"
-    text = "white"
-    error= "red"
-    success="green"
+    BACKGROUND = "black"
+    PRIMARY = "#333333"
+    TEXT = "white"
+    ERROR = "red"
+    SUCCESS = "green"
+    WARNING = "orange"

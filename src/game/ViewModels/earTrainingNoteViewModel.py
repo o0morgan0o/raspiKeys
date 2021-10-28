@@ -24,6 +24,13 @@ class GameStates(Enum):
         CURRENT_MIDI_OUT: str = "MIDI out: "
 
 
+class WaitingInput(Enum):
+    WAITING_INPUT_COMING_FROM_START_GAME = "coming_from_start_game"
+    WAITING_INPUT_COMING_FROM_WIN = "coming_from_win"
+    WAITING_INPUT_COMING_FROM_LOOSE = "coming_from_loose"
+    WAITING_INPUT_COMING_FROM_SKIP = "coming_from_skip"
+
+
 class EarTrainingNoteViewModel:
     def __init__(self, view):
         self.view = view
@@ -75,30 +82,50 @@ class EarTrainingNoteViewModel:
         self.delay = new_value
         updateEarTrainingNoteDelay(new_value)
 
-    # def skip(self):
-    #     try:
-    #         self.view.result["text"] = "It was ;-)\n{}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
-    #         self.view.result["bg"] = "orange"
-    #         # if we gave the good answer, we want a new note
-    #         self.changeGameState(GameStates.GAME_WAITING_USER_INPUT.value)
-    #     except BaseException as e:
-    #         print("impossible to skip question", e)
+    def skipQuestionCallback(self):
+        self.changeGameState(GameStates.GAME_INITIALIZATION.value, coming_from=WaitingInput.WAITING_INPUT_COMING_FROM_SKIP.value)
+
+    def skip(self):
+        self.view.result["text"] = "It was ;-)\n{}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
+        self.view.result["bg"] = "orange"
+        # if we gave the good answer, we want a new note
+        # self.changeGameState(GameStates.GAME_WAITING_USER_INPUT.value)
 
     def startGame(self):
         self.midiIO.setListening(True)
-        self.changeGameState(GameStates.GAME_INITIALIZATION.value)
+        self.changeGameState(GameStates.GAME_INITIALIZATION.value, coming_from=WaitingInput.WAITING_INPUT_COMING_FROM_START_GAME.value)
 
-    def changeGameState(self, new_state: str, note_received: int = None):
+    def changeGameState(self, new_state: str, note_received: int = None, coming_from: str = None):
         print("SWITCHING GAME_STATE TO {}".format(new_state), note_received)
         self.gameState = new_state
         if new_state == GameStates.GAME_NOT_STARTED.value:
             pass
 
         if new_state == GameStates.GAME_INITIALIZATION.value:
-            # We set here the interval of the question. We will later get the question note from the user input
-            self.questionInterval = self.pickQuestionInterval(self.view.slInterval.get())
-            self.changeGameState(GameStates.GAME_WAITING_USER_INPUT.value)
-            self.view.reinitializeUi()
+
+            if coming_from == WaitingInput.WAITING_INPUT_COMING_FROM_START_GAME.value:
+                # This should be triggered juste once
+                # We set here the interval of the question. We will later get the question note from the user input
+                self.questionInterval = self.pickQuestionInterval(self.view.slInterval.get())
+                self.view.reinitializeUi()
+                self.changeGameState(GameStates.GAME_WAITING_USER_INPUT.value)
+
+            elif coming_from == WaitingInput.WAITING_INPUT_COMING_FROM_WIN.value:
+                self.questionInterval = self.pickQuestionInterval(self.view.slInterval.get())
+                self.changeGameState(GameStates.GAME_WAITING_USER_INPUT.value)
+
+            elif coming_from == WaitingInput.WAITING_INPUT_COMING_FROM_LOOSE.value:
+                pass
+
+            elif coming_from == WaitingInput.WAITING_INPUT_COMING_FROM_SKIP.value:
+                if self.questionNote is None or self.originNote is None:
+                    return self.changeGameState(GameStates.GAME_WAITING_USER_INPUT.value)
+                intervalReadableText = formatOutputInterval(self.questionNote - self.originNote)
+                self.questionInterval = self.pickQuestionInterval(self.view.slInterval.get())
+                self.view.setUiStateSkippedQuestion(noteNameFull(self.questionNote), intervalReadableText)
+                self.changeGameState(GameStates.GAME_WAITING_USER_INPUT.value)
+            else:
+                raise BaseException("Error in Waiting User Input state, No coming_from value set.")
 
         elif new_state == GameStates.GAME_WAITING_USER_INPUT.value:
             # When in this game state, a midi input will trigger the change to the next game state
@@ -140,7 +167,11 @@ class EarTrainingNoteViewModel:
 
     def processWin(self):
         midi_win_melody_volume = int(float(getMidiVolume()) * 3 / 4)
-        playWinMelody(self.midiIO, midi_win_melody_volume, callback_after_melody=self.changeGameState(GameStates.GAME_INITIALIZATION.value))
+        playWinMelody(self.midiIO, midi_win_melody_volume,
+                      callback_after_melody=self.changeGameState(
+                          GameStates.GAME_INITIALIZATION.value,
+                          coming_from=WaitingInput.WAITING_INPUT_COMING_FROM_WIN.value)
+                      )
 
     def showLooseUi(self, note_received: int):
         intervalReadableText = formatOutputInterval(note_received - self.originNote)
@@ -154,15 +185,6 @@ class EarTrainingNoteViewModel:
     def initMIDIArray(self, max_note: int):
         for i in range(max_note):
             self.waitingNotes.append(WaitingNote(i, self))
-
-    # def checkAnswerA(self, answer: int):
-    # self.view.lblNoteUser.lift()
-    # if answer == self.questionNote.note:
-    # else:
-    # # self.parentRight.result.place(x=20, y=210, width=env.RIG)
-    # self.view.lblNoteUser.lower()
-    # self.midiIO.panic()
-    # pass
 
     @staticmethod
     def checkAnswer(m_answer: int, m_question: int):

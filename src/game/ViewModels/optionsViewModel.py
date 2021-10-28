@@ -6,7 +6,7 @@ from src.game import env
 from src.game.autoload import Autoload
 from src.game.utils.config import loadConfig, getMidiInterfaceIn, getMidiInterfaceOut, updateMidiOutConfig, \
     updateMidiInConfig
-from src.game.utils.customElements.buttons import *
+from src.game.utils.customElements.customElements import *
 from src.game.utils.customElements.labels import *
 from enum import Enum
 

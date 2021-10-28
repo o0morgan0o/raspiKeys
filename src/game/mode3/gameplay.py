@@ -9,7 +9,7 @@ import pygame
 from PIL import Image, ImageTk
 from src.game import env
 from src.game.autoload import Autoload
-from src.game.utils.customElements.buttons import *
+from src.game.utils.customElements.customElements import *
 from src.game.utils.customElements.labels import *
 from src.game.utils.midiToNotenames import noteName
 from src.game.utils.utilFunctions import formatOutputInterval

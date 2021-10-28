@@ -7,10 +7,10 @@ import os
 from src.game.mode2.gameplay import Game
 from src.game import env
 
-from src.game.utils.customElements.buttons import *
+from src.game.utils.customElements.customElements import *
 from src.game.utils.customElements.labels import *
 
-from src.game.utils.customElements.buttons import BtnBlack20
+from src.game.utils.customElements.customElements import BtnBlack20
 
 
 class Mode2:

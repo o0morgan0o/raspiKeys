@@ -1,7 +1,7 @@
 import tkinter
 import tkinter as tk
 from src.game import env
-from src.game.utils.customElements.buttons import *
+from src.game.utils.customElements.customElements import *
 from src.game.utils.customElements.scales import *
 from enum import Enum
 

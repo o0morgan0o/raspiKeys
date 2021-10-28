@@ -1,6 +1,6 @@
 from src.game.autoload import Autoload
 from src.game.mode2.recordSetupGui import RecordSetupGui
-from src.game.utils.customElements.buttons import *
+from src.game.utils.customElements.customElements import *
 from src.game.utils.customElements.labels import *
 
 

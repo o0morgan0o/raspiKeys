@@ -1,6 +1,6 @@
 {
     "default_mode": 0,
-    "question_delay": 547,
+    "question_delay": 518,
     "difficulty": 50,
     "times_each_transpose": 4,
     "nb_of_transpose_before_change": 4,
@@ -10,5 +10,5 @@
     "audio_volume": 61,
     "midi_volume": 65,
     "metroBpm": 91,
-    "max_interval_question_note": 11
+    "max_interval_question_note": 8
 }

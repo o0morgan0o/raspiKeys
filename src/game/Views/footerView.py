@@ -1,7 +1,7 @@
 import tkinter as tk
 
 from src.game.Views.navbarView import GameNames
-from src.game.utils.customElements.buttons import *
+from src.game.utils.customElements.customElements import *
 from src.game.ViewModels.FooterViewModel import FooterViewModel
 
 

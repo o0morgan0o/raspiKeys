@@ -2,7 +2,7 @@ import tkinter as tk
 from src.game.Views.earTrainingNoteView import EarTrainingNoteView
 from src.game.Views.mode2gui import Game
 
-from src.game.utils.customElements.buttons import *
+from src.game.utils.customElements.customElements import *
 from src.game.utils.customElements.labels import *
 
 

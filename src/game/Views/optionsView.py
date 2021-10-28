@@ -1,7 +1,7 @@
 from src.game.Views.navbarView import GameNames
 
 from src.game.autoload import Autoload
-from src.game.utils.customElements.buttons import *
+from src.game.utils.customElements.customElements import *
 from src.game.utils.customElements.labels import *
 from src.game.utils.customElements.scales import *
 from src.game.ViewModels.optionsViewModel import OptionsViewModel, ViewStrings

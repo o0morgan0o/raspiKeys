@@ -9,6 +9,7 @@ from src.game.autoload import Autoload
 from src.game.utils.config import loadConfig
 from src.game.utils.customElements.scales import *
 from src.game.utils.colors import Colors
+from src.game.Styles.customStyles import CustomButtonStyle
 
 from ttkwidgets import TickScale
 from tkinter import ttk
@@ -25,6 +26,9 @@ class MainApplication(tk.Tk):
         self.body = None
         self.config = loadConfig()
 
+        # use my own styles
+        style = CustomButtonStyle()
+
         # initialisation of default mode, this tracks the current active state of the application
         # self.currentGameMode = GameNames.GAME_OPTIONS
         self.currentGameMode = GameNames.GAME_EAR_TRAINING_NOTE
@@ -36,7 +40,6 @@ class MainApplication(tk.Tk):
         self.geometry("%sx%s" % (env.FULL_SCREEN_W, env.FULL_SCREEN_H))
         self.style = ttk.Style(self)
         print("ALL_THEMES" , self.style.theme_names())
-        self.style.theme_use('clam')
 
         self.frame = None
 
@@ -56,18 +59,6 @@ class MainApplication(tk.Tk):
         # Load default Screen
         self.new_window(self.currentGameMode)
 
-    # @staticmethod
-    # def changeVolume(offset: float):
-    #     actual_vol = Audio.getVolume()
-    #     if actual_vol + offset <= 0.01:
-    #         Autoload.get_instance().getAudioInstance().setVolume(0)
-    #     else:
-    #         Autoload.get_instance().getAudioInstance().setVolume(actual_vol + offset)
-    #
-    # @staticmethod
-    # def sliderMoved(value: float):
-    #     mSound = Audio.setVolume(None, value)
-
     # method to load a new game mode
     def new_window(self, new_game_mode: GameNames):
 
@@ -76,7 +67,7 @@ class MainApplication(tk.Tk):
         print("[GAME CHANGE] Creating new game window")
 
         # recreation of the body frame (middle frame)
-        self.body = tk.Frame(self, bg=Colors.primary)
+        self.body = tk.Frame(self, bg="yellow")
         self.body.place(x=env.NAVBAR_WIDTH, y=0, width=env.FULL_SCREEN_W - env.NAVBAR_WIDTH, height=env.FULL_SCREEN_H - env.FOOTER_HEIGHT)
 
         if self.app is not None:
