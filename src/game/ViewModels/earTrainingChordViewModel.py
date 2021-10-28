@@ -222,7 +222,7 @@ class Game:
                 self.changeGameState("waitingUserInput")
 
                 time.sleep(1)
-                self.melodies.playWinMelody()
+                self.melodies.processWin()
                 time.sleep(1)
                 self.isListening = True
 

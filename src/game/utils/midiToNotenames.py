@@ -27,8 +27,7 @@ def noteName(midiNum: int) -> str:
         return "B"
 
 
-def noteNameFull(midiNum: int) -> str:
-    entier = int(midiNum/12)
-    # print(entier)
-    key = noteName(midiNum)
-    return "{}{}".format(key, str(entier))
+def noteNameFull(midi_num: int) -> str:
+    octave_number = int(midi_num / 12)
+    key = noteName(midi_num)
+    return "{}{}".format(key, str(octave_number))

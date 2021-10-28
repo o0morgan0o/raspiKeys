@@ -109,24 +109,9 @@ def getMidiVolume() -> int:
     return loadConfig()[ConfigurationFields.MIDI_VOLUME.value]
 
 
-def getDefaultConfig() -> dict:
-    default_config = {
-        ConfigurationFields.DEFAULT_MODE.value: 0,
-        ConfigurationFields.EAR_TRAINING_NOTE_QUESTION_DELAY.value: 500,
-        ConfigurationFields.TIMES_EACH_TRANSPOSE.value: 4,
-        ConfigurationFields.NB_OF_TRANSPOSE_BEFORE_CHANGE.value: 4,
-        ConfigurationFields.MIDI_INTERFACE_IN.value: "",
-        ConfigurationFields.MIDI_INTERFACE_OUT.value: "",
-        ConfigurationFields.MIDI_HOTKEY.value: 50,
-        ConfigurationFields.AUDIO_VOLUME.value: 80,
-        ConfigurationFields.MIDI_VOLUME.value: 80,
-        ConfigurationFields.METRO_BPM.value: 91,
-        ConfigurationFields.EAR_TRAINING_NOTE_MAX_INTERVAL.value: 6
-    }
-    return default_config
-
-
-def __loadConfigFromFile(config: dict) -> dict:
+def loadConfigFromFile(config: dict) -> dict:
+    if config is None:
+        config = {}
     config[ConfigurationFields.DEFAULT_MODE.value] = \
         (0, config.get(ConfigurationFields.DEFAULT_MODE.value))[ConfigurationFields.DEFAULT_MODE.value in config.keys()]
     config[ConfigurationFields.EAR_TRAINING_NOTE_QUESTION_DELAY.value] = \
@@ -156,11 +141,11 @@ def loadConfig():
     try:
         with open(env.CONFIG_FILE, 'r') as f:
             configFile = json.load(f)
-            return __loadConfigFromFile(configFile)
+            return loadConfigFromFile(configFile)
     except OSError as e:
         print("No config file found", e)
         return None
     except KeyError as e:
         # it means a parameter is not correct, so we rewrite default config
-        # writeConfig(getDefaultConfig())
+        # writeConfig(src.game())
         return None

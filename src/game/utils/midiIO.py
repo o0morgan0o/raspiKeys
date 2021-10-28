@@ -94,7 +94,7 @@ class MidiIO:
             print("error in setCallback()", e)
 
     def sendOut(self, msg_type, note: int, velocity: int = 100):
-        # print("[+] sending note : ", msg_type, note, velocity)
+        print("[+] sending note : ", msg_type, note, velocity)
         msg = mido.Message(msg_type, note=note, velocity=velocity)
         self.out_port.send(msg)
 

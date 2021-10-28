@@ -1,11 +1,7 @@
-from game import env
-import json
-
-
-def formatOutputInterval(mInterval):
+def formatOutputInterval(m_interval:int):
     # TODO: Extend to other responses
     # interval = abs(mInterval)
-    interval = mInterval
+    interval = m_interval
     if interval == 0:
         return "unisson"
     elif interval == 1:

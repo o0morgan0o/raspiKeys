@@ -1,15 +1,21 @@
 from src.game.Views.navbarView import GameNames
-from src.game.autoload import Autoload
-
+from src.game.utils.colors import Colors
 from src.game.utils.customElements.buttons import *
 from src.game.utils.customElements.labels import *
 from src.game.ViewModels.earTrainingNoteViewModel import EarTrainingNoteViewModel
+from enum import Enum
+from tkinter import ttk
+
+
+class GameStrings(Enum):
+    LABEL_PICK_NOTE = "Pick a starting note"
+    LABEL_LISTEN = "Listen ..."
+    LABEL_WHAT_IS_YOUR_ANSWER = "What is your answer ?"
 
 
 class EarTrainingNoteView:
-    def __init__(self, master, game_frame: tk.Frame, config: dict):
+    def __init__(self, master, game_frame: tk.Frame):
         print("launching game {}".format(GameNames.GAME_EAR_TRAINING_NOTE))
-        self.config = config
         self.master = master
         self.viewModel = None
         self.gameFrame = game_frame
@@ -29,6 +35,8 @@ class EarTrainingNoteView:
         self.slDelay = tk.Scale(self.gameFrame, from_=200, to=1000, orient=tk.HORIZONTAL, width=40, label="Note Delay", showvalue=0)
         self.slDelay.grid(row=0, column=1, sticky=tk.EW, padx=(10, 10))
 
+        current_row += 1
+
         self.pickNote = MyLabel18(self.gameFrame)  # for user instructions
         self.pickNote.config(font=("Courier", 24), text="pickNote")
         self.pickNote.grid(row=current_row, columnspan=2)
@@ -40,80 +48,54 @@ class EarTrainingNoteView:
         self.lblNote.grid(row=current_row, column=0, sticky=tk.E, padx=(0, 12))
 
         self.lblNoteUser = MyLabel40(self.gameFrame)
-        self.lblNoteUser.config(font=("Courier", 120, "bold"), text="A", justify="left")
+        self.lblNoteUser.config(font=("Courier", 120, "bold"), text="", justify="left")
         self.lblNoteUser.grid(row=current_row, column=1, sticky=tk.W, padx=(12, 0))
 
         current_row += 1
 
-        self.result = MyLabel18(self.gameFrame, padx=10, pady=10)  # for "correct" or "incorrect"response
-        self.result.config(font=("Courier", 18, "bold"), text="Correct / Incorrect")
+        self.result = MyLabel18(self.gameFrame, padx=10, pady=10)
+        self.result.config(font=("Courier", 18, "bold"), text="")
         self.result.grid(row=current_row, columnspan=2)
 
         current_row += 1
 
         self.btnSkip = BtnBlack20(self.gameFrame, text="SKIP >")
         self.btnSkip.config(bd=0, highlightthickness=0)
-        self.btnSkip.grid(row=current_row, columnspan=2)
-
-        current_row += 1
+        self.btnSkip.grid(row=current_row, column=1, sticky=tk.SE, padx=12, pady=12)
 
         self.score = MyLabel30(self.gameFrame, )  # for global score
         self.score.config(font=("Courier", 10, "bold"), text="SCORE")
-        self.score.grid(row=current_row, columnspan=2)
+        self.score.grid(row=current_row, column=0, sticky=tk.SW, padx=12,pady=12)
 
         current_row += 1
-
-        #
-        # self.lblInterval = MyLabel18(self.gameFrame)
-        # self.lblInterval.config(font=("Courier", 12), text="Interval section:")
-        # self.lblInterval.pack(fill=tk.BOTH)
-        #
-        # self.lblMidiVolume = MyLabel18(self.gameFrame)
-        # self.lblMidiVolume.config(font=("Courier", 12), text="Midi Volume:")
-        # self.lblMidiVolume.pack(fill=tk.BOTH)
-
-        #
-        # self.gameFrame.slMidiVolume = SettingsScale(self.gameFrame, from_=1, to=127, orient=tk.HORIZONTAL)  # command=self.updateConfig)
-        # self.gameFrame.slMidiVolume.set(int(config["mode0MidiVolume"]))
-        # self.gameFrame.slMidiVolume.config(showvalue=0)
-        # # self.gameFrameLeft.slMidiVolume.set()
-        #
-
-        # placement of differents labels
-        # self.placeElements()
 
         self.viewModel = EarTrainingNoteViewModel(self)
         self.slInterval.bind("<ButtonRelease-1>", self.viewModel.updateSliderIntervalCallback)
         self.slDelay.bind("<ButtonRelease-1>", self.viewModel.updateSliderDelayCallback)
-        # self.game = EarTrainingNoteViewModel(self, self.config)
 
-    def placeElements(self):
-        pass
-        # self.gameFrame.lblInterval.pack()
-        # yoffset = 160
-        # self.gameFrameLeft.lblInterval.place(x=20, y=yoffset, width=env.LEFT_SCREEN_W - 40, height=30)
-        # yoffset += 40
-        # self.gameFrameLeft.slInterval.place(x=20, y=yoffset, width=env.LEFT_SCREEN_W - 40, height=30)
-        # yoffset += 40
-        # self.gameFrameLeft.lblMidiVolume.place(x=20, y=yoffset, width=env.LEFT_SCREEN_W - 40, height=30)
-        # yoffset += 40
-        # self.gameFrameLeft.slMidiVolume.place(x=20, y=yoffset, width=env.LEFT_SCREEN_W - 40, height=30)
+    def reinitializeUi(self):
+        self.pickNote.config(text=GameStrings.LABEL_PICK_NOTE.value)
 
-        # self.gameFrameRight.configure(bg="red") # should be invisible
-        # self.gameFrameRight.result.place(x=0, y=0,width=env.RIGHT_SCREEN_W,height=80)
+    def setUiStateSetNoteQuestion(self, origin_note_readable: str):
+        self.pickNote.config(text=GameStrings.LABEL_LISTEN.value)
+        self.lblNote.config(text=origin_note_readable)
+        self.lblNoteUser.config(text="")
 
-        # self.gameFrameRight.pickNote.place(x=0, y=30, width=env.RIGHT_SCREEN_W, height=40)
-        # self.gameFrameRight.lblNoteUser.place(x=0, y=140, width=env.RIGHT_SCREEN_W)
-        # self.gameFrameRight.lblNote.place(x=0, y=140, width=env.RIGHT_SCREEN_W)
-        # self.gameFrameRight.lblNote.lift()
-        # self.gameFrameRight.btnSkip.place(x=0, y=350, width=env.RIGHT_SCREEN_W, height=60)
-        # self.gameFrameRight.score.place(x=0, y=420, width=env.RIGHT_SCREEN_W, height=60)
+    def setUiStateWaitingAnswer(self):
+        self.pickNote.config(text=GameStrings.LABEL_WHAT_IS_YOUR_ANSWER.value)
+        self.result.config(text="")
+        self.lblNoteUser.config(text="")
 
-    # def activateListening(self):
-    # self.master.isListening = True
+    def setUiStateShowingResult(self, note_user_readable: str):
+        self.lblNoteUser.config(text=note_user_readable)
+
+    def setUiStateWin(self, question_note_readable:str, interval_readable_text: str):
+        self.result.config(text="correct ;->\n{}".format(interval_readable_text), bg=Colors.success)
+        self.lblNoteUser.config(text=question_note_readable, fg=Colors.success)
+
+    def setUiStateLoose(self, user_note_readable:str, interval_readable_text: str):
+        self.result.config(text="incorrect \n{}".format(interval_readable_text), bg=Colors.error)
+        self.lblNoteUser.config(text=user_note_readable, fg=Colors.error)
 
     def __del__(self):
         pass
-        # print("trying destroy Mode 0")
-        # if self.game is not None:
-        #     self.game.destroy()
