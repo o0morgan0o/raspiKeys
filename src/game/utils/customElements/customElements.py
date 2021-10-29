@@ -1,56 +1,63 @@
 import tkinter as tk
+from ttkbootstrap import Style
+from tkinter import ttk
 from src.game.utils.colors import Colors
+from enum import Enum
 import os
 
 my_font = "Courier"
 DEFAULT_FONT_NAME = "Helvetica"
-DEFAULT_FONT_SIZE = 12
+DEFAULT_FONT_SIZE = 14
 DEFAULT_FONT = (DEFAULT_FONT_NAME, DEFAULT_FONT_SIZE)
 DEFAULT_PADDING_X = 20
 DEFAULT_PADDING_Y = 5
 
 
-class CustomButton(tk.Button):
+class CustomStylesNames(Enum):
+    STYLE_BTN_WARNING_OUTLINE = "custom.warning.Outline.TButton"
+    STYLE_BTN_DARK="custom.TButton"
+    STYLE_BTN_FOOTER_PLUS_MINUS = "custom_footer_plus_minus.TButton"
+    STYLE_LBL_FULL = "custom.Inverse.TLabel"
+
+
+def getCustomStyles():
+    style = Style()
+    style.configure(CustomStylesNames.STYLE_BTN_WARNING_OUTLINE.value,
+                    font=(DEFAULT_FONT_NAME, DEFAULT_FONT_SIZE)
+                    )
+    style.configure(CustomStylesNames.STYLE_BTN_DARK.value,
+                    background=Colors.BACKGROUND
+                    )
+    style.configure(CustomStylesNames.STYLE_LBL_FULL.value,
+                    background=Colors.BACKGROUND
+                    )
+    style.configure(CustomStylesNames.STYLE_BTN_FOOTER_PLUS_MINUS.value,
+                    background=Colors.BACKGROUND,
+                    font=(DEFAULT_FONT_NAME, 30)
+                    )
+
+
+class CustomButton(ttk.Button):
     def __init__(self, parent: tk.Frame, text="",
-                 filename: str = None,
-                 relief='flat',
                  font=DEFAULT_FONT,
                  background=Colors.BACKGROUND,
                  foreground=Colors.TEXT,
-                 takefocus=0,
                  command=None,
-                 wraplength=0,
-                 padx=0,
-                 pady=0,
-                 width=None,
-                 height=None
+                 style=None,
                  ):
-
-        if filename is not None:
-            img_file_path = os.path.join(os.getcwd(), 'game', 'utils', 'customElements', 'src_images', filename)
-            self.img_file = tk.PhotoImage(file=img_file_path)
-        else:
-            self.img_file = None
-
         super().__init__(parent, text=text,
-                         relief=relief,
-                         overrelief=relief,
-                         padx=padx,
-                         pady=pady,
-                         font=font,
-                         background=background,
-                         activebackground=background,
-                         foreground=foreground,
-                         activeforeground=foreground,
-                         takefocus=takefocus,
-                         command=command,
-                         highlightthickness=0,
-                         wraplength=wraplength,
-                         image=self.img_file,
-                         compound="center",
-                         width=width,
-                         height=height
+                         # background=background,
+                         # foreground=foreground,
+                         # command=command,
+                         # highlightthickness=0,
+                         style=style
                          )
+
+        # if filename is not None:
+        #     img_file_path = os.path.join(os.getcwd(), 'game', 'utils', 'customElements', 'src_images', filename)
+        #     self.img_file = tk.PhotoImage(file=img_file_path)
+        # else:
+        #     self.img_file = None
 
 
 class CustomLabel(tk.Label):
@@ -80,7 +87,8 @@ class CustomLabel(tk.Label):
 
 class CustomScale(tk.Scale):
     def __init__(self, parent: tk.Frame,
-                 background=Colors.BACKGROUND,
+                 background=Colors.ERROR,
+                 foreground=Colors.TEXT,
                  relief=tk.FLAT,
                  from_=0,
                  to=100,
@@ -88,18 +96,19 @@ class CustomScale(tk.Scale):
                  width=None,
                  label=None,
                  showvalue=0,
-                 troughcolor=Colors.TEXT,
+                 troughcolor=Colors.SLIDER_BACKGROUND,
                  ):
         super().__init__(parent,
                          highlightcolor="green",
                          highlightthickness=0,
+                         foreground=foreground,
                          background=background,
-                         relief='flat',
+                         relief=relief,
                          from_=from_,
                          to=to,
                          orient=orient,
                          width=width,
-                         # label=label,
+                         label=label,
                          showvalue=showvalue,
                          troughcolor=troughcolor,
                          borderwidth=0,

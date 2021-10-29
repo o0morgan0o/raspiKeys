@@ -1,4 +1,4 @@
-def formatOutputInterval(m_interval:int):
+def formatOutputInterval(m_interval: int):
     # TODO: Extend to other responses
     # interval = abs(mInterval)
     interval = m_interval
@@ -79,34 +79,26 @@ def formatOutputInterval(m_interval:int):
     elif interval == -18:
         return "-aug 11th"
     else:
-        print("ERROR: interval unknow", interval)
+        print("ERROR: interval unknown", interval)
         return ""
 
 
-def getChordInterval(type):
-    if type == "minor":
+def formatOutputIntervalUnsigned(interval: int) -> str:
+    signed_output = formatOutputInterval(interval)
+    unsigned_output = signed_output.replace("+", "+/-")
+    return unsigned_output
+
+
+def getChordInterval(chord_quality: str):
+    if chord_quality == "minor":
         return [0, 3, 7]
-    elif type == "major":
+    elif chord_quality == "major":
         return [0, 4, 7]
-    elif type == "min7":
+    elif chord_quality == "min7":
         return [0, 3, 7, 10]
-    elif type == "maj7":
+    elif chord_quality == "maj7":
         return [0, 4, 7, 11]
-    elif type == "min7b5":
+    elif chord_quality == "min7b5":
         return [0, 3, 6, 10]
-    elif type == "dom7":
+    elif chord_quality == "dom7":
         return [0, 4, 10]
-
-
-
-def saveMode0IntervalOffset(value):
-    newConfig = loadConfig()
-    newConfig["mode0IntervalOffset"] = int(value)
-    saveConfig(newConfig)
-
-def saveMode0MidiVolume(value):
-    newConfig = loadConfig()
-    newConfig["mode0MidiVolume"] = int(value)
-    saveConfig(newConfig)
-
-

@@ -19,10 +19,6 @@ class GameStates(Enum):
     GAME_CPU_PLAY_NOTE = "cpu_play_note"
     GAME_SHOWING_RESULT = "game_showing_result"
 
-    class ViewStrings(Enum):
-        CURRENT_MIDI_IN: str = "MIDI in: "
-        CURRENT_MIDI_OUT: str = "MIDI out: "
-
 
 class WaitingInput(Enum):
     WAITING_INPUT_COMING_FROM_START_GAME = "coming_from_start_game"
@@ -60,7 +56,6 @@ class EarTrainingNoteViewModel:
         self.startingNote = -1
         self.startGame()
 
-        # self.parentRight.btnSkip.configure(command=self.skip)
         self.initializeIntervalSlider()
         self.initializeNoteDelaySlider()
 
@@ -75,21 +70,17 @@ class EarTrainingNoteViewModel:
         new_value = self.view.slInterval.get()
         self.intervalMax = new_value
         updateEarTrainingNoteMaxInterval(new_value)
+        self.view.updateLblMaxInterval(new_value)
 
     # noinspection PyUnusedLocal
     def updateSliderDelayCallback(self, event):
         new_value = self.view.slDelay.get()
         self.delay = new_value
         updateEarTrainingNoteDelay(new_value)
+        self.view.updateLblNoteDelay(new_value)
 
     def skipQuestionCallback(self):
         self.changeGameState(GameStates.GAME_INITIALIZATION.value, coming_from=WaitingInput.WAITING_INPUT_COMING_FROM_SKIP.value)
-
-    def skip(self):
-        self.view.result["text"] = "It was ;-)\n{}".format(formatOutputInterval(self.questionNote.note - self.startingNote))
-        self.view.result["bg"] = "orange"
-        # if we gave the good answer, we want a new note
-        # self.changeGameState(GameStates.GAME_WAITING_USER_INPUT.value)
 
     def startGame(self):
         self.midiIO.setListening(True)
@@ -109,14 +100,11 @@ class EarTrainingNoteViewModel:
                 self.questionInterval = self.pickQuestionInterval(self.view.slInterval.get())
                 self.view.reinitializeUi()
                 self.changeGameState(GameStates.GAME_WAITING_USER_INPUT.value)
-
             elif coming_from == WaitingInput.WAITING_INPUT_COMING_FROM_WIN.value:
                 self.questionInterval = self.pickQuestionInterval(self.view.slInterval.get())
                 self.changeGameState(GameStates.GAME_WAITING_USER_INPUT.value)
-
             elif coming_from == WaitingInput.WAITING_INPUT_COMING_FROM_LOOSE.value:
                 pass
-
             elif coming_from == WaitingInput.WAITING_INPUT_COMING_FROM_SKIP.value:
                 if self.questionNote is None or self.originNote is None:
                     return self.changeGameState(GameStates.GAME_WAITING_USER_INPUT.value)
@@ -138,9 +126,9 @@ class EarTrainingNoteViewModel:
             self.changeGameState(GameStates.GAME_CPU_PLAY_NOTE.value)
 
         elif new_state == GameStates.GAME_CPU_PLAY_NOTE.value:
-            delay_before_on = 0.4
+            delay_before_on = float(self.delay) / 1000
             note_duration = 0.4
-            CustomNote(self.midiIO, self.questionNote, delay_before_on, note_duration, getMidiVolume(),
+            CustomNote(self.midiIO, note=self.questionNote, delay_on=delay_before_on, note_duration=note_duration, velocity=getMidiVolume(),
                        callback_after_note_off=lambda: self.changeGameState(GameStates.GAME_WAITING_USER_ANSWER.value)
                        )
 

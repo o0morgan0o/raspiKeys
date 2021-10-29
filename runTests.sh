@@ -25,7 +25,7 @@ python3 -m unittest
 # - modeOptions.py
 # - earTrainingNoteView.py
 # - earTrainingChordView.py
-# - mode2gui.py
+# - backtracksView.py
 # - mode3gui.py
 # - gameplay0.py
 # - gameplay1.py 

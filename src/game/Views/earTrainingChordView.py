@@ -1,6 +1,6 @@
 import tkinter as tk
 from src.game.Views.earTrainingNoteView import EarTrainingNoteView
-from src.game.Views.mode2gui import Game
+from src.game.Views.backtracksView import BacktracksViewModel
 
 from src.game.utils.customElements.customElements import *
 from src.game.utils.customElements.labels import *
@@ -27,7 +27,7 @@ class Mode1:
         # placement of differents labels
         self.placeElements()
 
-        self.game = Game(self.gameFrame, config)
+        self.game = BacktracksViewModel(self.gameFrame, config)
 
     def placeElements(self):
 

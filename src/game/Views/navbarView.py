@@ -1,11 +1,10 @@
 import tkinter
-import tkinter as tk
+
+from PIL import Image, ImageTk
+
 from src.game import env
 from src.game.utils.customElements.customElements import *
 from src.game.utils.customElements.scales import *
-from enum import Enum
-
-from PIL import Image, ImageTk
 
 
 class GameNames(Enum):
@@ -35,22 +34,25 @@ class NavBarView:
         self.mode2ImageWhite = ImageTk.PhotoImage(Image.open(env.MODE2_IMAGE_WHITE))
         self.mode3ImageWhite = ImageTk.PhotoImage(Image.open(env.MODE3_IMAGE_WHITE))
 
-        # ///////// btn
         PADDING_FOR_VERTICAL_SPACE = 60
         BUTTON_HEIGHT = 80
-        self.button1 = BtnMenu(self.parent, image=self.mode0ImageBlack, height=BUTTON_HEIGHT)
-        self.button1.config(command=lambda: self.master.new_window(GameNames.GAME_EAR_TRAINING_NOTE))
-        self.button1.pack(fill=tk.BOTH, expand=True, pady=(PADDING_FOR_VERTICAL_SPACE, 0))
+
+        # ///////// btn
+        self.btnEarTrainingNote = BtnMenu(self.parent, image=self.mode0ImageBlack, height=BUTTON_HEIGHT)
+        self.btnEarTrainingNote.config(command=lambda: self.master.new_window(GameNames.GAME_EAR_TRAINING_NOTE))
+        self.btnEarTrainingNote.pack(fill=tk.BOTH, expand=True, pady=(PADDING_FOR_VERTICAL_SPACE, 0))
         # self.original_background = self.button1.cget("background")  # get original background color
         # ///////// btn
         self.button2 = BtnMenu(self.parent, image=self.mode1ImageBlack, height=BUTTON_HEIGHT)
         self.button2.config(command=lambda: self.master.new_window(GameNames.GAME_EAR_TRAINING_CHORDS))
         self.button2.pack(fill=tk.BOTH, expand=True)
         # self.button2["command"] = lambda: self.new_window(1)
+
         # ///////// btn
         self.button3 = BtnMenu(self.parent, image=self.mode2ImageBlack, height=BUTTON_HEIGHT)
-        # self.button3.config(command=lambda: self.master.)
+        self.button3.config(command=lambda: self.master.new_window(GameNames.GAME_BACKTRACKS))
         self.button3.pack(fill=tk.BOTH, expand=True)
+
         # self.button3["command"] = lambda: self.new_window(2)
         # ///////// btn
         self.button4 = BtnMenu(self.parent, image=self.mode3ImageBlack, height=BUTTON_HEIGHT)

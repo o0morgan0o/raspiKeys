@@ -5,3 +5,4 @@ class Colors:
     ERROR = "red"
     SUCCESS = "green"
     WARNING = "orange"
+    SLIDER_BACKGROUND= "#222222"

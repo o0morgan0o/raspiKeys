@@ -1,20 +1,15 @@
-import tkinter as tk
-import threading
 import time
+import tkinter as tk
+
 import pygame
-from game import env
 from PIL import ImageTk, Image
-
-from game.autoload import Autoload
-from game.utils.canvasThread import MyThread
-
-from game.utils.midiToNotenames import noteName
-
-from game.utils.bpm import Bpm
-from game.utils.customElements.buttons import *
-from game.utils.customElements.labels import *
-
-from game.mode2.recordNotesGui import RecordNotesGui
+from src.game import env
+from src.game.autoload import Autoload
+from src.game.mode2.recordNotesGui import RecordNotesGui
+from src.game.utils.canvasThread import MyThread
+from src.game.utils.customElements.buttons import *
+from src.game.utils.customElements.labels import *
+from src.game.utils.midiToNotenames import noteName
 
 
 class RecordChordsGui:

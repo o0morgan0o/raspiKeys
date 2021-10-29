@@ -1,12 +1,16 @@
+from src.game.ViewModels.optionsViewModel import OptionsViewModel
 from src.game.Views.navbarView import GameNames
-
-from src.game.autoload import Autoload
 from src.game.utils.customElements.customElements import *
 from src.game.utils.customElements.labels import *
 from src.game.utils.customElements.scales import *
-from src.game.ViewModels.optionsViewModel import OptionsViewModel, ViewStrings
 
 
+class ViewStrings(Enum):
+    NO_MIDI_IN_INTERFACE_SELECTED = "No Midi-in interface selected !!"
+    NO_MIDI_OUT_INTERFACE_SELECTED = "No Midi-out interface selected !!"
+    CURRENT_MIDI_IN = "MIDI in: "
+    CURRENT_MIDI_OUT = "MIDI out: "
+    LABEL_HEADER_OPTIONS = "OPTIONS:"
 
 
 class OptionsView:
@@ -26,8 +30,8 @@ class OptionsView:
         self.gameFrame.grid_rowconfigure(3, weight=1, pad=DEFAULT_PADDING)
         self.gameFrame.grid_rowconfigure(4, weight=1, pad=DEFAULT_PADDING)
 
-        self.gameFrame.grid_columnconfigure(0, weight=1, pad=DEFAULT_PADDING)
-        self.gameFrame.grid_columnconfigure(1, weight=1, pad=DEFAULT_PADDING)
+        self.gameFrame.grid_columnconfigure(0, weight=1, uniform="column_size", pad=DEFAULT_PADDING)
+        self.gameFrame.grid_columnconfigure(1, weight=1, uniform="column_size", pad=DEFAULT_PADDING)
 
         current_row: int = 0
 
@@ -44,7 +48,7 @@ class OptionsView:
 
         current_row += 1
 
-        self.midiInListbox= tk.Listbox(self.gameFrame, selectmode='single', exportselection=0)
+        self.midiInListbox = tk.Listbox(self.gameFrame, selectmode='single', exportselection=0)
         self.midiInListbox.grid(row=current_row, column=0, sticky=tk.NSEW, padx=20)
 
         self.midiOutListbox = tk.Listbox(self.gameFrame, selectmode='single', exportselection=0)
@@ -55,33 +59,25 @@ class OptionsView:
         self.btnConfig = BtnDefault(self.gameFrame, text="Return Default")
         self.btnConfig.grid(row=current_row, column=1, sticky=tk.SE, padx=20)
 
+        # =========== CREATION OF THE VIEW_MODEL ====================
         self.game = OptionsViewModel(self, self.config)
+        # ===========================================================
         self.midiInListbox.bind("<<ListboxSelect>>", self.game.midiInChangeCallback)
         self.midiOutListbox.bind("<<ListboxSelect>>", self.game.midiOutChangeCallback)
 
-    def updateConfig(self, value):
-        difficulty = self.slider1_2.get()
-        times_each_transpose = self.slider2_1.get()
-        nb_of_transpose_before_change = self.slider2_2.get()
+    def updateUiMidiInAndOut(self, new_midi_in, new_midi_out):
+        # ternary operator
+        self.currentMidiIn.config(text=(new_midi_in, ViewStrings.NO_MIDI_IN_INTERFACE_SELECTED.value)[new_midi_in == ""])
+        self.currentMidiOut.config(text=(new_midi_out, ViewStrings.NO_MIDI_OUT_INTERFACE_SELECTED.value)[new_midi_out == ""])
 
-        # self.parent.config(["default_mode"])=default_mode
-        old_config = self.config
-        old_config["default_mode"] = 1
-        old_config["question_delay"] = question_delay
-        old_config["difficulty"] = difficulty
-        old_config["times_each_transpose"] = times_each_transpose
-        old_config["nb_of_transpose_before_change"] = nb_of_transpose_before_change
+    def updateUiMidiIn(self, new_midi_in):
+        self.currentMidiIn.config(text=ViewStrings.CURRENT_MIDI_IN.value + new_midi_in)
 
-        self.config = old_config
-        # self.parent.config(["question_delay"])=question_delay
-
-    def update(self):
-        print("updating UI")
+    def updateUiMidiOut(self, new_midi_out):
+        self.currentMidiOut.config(text=ViewStrings.CURRENT_MIDI_OUT.value + new_midi_out)
 
     def destroy(self):
         pass
-        # if self.game is not None:
-        #     self.game.destroy()
 
     def __del__(self):
-        print("trying destroy")
+        pass
