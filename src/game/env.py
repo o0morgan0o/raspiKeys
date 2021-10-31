@@ -8,9 +8,9 @@ TEST_ROOT_DIR_PROCESSED_EMPTY_FOLDER = os.path.join(ROOT_DIR, "res_test", "proce
 print("ROOT :::", ROOT_DIR)
 
 PROGRAM_FOLDER = os.path.join(ROOT_DIR, "game")
-USER_WAV_FOLDER = os.path.join(ROOT_DIR, "res", "backtracks", "user_wav")
+USER_WAV_BASE_FOLDER = os.path.join(ROOT_DIR, "res", "backtracks", "user_wav")
 USER_MP3_FOLDER = os.path.join(ROOT_DIR, "res", "backtracks", "user_mp3")
-PROCESSED_WAV_FOLDER = os.path.join(ROOT_DIR, "res", "backtracks", "processed_wav")
+PROCESSED_WAV_BASE_FOLDER = os.path.join(ROOT_DIR, "res", "backtracks", "processed_wav")
 METRO_TICK_FILE = os.path.join(ROOT_DIR, "res", "metro", "tick.wav")
 MIDI_FOLDER = os.path.join(ROOT_DIR, "res", "midi")
 CONFIG_FILE = os.path.join(ROOT_DIR,  "config.json")

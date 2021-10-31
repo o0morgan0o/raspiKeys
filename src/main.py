@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import logging
 
 from src.game import env
 from src.game.Styles.customStyles import CustomButtonStyle
@@ -31,7 +32,7 @@ class MainApplication(tk.Tk):
         # self.currentGameMode = GameNames.GAME_EAR_TRAINING_NOTE
         self.currentGameMode = GameNames.GAME_BACKTRACKS
         self.app = None
-        self.audioInstance = Autoload.get_instance()
+        self.audioInstance = Autoload.get_instance().getAudioInstance()
 
         # Main Frame
         self.title("RaspyKeys")
@@ -42,7 +43,8 @@ class MainApplication(tk.Tk):
         self.frame = None
 
         # keyboard shortcuts for dev
-        self.bind("<Escape>", lambda event: self.quit())
+        self.bind("<Escape>", lambda event: self.cleanWindow())
+        self.protocol('WM_DELETE_WINDOW', self.cleanWindow)
 
         self.sideNavBarFrame = tk.Frame(self, width=env.NAVBAR_WIDTH, height=env.FULL_SCREEN_H, bg="red")
         self.sideNavBarFrame.place(x=0, y=0, width=env.NAVBAR_WIDTH, height=env.FULL_SCREEN_H)
@@ -90,6 +92,11 @@ class MainApplication(tk.Tk):
         else:
             return
         self.sideNavBar.highLightActiveMode(new_game_mode)
+
+    def cleanWindow(self):
+        self.audioInstance.stopPlay()
+        self.destroy()
+
 
 
 if __name__ == "__main__":

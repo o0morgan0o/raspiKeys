@@ -19,7 +19,13 @@ class ConfigurationFields(Enum):
     METRO_BPM = "metroBpm"
 
 
-def updateAudioVolume(new_value: int):
+def updateMetroBpm(new_value: float):
+    config = loadConfig()
+    config[ConfigurationFields.METRO_BPM.value] = new_value
+    writeConfig(config)
+
+
+def updateAudioVolume(new_value: float):
     config = loadConfig()
     config[ConfigurationFields.AUDIO_VOLUME.value] = new_value
     writeConfig(config)
@@ -101,12 +107,16 @@ def getMaxIntervalQuestionNote() -> int:
     return loadConfig()[ConfigurationFields.EAR_TRAINING_NOTE_MAX_INTERVAL.value]
 
 
-def getAudioVolume() -> int:
+def getAudioVolume() -> float:
     return loadConfig()[ConfigurationFields.AUDIO_VOLUME.value]
 
 
 def getMidiVolume() -> int:
     return loadConfig()[ConfigurationFields.MIDI_VOLUME.value]
+
+
+def getMetroBpm() -> int:
+    return loadConfig()[ConfigurationFields.METRO_BPM.value]
 
 
 def loadConfigFromFile(config: dict) -> dict:

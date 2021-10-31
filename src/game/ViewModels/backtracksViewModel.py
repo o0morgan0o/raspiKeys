@@ -1,19 +1,33 @@
 import os
-import tkinter
+import random
+import threading
 
-import pygame
-from PIL import Image, ImageTk
-
-from src.game import env
 from src.game.autoload import Autoload
+from src.game.utils.config import getMetroBpm, getAudioVolume, updateMetroBpm
 
 
 # from src.game.mode2.recordWithBacktrack import RecordWithBacktrack
 # from src.game.utils.canvasThread import MyThreadForBacktrackScreen
 
+class ProgressThread(threading.Thread):
+    def __init__(self, view, audio_instance):
+        threading.Thread.__init__(self)
+        self.view = view
+        self.audioInstance = audio_instance
+        self.progressThreadAlive = True
+        self.innerTest = False
+
+    def run(self):
+        while self.progressThreadAlive:
+            # calculate the percentage played
+            percentage_played_full = self.audioInstance.getTimePlayed() / self.audioInstance.currentFileLength
+            percentage_played = percentage_played_full % 1
+            self.view.setUiUpdateProgress(percentage_played * 100)
+        print("PROGRESS THREAD FINISHED")
+
 
 class BacktracksViewModel:
-    def __init__(self, view: tkinter.Frame):
+    def __init__(self, view):
         self.view = view
 
         self.midiIO = Autoload.get_instance().getMidiInstance()
@@ -23,32 +37,13 @@ class BacktracksViewModel:
         self.currentTrack = None
         self.tracksWav = None
 
-        # self.metroBpm=int(self.config["metroBpm"])
-        # self.isPlayingMetro=False
+        self.progressThread = None
 
-        # # CLICK LISTENERS
-        # self.parent.btnPlay.config(command=self.toggleBacktrack)
-        # self.parent.btnMetro.config(command=self.playMetro)
-        # self.parent.btnBpmMinus.config(command=self.decreaseMetroTempo)
-        # self.parent.btnBpmPlus.config(command=self.increaseMetroTempo)
-        # self.parent.btnRandom.config(command=self.playRandom)
-        # self.parent.btnSwitchPage.config(command=self.switchPage)
-
-        # for i in range(0,len(self.parent.wav_buttons)):
-        #     button=self.parent.wav_buttons[i]
-        #     # we must extract the part with number of tracks to only keep the category
-        #     button_text=button['text'].split('\n')[0]
-        #     button.config(command=lambda button_text=button_text:self.pickRandomSampleInCategory(button_text))
-
-        # this is a list which regroups all 4 folders (house , jazz ,latin, hiphop)
-        # self.tracksWav = self.audioInstance.tracksWav
-        #
-        # self.parent.btnLick.config(
-        #     command=self.showWithOrWithoutBacktrackWindow)
-        # self.parent.btnRandom.config(text="", image=self.shuffleImage)
+        self.tempoMetronome = getMetroBpm()
+        self.allBacktracksInAllCategories = self.audioInstance.getAllBacktracksInAllFolders()
+        self.currentBacktrack = None
 
         # recording variables
-
         # self.recordingBassLick = False
         # self.recordingNotes = False
 
@@ -58,49 +53,72 @@ class BacktracksViewModel:
         #
         # self.damper = []
         # self.damperActive = False
+        self.initializeAudio()
+        self.initializeBacktracks(self.allBacktracksInAllCategories)
 
-    # def destroy(self):
-    #     self.sound.unloadAudio()
-    #     del self.sound
-    #     del self
+    def initializeAudio(self):
+        volume = getAudioVolume()
+        self.audioInstance.setVolume(volume)
+        self.view.setUiLblMetronome(self.tempoMetronome)
 
-    def onBtnCategoryClick(self, id):
-        print(id)
+    def initializeBacktracks(self, all_backtracks_in_all_categories: list):
+        category_counter: int = 0
+        for category_tuple in all_backtracks_in_all_categories:
+            category_name, backtracks_in_category = category_tuple
+            nb_of_backtracks_in_category = len(backtracks_in_category)
+            self.view.setUiAddBtnCategory(category_counter, category_name, nb_of_backtracks_in_category)
+            category_counter += 1
 
-    def playMetro(self, ):
-        if self.isPlayingMetro == True:
+    def onBtnPlayClick(self):
+        if self.audioInstance.getIsPlaying():
             self.audioInstance.stopPlay()
-            self.parent.btnMetro.config(text="Metro")
-            self.isPlayingMetro = False
         else:
-            self.audioInstance.playRealMetro(self.metroBpm)
-            self.parent.btnMetro.config(text="(" + str(self.metroBpm) + ")")
-            self.isPlayingMetro = True
+            self.playBacktrack(self.currentBacktrack)
 
-        # we would like to generate 2 bars of  audio file to certain bpm
+    def onBtnRandom(self):
+        random_category_index = random.randint(0, len(self.allBacktracksInAllCategories) - 1)
+        self.onBtnCategoryClick(random_category_index)
 
-    def decreaseMetroTempo(self, ):
+    def onBtnCategoryClick(self, _id: int):
+        #     # TODO should display somewhere the number of files in the category and the index
+        category_tuple_clicked = self.allBacktracksInAllCategories[_id]
+        category_name, category_backtracks = category_tuple_clicked
+        if len(category_backtracks) <= 0:
+            print("Empty backtrack list in category", category_name)
+            return
+        # we pick  a random track in the tuple selected
+        random_index = random.randint(0, len(category_backtracks))
+        random_backtrack = category_backtracks[random_index]
+        self.currentBacktrack = random_backtrack
+        filename = os.path.basename(random_backtrack)
+        print("next_audio_file: ", self.currentBacktrack)
+        self.view.setUiCurrentBacktrack(category_name, filename, random_index, len(category_backtracks))
+        self.playBacktrack(self.currentBacktrack)
+
+    def onBtnMetronomeClick(self):
+        self.audioInstance.playRealMetro(self.tempoMetronome)
+
+    def onBtnBpmPlusClick(self):
+        self.modifyMetroBpm(+10)
+
+    def onBtnBpmMinusClick(self):
+        self.modifyMetroBpm(-10)
+
+    def restartMetronome(self):
+        self.audioInstance.stopPlay()
+        self.audioInstance.playRealMetro(self.tempoMetronome)
+
+    def modifyMetroBpm(self, variation: int):
         minBpm = 10
-        self.metroBpm -= 10
-        if self.metroBpm <= minBpm:  # 10 is the minimum tempo
-            self.metroBpm = minBpm
-        self.saveMetroBpm(self.metroBpm)
-        self.isPlayingMetro = False
-        self.playMetro()
-
-    def increaseMetroTempo(self, ):
         maxBpm = 190
-        self.metroBpm += 10
-        if self.metroBpm >= maxBpm:  # max tempo
-            self.metroBpm = maxBpm
-        self.saveMetroBpm(self.metroBpm)
-        self.isPlayingMetro = False
-        self.playMetro()
-
-    def saveMetroBpm(self, bpm):
-        metroBpmFile = open(env.CONFIG_METRO_BPM, 'w')
-        metroBpmFile.write(str(bpm))
-        metroBpmFile.close()
+        self.tempoMetronome += variation
+        if self.tempoMetronome <= minBpm:  # 10 is the minimum tempo
+            self.tempoMetronome = minBpm
+        if self.tempoMetronome >= maxBpm:
+            self.tempoMetronome = maxBpm
+        self.view.setUiLblMetronome(self.tempoMetronome)
+        self.restartMetronome()
+        updateMetroBpm(self.tempoMetronome)
 
     def showWithOrWithoutBacktrackWindow(self, ):
         self.cancelThreads()
@@ -110,93 +128,16 @@ class BacktracksViewModel:
             print(e)
         self.parent.destroy()
         self.destroy()
-        self.globalRoot.recordWindow = RecordWithBacktrack(
-            self.globalRoot, self.app, )
+        self.globalRoot.recordWindow = RecordWithBacktrack(self.globalRoot, self.app)
 
-    def showRandomTracks(self, ):
-        self.showCurrentPlayingInLabel()
+    def playBacktrack(self, current_track: str):
+        if self.progressThread is not None and self.progressThread.isAlive():
+            # we cancel previous progress thread
+            self.progressThread.progressThreadAlive = False
+        self.audioInstance.simplePlay(current_track)
 
-    def showCurrentPlayingInLabel(self, ):
-        name = os.path.basename(self.currentTrack)
-        # self.parent.labelCurrent.config(text="Currently Playing:\n"+ name + "\n" + str(self.sound.getCurrentTrack()[0]) +" sec")
-
-    def changeTrack(self, index):
-        try:
-            self.stopBacktrack()
-        except Exception:
-            print("cant stop track during changeTrack.")
-        self.currentTrack = self.activeSample[index]
-        self.playBacktrack()
-        self.showCurrentPlayingInLabel()
-        self.audioInstance.isPlaying = True
-
-    def pickRandomSampleInCategory(self, category):
-        print(category)
-        self.audioInstance.pickRandomSample(category)
-        self.playBacktrack()
-
-    def playRandom(self):
-        self.audioInstance.pickRandomSample()
-        # TODO should display somewhere the number of files in the category and the index
-        self.showRandomTracks()
-        if self.audioInstance.isPlaying == True:
-            self.audioInstance.stopPlay()
-
-        self.currentTrack = self.audioInstance.activeSample[0]
-        self.showCurrentPlayingInLabel()
-        self.audioInstance.isPlaying = False
-        self.playBacktrack()
-        self.audioInstance.isPlaying = True
-
-    def toggleBacktrack(self):
-        if pygame.mixer.music.get_busy() == True:
-            self.stopBacktrack()
-            self.audioInstance.isPlaying = False
-        else:
-            self.playBacktrack()
-            self.audioInstance.isPlaying = True
-
-    def stopBacktrack(self):
-        self.audioInstance.stopPlay()
-        self.parent.btnPlay.config(image=self.playImage)
-
-    def playBacktrack(self):
-        self.audioInstance.simplePlay()
-        self.audioInstance.isPlaying = True
-        self.parent.btnPlay.config(image=self.pauseImage)
-        trackInfo = self.audioInstance.getCurrentTrack()
-        trackName = trackInfo[0].split("/")[-1]
-        trackLength = "{0:.2f}".format(trackInfo[1])
-        # self.parent.labelCurrent.config(
-        #     text="Currently Playing ({} / {}):\n{}\n({} sec length)".format(
-        #         self.sound.activeSample[1], str(
-        #             len(self.sound.tracksWav)), trackName, str(trackLength),
-        #     )
-        # )
-        # thread for canvas
-        self.parent.canvas.delete("all")
-        try:
-            self.thread.isAlive = False  # kill previous thread
-        except Exception as e:
-            print(e)
-        self.thread = MyThreadForBacktrackScreen(
-            "thread-canvas", self.parent.canvas, self.audioInstance, self.audioInstance.currentFileLength, self, )
-        self.thread.start()
-
-    def cancelThreads(self):
-        try:
-            self.thread.isAlive = False
-        except Exception as e:
-            print(e)
-        try:
-            del self.thread
-        except Exception as e:
-            print(e)
-        pygame.mixer.music.stop()
-
-    def destroy(self):
-        print("trying cancel thread")
-        self.cancelThreads()
+        self.progressThread = ProgressThread(self.view, self.audioInstance)
+        self.progressThread.start()
 
     def handleMIDIInput(self, msg):
         print(msg)
@@ -214,3 +155,6 @@ class BacktracksViewModel:
 
         # # No handle because we want to ignore the midi input messages
         pass
+
+    def destroy(self):
+        self.audioInstance.stopPlay()

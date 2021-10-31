@@ -1,135 +1,122 @@
-import soundfile
-from pydub import AudioSegment
+import logging
 import os
+
 import pygame
+import soundfile
+
 from src.game import env
-import random
 
 
 class Audio:
     def __init__(self):
 
-        self.user_waveDir = env.USER_WAV_FOLDER
+        self.isPlaying = False
+        self.user_waveDir = env.USER_WAV_BASE_FOLDER
         self.user_mp3Dir = env.USER_MP3_FOLDER
-        self.processed_waveDir = env.PROCESSED_WAV_FOLDER
+        self.processed_waveDir = env.PROCESSED_WAV_BASE_FOLDER
         self.metroTick = env.METRO_TICK_FILE
         self.currentFile = None
         self.currentFileLength = None
         self.convertNewFiles()
 
-        # self.tracksWav = self.loadBacktracksWav()
+        self.backtracksFolders = self.findBacktracksFolders(self.processed_waveDir)
+        self.allBacktracksInAllFolders = self.findAllBacktracksInAllFolders(self.processed_waveDir, self.backtracksFolders)
+
+        self.audioVolume = None
+
         self.realMetro = None
-        # initialisation des array contenant les tracks
-        self.tracksWav = lambda: None
-        self.tracksWav.house = []
-        self.tracksWav.jazz = []
-        self.tracksWav.latin = []
-        self.tracksWav.hiphop = []
 
         self.activeSample = None
         self.activeFolder = None
 
-    def initialize(self):
-        self.loadBacktracksWav()
-        self.pickRandomSample("house")
+    @staticmethod
+    def findAllBacktracksInAllFolders(base_backtracks_folder: str, backtrack_folders: list):
+        all_results = []
+        for m_folder in backtrack_folders:
+            backtracks_in_folder = Audio.findAllValidAudioFilesInFolder(base_backtracks_folder, m_folder)
+            all_results.append(backtracks_in_folder)
+        return all_results
 
-        # may be the buffer size will need to be increased if alsa problems in the console. ...
+    @staticmethod
+    def findBacktracksFolders(path: str) -> list:
+        """
+        Return a list containing folders in path passed in parameter. It includes empty folders
+        :param path:
+        :type path:
+        :return:
+        :rtype:
+        """
+        return [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
 
-        pygame.mixer.pre_init(44100, -16, 2, 1024)
+    @staticmethod
+    def findAllValidAudioFilesInFolder(base_audio_folder: str, backtrack_folder: str):
+        """
+        Return a tuple containing the folder to test (the one which is displayed in the UI, and a list containing the path of all wav files)
+        :param base_audio_folder:
+        :type base_audio_folder:
+        :param backtrack_folder:
+        :type backtrack_folder:
+        :return:
+        :rtype:
+        """
+        file_paths = []
+        for root, dirs, files in os.walk(os.path.join(base_audio_folder, backtrack_folder)):
+            for name in files:
+                file_name, file_extension = os.path.splitext(name)
+                if file_extension == '.wav':
+                    filepath = os.path.join(root, name)
+                    file_paths.append(filepath)
+        return backtrack_folder, file_paths
+
+    def getAllBacktracksInAllFolders(self):
+        return self.allBacktracksInAllFolders
+
+    @staticmethod
+    def initialize():
+        pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=1024)
         pygame.mixer.init()
         pygame.init()
-        pygame.mixer.music.set_volume(0.6)
-
-        self.isPlaying = False
-
-    def pickRandomSample(self, category):
-        selectedFolder = None
-        if category == "house":
-            self.activeFolder = "house"
-            selectedFolder = self.tracksWav.house
-        elif category == "jazz":
-            self.activeFolder = "jazz"
-            selectedFolder = self.tracksWav.jazz
-        elif category == "latin":
-            self.activeFolder = "latin"
-            selectedFolder = self.tracksWav.latin
-        elif category == "hiphop":
-            self.activeFolder = "hiphop"
-            selectedFolder = self.tracksWav.hiphop
-        else:
-            # TODO : handle error here
-            print("unknown category !")
-            return
-        if len(selectedFolder) == 0:
-            return
-        index = random.randint(0, len(selectedFolder) - 1)
-        self.activeSample = (selectedFolder[index], index)
-        # TODO: trigger this function on boutton pressed by user in the config to reload wav or mp3 files
 
     def convertNewFiles(self):
         # we try to convert all files put by the user. It is needed because we only want PCM 16 bits
-        # TODO This should not work because of refactorization between to multiple folders
+        # TODO This should not work because of refactor between to multiple folders
         # TODO make test to this to easier implementation
         print(self.user_waveDir)
         for filename in os.listdir(self.user_waveDir):
             filenameFull = os.path.join(self.user_waveDir, filename)
             # print("will tyr to convert " , filenameFull)
             try:
-                data, samplerate = soundfile.read(filenameFull)
+                data, sampleRate = soundfile.read(filenameFull)
                 outfile = os.path.join(self.processed_waveDir, filename)
-                soundfile.write(outfile, data, samplerate, subtype="PCM_16")
+                soundfile.write(outfile, data, sampleRate, subtype="PCM_16")
                 print("done")
-            except Exception:
+            except Exception as e:
                 print("error during conversion", filename)
+                logging.exception(e)
 
     def loadTick(self):
         pygame.mixer.music.load(self.metroTick)
 
-    def playTick(self):
+    @staticmethod
+    def playTick():
         pygame.mixer.music.play()
 
-    def loadBacktracksWav(self):
-        path_to_search = os.path.join(self.processed_waveDir, "house")
-        if (os.path.exists(path_to_search)):
-            for filename in os.listdir(path_to_search):
-                self.tracksWav.house.append(
-                    os.path.join(path_to_search, filename))
-
-        path_to_search = os.path.join(self.processed_waveDir, "jazz")
-        if (os.path.exists(path_to_search)):
-            for filename in os.listdir(path_to_search):
-                self.tracksWav.jazz.append(
-                    os.path.join(path_to_search, filename))
-
-        path_to_search = os.path.join(self.processed_waveDir, "latin")
-        if (os.path.exists(path_to_search)):
-            for filename in os.listdir(path_to_search):
-                self.tracksWav.latin.append(
-                    os.path.join(path_to_search, filename))
-
-        path_to_search = os.path.join(self.processed_waveDir, "hiphop")
-        if (os.path.exists(path_to_search)):
-            for filename in os.listdir(path_to_search):
-                self.tracksWav.hiphop.append(
-                    os.path.join(path_to_search, filename))
-
-    def simplePlay(self):
+    def simplePlay(self, audio_file_path: str):
         self.stopPlay()
         try:
-            file = self.activeSample[0]
-            pygame.mixer.music.load(file)
-            sound = pygame.mixer.Sound(file)
+            pygame.mixer.music.load(audio_file_path)
+            sound = pygame.mixer.Sound(audio_file_path)
             # pygame.mixer.music.set_pos(0)
             # we keep trace of the current file if we want to retreive it for the lick recording
-            self.currentFile = file
+            self.currentFile = audio_file_path
             self.currentFileLength = sound.get_length()
             print("Current audio file is ... :",
                   sound.get_length(), " ms, ", self.currentFile)
             # _thread.start_new_thread(self.testLatency, (time.time(),))
             pygame.mixer.music.play(loops=-1, fade_ms=200)
-            print("after play")
+            self.isPlaying = True
         except Exception as e:
-            print(e)
+            logging.exception(e)
             print("can't play file !!")
         # pygame.mixer.music.play(loops=-1, fade_ms=200)
 
@@ -146,6 +133,10 @@ class Audio:
     #             deltaTime = newTime - initialTime
     #             print(f"Soud is PLAYING !!, latency is {deltaTime*1000}")
     #             isActive=False
+
+    @staticmethod
+    def getBusy():
+        return pygame.mixer.get_busy()
 
     def playRealMetro(self, bpm_asked):
         # the metro is handle a little differently than files it is considered as a sound (and not a music)
@@ -178,42 +169,52 @@ class Audio:
         raw_array += raw_array  # (8 ticks)
         # and again
         raw_array += raw_array  # (8 ticks)
+        self.setVolume(self.audioVolume)
         self.realMetro = pygame.mixer.Sound(buffer=raw_array)
+        self.isPlaying=True
         self.realMetro.play(-1)
 
     def stopPlay(self):
+        self.isPlaying = False
         pygame.mixer.music.stop()
-        try:
-            self.realMetro.stop()
-        except Exception as e:
-            print('')
+        if self.realMetro is not None:
+            try:
+                self.realMetro.stop()
+            except Exception as e:
+                logging.exception(e)
 
-    def convertToWav(self, filename):
-        sound = AudioSegment.from_file(filename, format="wav")
-        sound.set_frame_rate
-        baseName = os.path.basename(filename)
-        exportName = os.path.splitext(baseName)[0]
-        exportName = "out.wav"
-        print("outname ", exportName)
-        sound.export(os.path.join(self.waveDir, exportName),
-                     format="wav", bitrate="16k")
+    # def convertToWav(self, filename):
+    #     sound = AudioSegment.from_file(filename, format="wav")
+    #     sound.set_frame_rate
+    #     baseName = os.path.basename(filename)
+    #     exportName = os.path.splitext(baseName)[0]
+    #     exportName = "out.wav"
+    #     print("outname ", exportName)
+    #     sound.export(os.path.join(self.waveDir, exportName),
+    #                  format="wav", bitrate="16k")
+    #
+    #     return exportName
 
-        return exportName
+    def getIsPlaying(self) -> bool:
+        return self.isPlaying
 
-    def unloadAudio(self):
+    @staticmethod
+    def unloadAudio():
         print("try unload ....")
         pygame.mixer.music.unload()
 
+    @staticmethod
     def getVolume():
         actualVol = pygame.mixer.music.get_volume()
         print('Getting actual volume ...', actualVol)
         return actualVol
 
     def setVolume(self, value):
-        print("Updating sound volume ...", value)
-        pygame.mixer.music.set_volume(value)
+        self.audioVolume = value
+        print("Updating sound volume ...", self.audioVolume)
+        pygame.mixer.music.set_volume(self.audioVolume)
         try:
-            self.realMetro.set_volume(value)
+            self.realMetro.set_volume(self.audioVolume)
         except Exception as e:
             print('cannot change volume of metronome')
 
@@ -221,9 +222,10 @@ class Audio:
     # self.realMetro.set_volume(value)
 
     def getCurrentTrack(self):
-        return (self.currentFile, self.currentFileLength)
+        return self.currentFile, self.currentFileLength
 
-    def getTimePlayed(self):
+    @staticmethod
+    def getTimePlayed():
         return pygame.mixer.music.get_pos() / 1000
 
     def prepareBacktrackForRecord(self, backtrackFile):
@@ -231,7 +233,8 @@ class Audio:
         pygame.mixer.music.stop()
         pygame.mixer.music.load(backtrackFile)
 
-    def playBacktrackForRecord(self, nbOfLoops):
+    @staticmethod
+    def playBacktrackForRecord(nbOfLoops):
         pygame.mixer.music.play(loops=nbOfLoops)
 
         # start a thread
@@ -239,5 +242,6 @@ class Audio:
     def stopBacktrackForRecord(self):
         pass
 
-    def checkIsPlayingMusic(self):
+    @staticmethod
+    def checkIsPlayingMusic():
         return pygame.mixer.music.get_busy()

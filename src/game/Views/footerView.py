@@ -63,11 +63,11 @@ class FooterView:
         self.btnMidiPlus.config(command=self.viewModel.midiPlusClicked)
 
     def setUiInitialization(self, audio_volume: int, midi_volume: int):
-        self.lblAudioVolume.config(text=ViewStrings.STRING_LBL_AUDIO_VOLUME.value + str(audio_volume))
+        self.lblAudioVolume.config(text=ViewStrings.STRING_LBL_AUDIO_VOLUME.value + str(round(audio_volume,2)))
         self.lblMidiVolume.config(text=ViewStrings.STRING_LBL_MIDI_VOLUME.value + str(midi_volume))
 
-    def updateLblAudioVolume(self, audio_volume: int):
-        self.lblAudioVolume.config(text=ViewStrings.STRING_LBL_AUDIO_VOLUME.value + str(audio_volume))
+    def updateLblAudioVolume(self, audio_volume: float):
+        self.lblAudioVolume.config(text=ViewStrings.STRING_LBL_AUDIO_VOLUME.value + str(round(audio_volume,2)))
 
-    def updateLblMidiVolume(self, midi_volume:int):
+    def updateLblMidiVolume(self, midi_volume: int):
         self.lblMidiVolume.config(text=ViewStrings.STRING_LBL_MIDI_VOLUME.value + str(midi_volume))

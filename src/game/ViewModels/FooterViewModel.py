@@ -11,7 +11,7 @@ class FooterViewModel:
 
         self.initializeView()
 
-        self.audioIncrement: int = 7
+        self.audioIncrement: float = 0.07
         self.midiIncrement: int = 10
 
     def initializeView(self):
@@ -43,13 +43,13 @@ class FooterViewModel:
     def midiMinusClicked(self):
         self.changeMidiVolume(-self.midiIncrement)
 
-    def changeAudioVolume(self, volume_change: int):
+    def changeAudioVolume(self, volume_change: float):
         current_volume = getAudioVolume()
         new_volume = current_volume + volume_change
         if new_volume <= 0:
             new_volume = 0
-        elif new_volume >= 99:
-            new_volume = 99
+        elif new_volume >= 1.0:
+            new_volume = 1.0
         if current_volume != new_volume:
             self.audioInstance.setVolume(new_volume)
             # write to config file the new volume

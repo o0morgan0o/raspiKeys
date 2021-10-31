@@ -7,8 +7,8 @@
     "MIDI_interface_in": "UMC1820 MIDI In 0",
     "MIDI_interface_out": "Microsoft GS Wavetable Synth 0",
     "midi_hotkey": 50,
-    "audio_volume": 99,
-    "midi_volume": 127,
-    "metroBpm": 91,
+    "audio_volume": 0.22999999999999954,
+    "midi_volume": 117,
+    "metroBpm": 71,
     "max_interval_question_note": 15
 }
