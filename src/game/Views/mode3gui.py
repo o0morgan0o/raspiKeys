@@ -1,9 +1,7 @@
-import tkinter as tk
-from tkinter import ttk as ttk
-from game.mode3.gameplay import Game
+from src.game.mode3.gameplay import Game
 
-from game.utils.customElements.buttons import *
-from game.utils.customElements.labels import *
+from src.game.utils.customElements.buttons import *
+from src.game.utils.customElements.labels import *
 
 
 class Mode3:

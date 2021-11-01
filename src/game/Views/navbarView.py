@@ -3,24 +3,18 @@ import tkinter
 from PIL import Image, ImageTk
 
 from src.game import env
-from src.game.utils.customElements.customElements import *
+from src.game.GamesNames import GameNames
+from src.game.ViewModels.navbarViewModel import NavbarViewModel
 from src.game.utils.customElements.scales import *
-
-
-class GameNames(Enum):
-    GAME_EAR_TRAINING_NOTE = "EarTraining_Note"
-    GAME_EAR_TRAINING_CHORDS = "EarTraining_Chords"
-    GAME_METRONOME = "Metronome"
-    GAME_BACKTRACKS = "Backtracks"
-    GAME_LICKS_PRACTISE = "LickPractise"
-    GAME_OPTIONS = "Options"
+from src.game.utils.colors import Colors
 
 
 class NavBarView:
 
     def __init__(self, master, parent: tkinter.Frame):
-        self.parent = parent
         self.master = master
+        self.parent = parent
+        self.viewModel = None
 
         # images
         self.volumeImage = ImageTk.PhotoImage(Image.open(env.VOLUME_IMAGE))
@@ -38,54 +32,42 @@ class NavBarView:
         BUTTON_HEIGHT = 80
 
         # ///////// btn
-        self.btnEarTrainingNote = BtnMenu(self.parent, image=self.mode0ImageBlack, height=BUTTON_HEIGHT)
-        self.btnEarTrainingNote.config(command=lambda: self.master.new_window(GameNames.GAME_EAR_TRAINING_NOTE))
+        self.btnEarTrainingNote = tk.Button(self.parent, image=self.mode0ImageBlack, height=BUTTON_HEIGHT)
         self.btnEarTrainingNote.pack(fill=tk.BOTH, expand=True, pady=(PADDING_FOR_VERTICAL_SPACE, 0))
-        # self.original_background = self.button1.cget("background")  # get original background color
         # ///////// btn
-        self.button2 = BtnMenu(self.parent, image=self.mode1ImageBlack, height=BUTTON_HEIGHT)
-        self.button2.config(command=lambda: self.master.new_window(GameNames.GAME_EAR_TRAINING_CHORDS))
-        self.button2.pack(fill=tk.BOTH, expand=True)
-        # self.button2["command"] = lambda: self.new_window(1)
+        self.btnEarTrainingChord = tk.Button(self.parent, image=self.mode1ImageBlack, height=BUTTON_HEIGHT)
+        self.btnEarTrainingChord.pack(fill=tk.BOTH, expand=True)
+        # ///////// btn
+        self.btnBacktracks = tk.Button(self.parent, image=self.mode2ImageBlack, height=BUTTON_HEIGHT)
+        self.btnBacktracks.pack(fill=tk.BOTH, expand=True)
+        # ///////// btn
+        self.btnPractiseLicks = tk.Button(self.parent, image=self.mode3ImageBlack, height=BUTTON_HEIGHT)
+        self.btnPractiseLicks.pack(fill=tk.BOTH, expand=True, pady=(0, PADDING_FOR_VERTICAL_SPACE))
 
-        # ///////// btn
-        self.button3 = BtnMenu(self.parent, image=self.mode2ImageBlack, height=BUTTON_HEIGHT)
-        self.button3.config(command=lambda: self.master.new_window(GameNames.GAME_BACKTRACKS))
-        self.button3.pack(fill=tk.BOTH, expand=True)
+        # =========== CREATION OF THE VIEW_MODEL ====================
+        self.viewModel = NavbarViewModel(self)
+        # ===========================================================
 
-        # self.button3["command"] = lambda: self.new_window(2)
-        # ///////// btn
-        self.button4 = BtnMenu(self.parent, image=self.mode3ImageBlack, height=BUTTON_HEIGHT)
-        self.button4.pack(fill=tk.BOTH, expand=True, pady=(0, PADDING_FOR_VERTICAL_SPACE))
+        self.btnEarTrainingNote.config(command=lambda: self.master.new_window(GameNames.GAME_EAR_TRAINING_NOTE))
+        self.btnEarTrainingChord.config(command=lambda: self.master.new_window(GameNames.GAME_EAR_TRAINING_CHORDS))
+        self.btnBacktracks.config(command=lambda: self.master.new_window(GameNames.GAME_BACKTRACKS))
         # self.button4["command"] = lambda: self.new_window(3)
 
+    def resetAllButtonsBackgroundColor(self):
+        self.btnEarTrainingNote.configure(background=Colors.BTN_SIDEBAR_NEUTRAL)
+        self.btnEarTrainingChord.configure(background=Colors.BTN_SIDEBAR_NEUTRAL)
+        self.btnBacktracks.configure(background=Colors.BTN_SIDEBAR_NEUTRAL)
+        self.btnPractiseLicks.configure(background=Colors.BTN_SIDEBAR_NEUTRAL)
+
     def highLightActiveMode(self, game_mode: GameNames):
-        pass
-        # self.button0.configure(background=self.original_background)
-        # self.button1.configure(background=self.original_background)
-        # self.button2.configure(background=self.original_background)
-        # self.button3.configure(background=self.original_background)
-        # self.button0["image"] = self.mode0ImageBlack
-        # self.button1["image"] = self.mode1ImageBlack
-        # self.button2["image"] = self.mode2ImageBlack
-        # self.button3["image"] = self.mode3ImageBlack
-        # self.button0["fg"] = "black"
-        # self.button1["fg"] = "black"
-        # self.button2["fg"] = "black"
-        # self.button3["fg"] = "black"
-        # if intMode == -1:
-        #     self.button0["image"] = self.mode0ImageWhite
-        #     self.button0["bg"] = "black"
-        #     self.button0["activebackground"] = "black"
-        # elif intMode == 0:
-        #     self.button1["image"] = self.mode1ImageWhite
-        #     self.button1["bg"] = "black"
-        #     self.button1["activebackground"] = "black"
-        # elif intMode == 1:
-        #     self.button2["image"] = self.mode2ImageWhite
-        #     self.button2["bg"] = "black"
-        #     self.button2["activebackground"] = "black"
-        # elif intMode == 2:
-        #     self.button3["image"] = self.mode3ImageWhite
-        #     self.button3["bg"] = "black"
-        #     self.button3["activebackground"] = "black"
+        self.resetAllButtonsBackgroundColor()
+        if game_mode.value == GameNames.GAME_EAR_TRAINING_NOTE.value:
+            self.btnEarTrainingNote.configure(background=Colors.BTN_SIDEBAR_PUSHED)
+        elif game_mode.value == GameNames.GAME_EAR_TRAINING_CHORDS.value:
+            self.btnEarTrainingChord.configure(background=Colors.BTN_SIDEBAR_PUSHED)
+        elif game_mode.value == GameNames.GAME_BACKTRACKS.value:
+            self.btnBacktracks.configure(background=Colors.BTN_SIDEBAR_PUSHED)
+        elif game_mode.value == GameNames.GAME_LICKS_PRACTISE.value:
+            self.btnPractiseLicks.configure(background=Colors.BTN_SIDEBAR_PUSHED)
+        else:
+            pass

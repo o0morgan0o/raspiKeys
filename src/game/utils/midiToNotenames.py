@@ -1,6 +1,6 @@
-def noteName(midiNum: int) -> str:
+def noteName(midi_num: int) -> str:
     # convert note number to name "A", "B", ...
-    num = midiNum % 12
+    num = midi_num % 12
     if num == 0:
         return "C"
     elif num == 1:

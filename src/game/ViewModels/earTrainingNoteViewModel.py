@@ -1,13 +1,12 @@
+from enum import Enum
 from random import choice
 
 from src.game.autoload import Autoload
+from src.game.utils.config import getNoteDelay, getMaxIntervalQuestionNote, updateEarTrainingNoteMaxInterval, updateEarTrainingNoteDelay, getMidiVolume
 from src.game.utils.midiToNotenames import noteNameFull
+from src.game.utils.questionNote import CustomNote
 from src.game.utils.questionNote import playWinMelody
 from src.game.utils.utilFunctions import *
-from src.game.utils.waitingNote import WaitingNote
-from src.game.utils.questionNote import CustomNote
-from src.game.utils.config import getNoteDelay, getMaxIntervalQuestionNote, updateEarTrainingNoteMaxInterval, updateEarTrainingNoteDelay, getMidiVolume
-from enum import Enum
 
 
 class GameStates(Enum):
@@ -30,7 +29,6 @@ class WaitingInput(Enum):
 class EarTrainingNoteViewModel:
     def __init__(self, view):
         self.view = view
-
         self.midiIO = Autoload.get_instance().getMidiInstance()
         self.midiIO.setCallback(self.handleMIDIInput)
 
@@ -45,15 +43,10 @@ class EarTrainingNoteViewModel:
         self.questionNote = None
         self.questionInterval = None
 
-        self.stopGame = False
-        self.waitingNotes = []
-        self.initMIDIArray(128)
-
         # gameState is used to know when the user is guessing
         self.gameState = GameStates.GAME_NOT_STARTED.value
 
         # startGame
-        self.startingNote = -1
         self.startGame()
 
         self.initializeIntervalSlider()
@@ -128,7 +121,11 @@ class EarTrainingNoteViewModel:
         elif new_state == GameStates.GAME_CPU_PLAY_NOTE.value:
             delay_before_on = float(self.delay) / 1000
             note_duration = 0.4
-            CustomNote(self.midiIO, note=self.questionNote, delay_on=delay_before_on, note_duration=note_duration, velocity=getMidiVolume(),
+            CustomNote(self.midiIO,
+                       note=self.questionNote,
+                       delay_on=delay_before_on,
+                       note_duration=note_duration,
+                       velocity=getMidiVolume(),
                        callback_after_note_off=lambda: self.changeGameState(GameStates.GAME_WAITING_USER_ANSWER.value)
                        )
 
@@ -168,11 +165,6 @@ class EarTrainingNoteViewModel:
     def processLoose(self):
         self.changeGameState(GameStates.GAME_SET_NOTE_QUESTION.value, self.originNote)
         pass
-
-    # init a 128 array of WaitingNote in order to store all the timers
-    def initMIDIArray(self, max_note: int):
-        for i in range(max_note):
-            self.waitingNotes.append(WaitingNote(i, self))
 
     @staticmethod
     def checkAnswer(m_answer: int, m_question: int):

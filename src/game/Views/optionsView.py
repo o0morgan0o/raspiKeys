@@ -1,5 +1,5 @@
+from src.game.GamesNames import GameNames
 from src.game.ViewModels.optionsViewModel import OptionsViewModel
-from src.game.Views.navbarView import GameNames
 from src.game.utils.customElements.customElements import *
 from src.game.utils.customElements.labels import *
 from src.game.utils.customElements.scales import *
@@ -56,7 +56,7 @@ class OptionsView:
 
         current_row += 1
 
-        self.btnConfig = BtnDefault(self.gameFrame, text="Return Default")
+        self.btnConfig = tk.Button(self.gameFrame, text="Return Default")
         self.btnConfig.grid(row=current_row, column=1, sticky=tk.SE, padx=20)
 
         # =========== CREATION OF THE VIEW_MODEL ====================

@@ -1,5 +1,5 @@
+from src.game.GamesNames import GameNames
 from src.game.ViewModels.earTrainingNoteViewModel import EarTrainingNoteViewModel
-from src.game.Views.navbarView import GameNames
 from src.game.utils.customElements.customElements import *
 from src.game.utils.customElements.labels import *
 from src.game.utils.utilFunctions import formatOutputIntervalUnsigned
@@ -82,7 +82,6 @@ class EarTrainingNoteView:
         self.lblDelay.config(text=GameStrings.LABEL_SLIDER_NOTE_DELAY.value + str(self.slDelay.get()))
 
     def reinitializeUi(self):
-        # we center the lblNote because lblNoteUser is Null
         self.pickNote.config(text=GameStrings.LABEL_PICK_NOTE.value)
 
     def updateLblMaxInterval(self, value: int):

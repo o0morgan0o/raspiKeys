@@ -17,15 +17,13 @@ class Audio:
         self.metroTick = env.METRO_TICK_FILE
         self.currentFile = None
         self.currentFileLength = None
-        self.convertNewFiles()
+        # self.convertNewFiles()
 
         self.backtracksFolders = self.findBacktracksFolders(self.processed_waveDir)
         self.allBacktracksInAllFolders = self.findAllBacktracksInAllFolders(self.processed_waveDir, self.backtracksFolders)
 
         self.audioVolume = None
-
         self.realMetro = None
-
         self.activeSample = None
         self.activeFolder = None
 
@@ -77,22 +75,22 @@ class Audio:
         pygame.mixer.init()
         pygame.init()
 
-    def convertNewFiles(self):
-        # we try to convert all files put by the user. It is needed because we only want PCM 16 bits
-        # TODO This should not work because of refactor between to multiple folders
-        # TODO make test to this to easier implementation
-        print(self.user_waveDir)
-        for filename in os.listdir(self.user_waveDir):
-            filenameFull = os.path.join(self.user_waveDir, filename)
-            # print("will tyr to convert " , filenameFull)
-            try:
-                data, sampleRate = soundfile.read(filenameFull)
-                outfile = os.path.join(self.processed_waveDir, filename)
-                soundfile.write(outfile, data, sampleRate, subtype="PCM_16")
-                print("done")
-            except Exception as e:
-                print("error during conversion", filename)
-                logging.exception(e)
+    # def convertNewFiles(self):
+    #     return
+    #     # we try to convert all files put by the user. It is needed because we only want PCM 16 bits
+    #     # TODO make test to this to easier implementation
+    #     print(self.user_waveDir)
+    #     for filename in os.listdir(self.user_waveDir):
+    #         filenameFull = os.path.join(self.user_waveDir, filename)
+    #         # print("will tyr to convert " , filenameFull)
+    #         try:
+    #             data, sampleRate = soundfile.read(filenameFull)
+    #             outfile = os.path.join(self.processed_waveDir, filename)
+    #             soundfile.write(outfile, data, sampleRate, subtype="PCM_16")
+    #             print("done")
+    #         except Exception as e:
+    #             print("error during conversion", filename)
+    #             logging.exception(e)
 
     def loadTick(self):
         pygame.mixer.music.load(self.metroTick)
@@ -143,7 +141,7 @@ class Audio:
         # the sample is created and loop indefinitely.
         self.stopPlay()
         self.unloadAudio()
-        bpm = bpm_asked  # just for example
+        bpm = float(bpm_asked)  # just for example
         # we must first calculate the length of 1 bar / 4 (1 tick + 1 space)
         tick_duration = 60.0 / bpm  # this value is in seconds
         # we must calculate the total length of the buffer according to audio
@@ -159,6 +157,9 @@ class Audio:
             print('missing samples ', how_many_samples_missing)
             empty_bytes = bytes(how_many_samples_missing)
             raw_array += empty_bytes
+            # we must have a pair number of bytes to suppress any glitch sound
+            if len(raw_array) % 2 != 0 :
+                raw_array += b'\x00'
 
         # here we can construct 1 bar
         raw_array += raw_array  # (2ticks)
@@ -169,9 +170,10 @@ class Audio:
         raw_array += raw_array  # (8 ticks)
         # and again
         raw_array += raw_array  # (8 ticks)
-        self.setVolume(self.audioVolume)
         self.realMetro = pygame.mixer.Sound(buffer=raw_array)
-        self.isPlaying=True
+        self.isPlaying = True
+        print("PLAYING METRO, VOLUME: ", self.audioVolume)
+        self.setVolume(self.audioVolume)
         self.realMetro.play(-1)
 
     def stopPlay(self):
@@ -213,10 +215,12 @@ class Audio:
         self.audioVolume = value
         print("Updating sound volume ...", self.audioVolume)
         pygame.mixer.music.set_volume(self.audioVolume)
-        try:
-            self.realMetro.set_volume(self.audioVolume)
-        except Exception as e:
-            print('cannot change volume of metronome')
+        if self.realMetro is not None:
+            try:
+                self.realMetro.set_volume(self.audioVolume)
+            except Exception as e:
+                logging.exception(e)
+                print('cannot change volume of metronome')
 
     # def setMetroVolume(value):
     # self.realMetro.set_volume(value)

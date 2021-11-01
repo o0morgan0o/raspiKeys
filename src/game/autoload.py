@@ -1,14 +1,14 @@
-import mido
 import logging
 
-from src.game.utils.midiIO import MidiIO
+import mido
+
 from src.game.utils.audio import Audio
 from src.game.utils.config import getMidiInterfaceIn, getMidiInterfaceOut
+from src.game.utils.midiIO import MidiIO
 
 
 class Autoload:
     """Class used for singleton pattern, for storing global midiIO config"""
-
     __instance = None
 
     def __init__(self):

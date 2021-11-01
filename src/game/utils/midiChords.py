@@ -63,11 +63,12 @@ class MidiChords:
         rand = random.randint(0, size - 1)
         return self.chords[rand]
 
-    ### Next functions are just an util for having chord inversions before hardcoding. They are not used outside of dev context
-    def get1stInversion(self, chordtuple):
-        name = chordtuple[0]
-        name = name + "/1stInv"
-        chord = chordtuple[1]
+    @staticmethod
+    def get1stInversion(chord_tuple):
+        """ Next functions are just an util for having chord inversions before hard-coding. They are not used outside of dev context"""
+        name = chord_tuple[0]
+        name += "/1stInv"
+        chord = chord_tuple[1]
         newChord = chord[1:]
         init = newChord[0]
         for i in range(len(newChord)):
@@ -77,21 +78,21 @@ class MidiChords:
         end = newChord[-1] + lastInterval
 
         newChord.append(end)
-        return (name, newChord)
+        return name, newChord
 
-    def get2ndInversion(self, chordtuple):
-        name = chordtuple[0]
-        name = name + "/2ndInv"
-        tmp = self.get1stInversion(chordtuple)
+    def get2ndInversion(self, chord_tuple):
+        name = chord_tuple[0]
+        name += "/2ndInv"
+        tmp = self.get1stInversion(chord_tuple)
         chord = self.get1stInversion(tmp)
-        return (name, chord[1])
+        return name, chord[1]
 
-    def get3rdInversion(self, chordtuple):
-        name = chordtuple[0]
-        name = name + "/3rdInv"
-        tmp = self.get2ndInversion(chordtuple)
+    def get3rdInversion(self, chord_tuple):
+        name = chord_tuple[0]
+        name += "/3rdInv"
+        tmp = self.get2ndInversion(chord_tuple)
         chord = self.get1stInversion(tmp)
-        return (name, chord[1])
+        return name, chord[1]
 
     def printAllInversion(self):
         tmpChords = [
@@ -119,8 +120,3 @@ class MidiChords:
             b.sort()
             cc = (a, b)
             # print (cc)
-
-
-# a = MidiChords()
-# a.printAllInversion()
-

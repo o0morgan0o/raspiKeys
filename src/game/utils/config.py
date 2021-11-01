@@ -1,3 +1,5 @@
+import logging
+
 from src.game import env
 import json
 from enum import Enum
@@ -81,8 +83,9 @@ def getMidiInterfaceIn() -> str:
         print("WARNING !! Empty MIDI-IN interface, will try to load first input")
         try:
             midi_in_config = mido.get_input_names()[0]
-        except BaseException as e:
+        except Exception as e:
             print("ERROR !! Could not load any MIDI-in interface")
+            logging.exception(e)
             return ""
     return midi_in_config
 
@@ -93,8 +96,9 @@ def getMidiInterfaceOut() -> str:
         print("WARNING !! Empty MIDI-OUT interface, will try to load first input")
         try:
             midi_out_config = mido.get_output_names()[0]
-        except BaseException as e:
+        except Exception as e:
             print("ERROR !! Could not load any MIDI-out interface")
+            logging.exception(e)
             return ""
     return midi_out_config
 
@@ -156,6 +160,7 @@ def loadConfig():
         print("No config file found", e)
         return None
     except KeyError as e:
+        logging.exception(e)
         # it means a parameter is not correct, so we rewrite default config
         # writeConfig(src.game())
         return None

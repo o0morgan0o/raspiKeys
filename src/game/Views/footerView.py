@@ -1,9 +1,6 @@
-import tkinter as tk
-
-from src.game.Views.navbarView import GameNames
-from src.game.utils.customElements.customElements import *
+from src.game.GamesNames import GameNames
 from src.game.ViewModels.FooterViewModel import FooterViewModel
-from enum import Enum
+from src.game.utils.customElements.customElements import *
 
 
 class ViewStrings(Enum):
@@ -63,11 +60,11 @@ class FooterView:
         self.btnMidiPlus.config(command=self.viewModel.midiPlusClicked)
 
     def setUiInitialization(self, audio_volume: int, midi_volume: int):
-        self.lblAudioVolume.config(text=ViewStrings.STRING_LBL_AUDIO_VOLUME.value + str(round(audio_volume,2)))
+        self.lblAudioVolume.config(text=ViewStrings.STRING_LBL_AUDIO_VOLUME.value + str(round(audio_volume, 2)))
         self.lblMidiVolume.config(text=ViewStrings.STRING_LBL_MIDI_VOLUME.value + str(midi_volume))
 
     def updateLblAudioVolume(self, audio_volume: float):
-        self.lblAudioVolume.config(text=ViewStrings.STRING_LBL_AUDIO_VOLUME.value + str(round(audio_volume,2)))
+        self.lblAudioVolume.config(text=ViewStrings.STRING_LBL_AUDIO_VOLUME.value + str(round(audio_volume, 2)))
 
     def updateLblMidiVolume(self, midi_volume: int):
         self.lblMidiVolume.config(text=ViewStrings.STRING_LBL_MIDI_VOLUME.value + str(midi_volume))

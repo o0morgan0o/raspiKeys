@@ -1,3 +1,5 @@
+import logging
+
 import mido
 
 
@@ -31,6 +33,7 @@ class MidiIO:
     def getMidiVolume(self) -> int:
         return self.midiVolume
 
+    # noinspection PyProtectedMember
     def resetInAndOut(self):
         try:
             self.in_port.callback = None
@@ -47,8 +50,9 @@ class MidiIO:
             self.showIOPorts()
             self.out_port.panic()
             self.out_port.reset()
-        except BaseException as e:
-            print("Error in function resetInAndOut()", e)
+        except Exception as e:
+            print("Error in function resetInAndOut()")
+            logging.exception(e)
 
     def showIOPorts(self):
         print(80 * "=")

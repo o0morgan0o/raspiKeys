@@ -6,3 +6,5 @@ class Colors:
     SUCCESS = "green"
     WARNING = "orange"
     SLIDER_BACKGROUND= "#222222"
+    BTN_SIDEBAR_PUSHED = "orange"
+    BTN_SIDEBAR_NEUTRAL= "brown"

@@ -66,4 +66,3 @@ class MyThreadForBacktrackScreen(threading.Thread):
         except:
             self.isAlive = False
             pass
-
