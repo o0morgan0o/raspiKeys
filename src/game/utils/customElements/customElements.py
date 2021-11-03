@@ -20,6 +20,7 @@ class CustomStylesNames(Enum):
     STYLE_BTN_FOOTER_PLUS_MINUS = "custom_footer_plus_minus.TButton"
     STYLE_BTN_CONTROLS_PLUS_MINUS = "custom_controls.TButton"
     STYLE_LBL_FULL = "custom.Inverse.TLabel"
+    STYLE_PROGRESSBAR_RED = "danger.Horizontal.TProgressbar"
 
 
 def getCustomStyles():
@@ -43,16 +44,42 @@ def getCustomStyles():
                     )
 
 
-class CustomButton(ttk.Button):
-    def __init__(self, parent: tk.Frame, text="",
+class CustomButton(tk.Button):
+    def __init__(self, parent, text="",
                  font=DEFAULT_FONT,
-                 background=Colors.BACKGROUND,
+                 background=Colors.BTN_STANDARD_BACKGROUND,
+                 foreground=Colors.TEXT,
+                 command=None,
+                 borderwidth=None,
+                 highlightbackground="red",
+                 highlightthickness=12,
+                 highlightcolor="red"
+                 ):
+        super().__init__(parent, text=text,
+                         font=font,
+                         background=background,
+                         foreground=foreground,
+                         command=command,
+                         borderwidth=borderwidth,
+                         highlightbackground=highlightbackground,
+                         highlightthickness=highlightthickness,
+                         highlightcolor=highlightcolor
+                         )
+
+
+class CustomFooterButton(tk.Button):
+    def __init__(self, parent, text="",
+                 font=DEFAULT_FONT,
+                 background=Colors.BTN_FOOTER_BACKGROUND,
                  foreground=Colors.TEXT,
                  command=None,
                  style=None,
                  ):
         super().__init__(parent, text=text,
-                         style=style
+                         font=font,
+                         background=background,
+                         foreground=foreground,
+                         command=command,
                          )
 
 

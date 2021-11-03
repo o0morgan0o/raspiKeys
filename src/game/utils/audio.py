@@ -44,7 +44,9 @@ class Audio:
         :return:
         :rtype:
         """
-        return [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
+        all_folders = [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
+        all_folders.sort()
+        return all_folders
 
     @staticmethod
     def findAllValidAudioFilesInFolder(base_audio_folder: str, backtrack_folder: str):
@@ -99,7 +101,7 @@ class Audio:
     def playTick():
         pygame.mixer.music.play()
 
-    def simplePlay(self, audio_file_path: str):
+    def simplePlay(self, audio_file_path: str, loops: int = -1):
         self.stopPlay()
         try:
             pygame.mixer.music.load(audio_file_path)
@@ -111,7 +113,7 @@ class Audio:
             print("Current audio file is ... :",
                   sound.get_length(), " ms, ", self.currentFile)
             # _thread.start_new_thread(self.testLatency, (time.time(),))
-            pygame.mixer.music.play(loops=-1, fade_ms=200)
+            pygame.mixer.music.play(loops=loops, fade_ms=200)
             self.isPlaying = True
         except Exception as e:
             logging.exception(e)
@@ -158,7 +160,7 @@ class Audio:
             empty_bytes = bytes(how_many_samples_missing)
             raw_array += empty_bytes
             # we must have a pair number of bytes to suppress any glitch sound
-            if len(raw_array) % 2 != 0 :
+            if len(raw_array) % 2 != 0:
                 raw_array += b'\x00'
 
         # here we can construct 1 bar
@@ -227,6 +229,10 @@ class Audio:
 
     def getCurrentTrack(self):
         return self.currentFile, self.currentFileLength
+
+    @staticmethod
+    def getAudioFileLength(audio_file_path: str):
+        return pygame.mixer.Sound(audio_file_path).get_length()
 
     @staticmethod
     def getTimePlayed():

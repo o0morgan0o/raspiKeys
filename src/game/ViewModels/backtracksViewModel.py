@@ -1,14 +1,12 @@
 import os
 import random
 import threading
+from functools import partial
 
 from src.game.autoload import Autoload
 from src.game.utils.config import getMetroBpm, getAudioVolume, updateMetroBpm
 from enum import Enum
 
-
-# from src.game.mode2.recordWithBacktrack import RecordWithBacktrack
-# from src.game.utils.canvasThread import MyThreadForBacktrackScreen
 
 class BacktracksConstants(Enum):
     TEMPO_MIN_BPM = 10
@@ -37,7 +35,7 @@ class BacktracksViewModel:
         self.view = view
 
         self.midiIO = Autoload.get_instance().getMidiInstance()
-        self.midiIO.setCallback(self.handleMIDIInput)
+        # self.midiIO.setCallback(self.handleMIDIInput)
         self.audioInstance = Autoload.get_instance().getAudioInstance()
 
         self.tracksWav = None
@@ -60,6 +58,11 @@ class BacktracksViewModel:
         self.initializeAudio()
         self.initializeBacktracks(self.allBacktracksInAllCategories)
 
+        # DEBUG
+        # TODO Remove this
+        # self.currentBacktrack = 'D:\\code\\raspiKeys\\src\\res\\backtracks\\processed_wav\\house\\S_L_127_BEATS_30.wav'
+        self.onBtnRecordClick()
+
     def initializeAudio(self):
         volume = getAudioVolume()
         self.audioInstance.setVolume(volume)
@@ -80,6 +83,11 @@ class BacktracksViewModel:
             if _name == category_name:
                 return category
         return None
+
+    def onBtnRecordClick(self):
+        self.audioInstance.stopPlay()
+        if self.currentBacktrack is not None:
+            self.view.setUiSpawnRecordWindow(self.currentBacktrack)
 
     def onBtnPlayClick(self):
         if self.currentBacktrack is None:
@@ -171,23 +179,6 @@ class BacktracksViewModel:
 
         self.progressThread = ProgressThread(self.view, self.audioInstance)
         self.progressThread.start()
-
-    def handleMIDIInput(self, msg):
-        print(msg)
-        # if msg.type == "control_change":
-        #     print("pedal ... : ", msg.control, msg.value)
-        #     if msg.control == 64 and msg.value > 64:
-        #         self.damperActive = True
-        #     if msg.control == 64 and msg.value <= 64:
-        #         self.damperActive = False
-        #         print(self.damper)
-        #         self.damper = []
-
-        # if self.damperActive == True and msg.type == "note_off":
-        #     self.damper.append(msg.note)
-
-        # # No handle because we want to ignore the midi input messages
-        pass
 
     def destroy(self):
         self.audioInstance.stopPlay()

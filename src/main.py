@@ -8,6 +8,7 @@ from src.game.Views.earTrainingNoteView import EarTrainingNoteView
 from src.game.Views.footerView import FooterView
 from src.game.Views.navbarView import NavBarView
 from src.game.Views.optionsView import OptionsView
+from src.game.Views.practiseLicksView import PractiseLicksView
 from src.game.autoload import Autoload
 from src.game.utils.config import loadConfig
 from src.game.utils.customElements.customElements import *
@@ -27,8 +28,8 @@ class MainApplication(tk.Tk):
         # initialisation of default mode, this tracks the current active state of the application
         # self.currentGameMode = GameNames.GAME_OPTIONS
         # self.currentGameMode = GameNames.GAME_EAR_TRAINING_NOTE
-        self.currentGameMode = GameNames.GAME_EAR_TRAINING_CHORDS
-        # self.currentGameMode = GameNames.GAME_BACKTRACKS
+        # self.currentGameMode = GameNames.GAME_LICKS_PRACTISE
+        self.currentGameMode = GameNames.GAME_BACKTRACKS
         self.app = None
         self.audioInstance = Autoload.get_instance().getAudioInstance()
 
@@ -44,7 +45,7 @@ class MainApplication(tk.Tk):
         self.bind("<Escape>", lambda event: self.cleanWindow())
         self.protocol('WM_DELETE_WINDOW', self.cleanWindow)
 
-        self.sideNavBarFrame = tk.Frame(self, width=env.NAVBAR_WIDTH, height=env.FULL_SCREEN_H, bg="red")
+        self.sideNavBarFrame = tk.Frame(self, width=env.NAVBAR_WIDTH, height=env.FULL_SCREEN_H, bg=Colors.NAVBAR_BACKGROUND)
         self.sideNavBarFrame.place(x=0, y=0, width=env.NAVBAR_WIDTH, height=env.FULL_SCREEN_H)
         self.sideNavBar = NavBarView(self, self.sideNavBarFrame)
 
@@ -78,12 +79,11 @@ class MainApplication(tk.Tk):
         elif new_game_mode.value == GameNames.GAME_EAR_TRAINING_CHORDS.value:
             self.app = EarTrainingChordView(self, self.body)
         elif new_game_mode.value == GameNames.GAME_BACKTRACKS.value:
-            self.app = BacktracksView(self.master, self.body)
+            self.app = BacktracksView(self, self.body)
         elif new_game_mode.value == GameNames.GAME_LICKS_PRACTISE.value:
-            # self.app = Mode3(self.master, self.master.bodyLeft, self.config, self)
-            pass
+            self.app = PractiseLicksView(self, self.body)
         elif new_game_mode.value == GameNames.GAME_OPTIONS.value:
-            self.app = OptionsView(self, self.body, self.config)
+            self.app = OptionsView(self, self.body)
         else:
             return
         self.sideNavBar.highLightActiveMode(new_game_mode)

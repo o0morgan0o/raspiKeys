@@ -1,0 +1,125 @@
+{
+    "lick_id": "e80a3b90-3ce1-11ec-846a-a8a1596344f1",
+    "lick_date": "03/11/2021 00:00",
+    "lick_name": "",
+    "lick_key": 34,
+    "backtrack_file": "D:\\code\\raspiKeys\\src\\res\\backtracks\\processed_wav\\house\\S_L_127_BEATS_30.wav",
+    "number_of_loops": 2,
+    "chord_notes": [
+        {
+            "type": "note_on",
+            "note": 31,
+            "velocity": 38,
+            "time": 5
+        },
+        {
+            "type": "note_off",
+            "note": 34,
+            "velocity": 83,
+            "time": 205
+        },
+        {
+            "type": "note_off",
+            "note": 31,
+            "velocity": 90,
+            "time": 228
+        },
+        {
+            "type": "note_on",
+            "note": 43,
+            "velocity": 34,
+            "time": 4222
+        },
+        {
+            "type": "note_off",
+            "note": 43,
+            "velocity": 93,
+            "time": 4286
+        },
+        {
+            "type": "note_on",
+            "note": 44,
+            "velocity": 86,
+            "time": 4503
+        },
+        {
+            "type": "note_off",
+            "note": 44,
+            "velocity": 77,
+            "time": 4655
+        },
+        {
+            "type": "note_on",
+            "note": 43,
+            "velocity": 66,
+            "time": 4936
+        },
+        {
+            "type": "note_on",
+            "note": 38,
+            "velocity": 69,
+            "time": 5173
+        },
+        {
+            "type": "note_off",
+            "note": 43,
+            "velocity": 71,
+            "time": 5186
+        },
+        {
+            "type": "note_off",
+            "note": 38,
+            "velocity": 76,
+            "time": 5362
+        },
+        {
+            "type": "note_on",
+            "note": 41,
+            "velocity": 61,
+            "time": 5402
+        },
+        {
+            "type": "note_off",
+            "note": 41,
+            "velocity": 84,
+            "time": 5585
+        },
+        {
+            "type": "note_on",
+            "note": 38,
+            "velocity": 54,
+            "time": 5634
+        },
+        {
+            "type": "note_off",
+            "note": 38,
+            "velocity": 63,
+            "time": 5849
+        },
+        {
+            "type": "note_on",
+            "note": 39,
+            "velocity": 68,
+            "time": 6259
+        },
+        {
+            "type": "note_off",
+            "note": 39,
+            "velocity": 80,
+            "time": 6431
+        },
+        {
+            "type": "note_on",
+            "note": 36,
+            "velocity": 55,
+            "time": 6484
+        },
+        {
+            "type": "note_off",
+            "note": 36,
+            "velocity": 81,
+            "time": 6632
+        }
+    ],
+    "melody_notes": null
+}

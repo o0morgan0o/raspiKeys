@@ -32,17 +32,17 @@ class FooterView:
         self.lblMidiVolume = ttk.Label(self.gameFrame, text=ViewStrings.STRING_LBL_MIDI_VOLUME, style=CustomStylesNames.STYLE_LBL_FULL.value, padding=0)
         self.lblMidiVolume.grid(row=0, column=3, columnspan=2, sticky=tk.NSEW)
 
-        self.btnAudioMinus = CustomButton(self.gameFrame, text="-", style=CustomStylesNames.STYLE_BTN_FOOTER_PLUS_MINUS.value)
+        self.btnAudioMinus = CustomFooterButton(self.gameFrame, text="-", style=CustomStylesNames.STYLE_BTN_FOOTER_PLUS_MINUS.value)
         self.btnAudioMinus.grid(row=1, column=0, sticky=tk.NSEW)
-        self.btnAudioPlus = CustomButton(self.gameFrame, text="+", style=CustomStylesNames.STYLE_BTN_FOOTER_PLUS_MINUS.value)
+        self.btnAudioPlus = CustomFooterButton(self.gameFrame, text="+", style=CustomStylesNames.STYLE_BTN_FOOTER_PLUS_MINUS.value)
         self.btnAudioPlus.grid(row=1, column=1, sticky=tk.NSEW)
 
-        self.btnMidiMinus = CustomButton(self.gameFrame, text="-", style=CustomStylesNames.STYLE_BTN_FOOTER_PLUS_MINUS.value)
+        self.btnMidiMinus = CustomFooterButton(self.gameFrame, text="-", style=CustomStylesNames.STYLE_BTN_FOOTER_PLUS_MINUS.value)
         self.btnMidiMinus.grid(row=1, column=3, sticky=tk.NSEW)
-        self.btnMidiPlus = CustomButton(self.gameFrame, text="+", style=CustomStylesNames.STYLE_BTN_FOOTER_PLUS_MINUS.value)
+        self.btnMidiPlus = CustomFooterButton(self.gameFrame, text="+", style=CustomStylesNames.STYLE_BTN_FOOTER_PLUS_MINUS.value)
         self.btnMidiPlus.grid(row=1, column=4, sticky=tk.NSEW)
 
-        self.btnOptions = CustomButton(self.gameFrame, text=ViewStrings.STRING_BTN_OPTIONS.value, style=CustomStylesNames.STYLE_BTN_DARK.value)
+        self.btnOptions = CustomFooterButton(self.gameFrame, text=ViewStrings.STRING_BTN_OPTIONS.value, style=CustomStylesNames.STYLE_BTN_DARK.value)
         self.btnOptions.config(command=lambda: self.master.new_window(GameNames.GAME_OPTIONS))
         self.btnOptions.grid(row=0, column=2, rowspan=2, sticky=tk.NSEW, padx=DEFAULT_PADDING)
         # self.slAudioVolume = tk.Scale(self.gameFrame, from_=1, to=100, orient=tk.HORIZONTAL, showvalue=1)

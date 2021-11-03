@@ -14,10 +14,9 @@ class ViewStrings(Enum):
 
 
 class OptionsView:
-    def __init__(self, master, game_frame: tk.Frame, config: dict):
+    def __init__(self, master, game_frame: tk.Frame):
         print("launching game {}".format(GameNames.GAME_OPTIONS))
         self.game = None
-        self.config = config
         self.master = master
         self.gameFrame = game_frame
         self.gameFrame.config(bg="black")
@@ -60,7 +59,7 @@ class OptionsView:
         self.btnConfig.grid(row=current_row, column=1, sticky=tk.SE, padx=20)
 
         # =========== CREATION OF THE VIEW_MODEL ====================
-        self.game = OptionsViewModel(self, self.config)
+        self.game = OptionsViewModel(self)
         # ===========================================================
         self.midiInListbox.bind("<<ListboxSelect>>", self.game.midiInChangeCallback)
         self.midiOutListbox.bind("<<ListboxSelect>>", self.game.midiOutChangeCallback)

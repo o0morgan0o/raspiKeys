@@ -6,8 +6,7 @@ from src.game.utils.config import getMidiInterfaceIn, getMidiInterfaceOut, updat
 
 
 class OptionsViewModel:
-    def __init__(self, view, config: dict):
-        self.config = config
+    def __init__(self, view):
         self.view = view
         self.midiIO = Autoload.get_instance().getMidiInstance()
         self.midiInstance = None

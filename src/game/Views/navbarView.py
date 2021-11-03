@@ -51,7 +51,7 @@ class NavBarView:
         self.btnEarTrainingNote.config(command=lambda: self.master.new_window(GameNames.GAME_EAR_TRAINING_NOTE))
         self.btnEarTrainingChord.config(command=lambda: self.master.new_window(GameNames.GAME_EAR_TRAINING_CHORDS))
         self.btnBacktracks.config(command=lambda: self.master.new_window(GameNames.GAME_BACKTRACKS))
-        # self.button4["command"] = lambda: self.new_window(3)
+        self.btnPractiseLicks.config(command=lambda: self.master.new_window(GameNames.GAME_LICKS_PRACTISE))
 
     def resetAllButtonsBackgroundColor(self):
         self.btnEarTrainingNote.configure(background=Colors.BTN_SIDEBAR_NEUTRAL)

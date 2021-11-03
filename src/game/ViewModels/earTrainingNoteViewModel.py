@@ -184,7 +184,7 @@ class EarTrainingNoteViewModel:
     def handleMIDIInput(self, msg):
         # check if user has midi  listen
         if not self.midiIO.getListeningState():
-            print("[--] Ignoring queue message...", msg)
+            print("[--] ignoring queue message...", msg)
             return
         print("[-]receiving something", msg)
 

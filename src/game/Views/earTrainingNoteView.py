@@ -65,7 +65,7 @@ class EarTrainingNoteView:
         current_row += 1
 
         # self.btnSkip = CustomButton(self.gameFrame, text="SKIP", filename="btn_round.png")
-        self.btnSkip = CustomButton(self.gameFrame, text="Skip", style="TButton")
+        self.btnSkip = CustomButton(self.gameFrame, text="Skip")
         self.btnSkip.grid(row=0, rowspan=current_row, column=0, columnspan=2, sticky=tk.SE, padx=12, pady=12)
 
         self.score = CustomLabel(self.gameFrame, font=(DEFAULT_FONT_NAME, DEFAULT_FONT_SIZE, "bold"), text=GameStrings.LABEL_SCORE.value)

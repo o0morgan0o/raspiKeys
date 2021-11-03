@@ -15,7 +15,7 @@ class RecordWithBacktrack:
         self.backtrack = None
 
         self.window = tk.Toplevel(self.globalRoot)
-        self.window.config(cursor="none")
+        # self.window.config(cursor="none")
         self.window.attributes('-fullscreen', True)
         self.window.geometry("320x480")
         self.window["bg"] = "black"
@@ -68,15 +68,15 @@ class RecordWithBacktrack:
     def nextWindow(self):
         self.window.destroy()
         try:
-            self.globalRoot.recordWindow.destroy()
+            self.globalRoot.recordFrame.destroy()
         except Exception as e:
             print(e)
         try:
-            del self.globalRoot.recordWindow
+            del self.globalRoot.recordFrame
         except Exception as e:
             print(e)
 
-        self.globalRoot.recordWindow = RecordSetupGui(
+        self.globalRoot.recordFrame = RecordSetupGui(
             self.globalRoot,
             self.currentTrack[0],
             self.currentTrack[1],

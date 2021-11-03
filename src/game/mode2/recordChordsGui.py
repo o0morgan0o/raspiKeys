@@ -73,7 +73,7 @@ class RecordChordsGui:
 
     def nextWindow(self):
         self.window.destroy()
-        self.globalRoot.recordWindow = RecordNotesGui(
+        self.globalRoot.recordFrame = RecordNotesGui(
             self.globalRoot,
             self.choosenBpm,
             self.bassNote,

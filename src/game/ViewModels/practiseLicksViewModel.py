@@ -7,101 +7,106 @@ from tkinter import messagebox
 
 import pygame
 from PIL import Image, ImageTk
+
 from src.game import env
 from src.game.autoload import Autoload
-from src.game.utils.customElements.customElements import *
-from src.game.utils.customElements.labels import *
 from src.game.utils.midiToNotenames import noteName
 from src.game.utils.utilFunctions import formatOutputInterval
+from src.game.utils.licksUtils import getAllMidiLicksFiles, getJsonDataFromFile, JsonLickFields
 
 
-class Game:
-    def __init__(self, globalRoot, root, config, app):
+class PractiseLicksViewModel:
+    def __init__(self, view):
+        self.view = view
+
         # images
-        self.playImage = ImageTk.PhotoImage(Image.open(env.PLAY_IMAGE))
-        self.pauseImage = ImageTk.PhotoImage(Image.open(env.PAUSE_IMAGE))
-        self.shuffleImage = ImageTk.PhotoImage(Image.open(env.SHUFFLE_IMAGE))
+        # self.playImage = ImageTk.PhotoImage(Image.open(env.PLAY_IMAGE))
+        # self.pauseImage = ImageTk.PhotoImage(Image.open(env.PAUSE_IMAGE))
+        # self.shuffleImage = ImageTk.PhotoImage(Image.open(env.SHUFFLE_IMAGE))
 
         self.midiIO = Autoload.get_instance().getMidiInstance()
-        self.midiIO.setCallback(self.handleMIDIInput)
-
-        self.isPlaying = False
-        self.config = config
-        self.globalRoot = globalRoot
-        self.root = root
-        self.app = app
+        # self.midiIO.setCallback(self.handleMIDIInput)
 
         # Default path
         self.midiRepository = env.MIDI_FOLDER
 
         # Callbacks for buttons
         # self.root.btnRecord.config(command=self.showWithOrWithoutBacktrackWindow)
-        self.root.btnPractiseLick.config(image=self.playImage, command=self.playOneLick)
-        self.root.btnRandomLick.config(image=self.shuffleImage, command=self.pickRandomLick)
-        self.root.btnDeleteSelected.config(command=self.deleteLick)
-        self.root.btnPrev.config(command=self.previousLick)
-        self.root.btnNext.config(command=self.nextLick)
+        # self.view.btnPractiseLick.config(image=self.playImage, command=self.playOneLick)
+        # self.view.btnRandomLick.config(image=self.shuffleImage, command=self.pickRandomLick)
+        # self.view.btnDeleteSelected.config(command=self.deleteLick)
+        # self.view.btnPrev.config(command=self.previousLick)
+        # self.view.btnNext.config(command=self.nextLick)
 
-        self.midiFiles = []
-        self.reloadMidiFiles()
-        self.fileIndex = 0
-        self.recordNotes = None
+        self.allMidiLicksFilePaths = getAllMidiLicksFiles()
+        # self.fileIndex = 0
+        # self.recordNotes = None
 
         self.midiIO = Autoload.get_instance().getMidiInstance()
         self.audioInstance = Autoload.get_instance().getAudioInstance()
         # self.midiIO.setCallback(self.handleMIDIInput)
 
-        self.bassNote = 0
-        self.chordQuality = "-"
-        self.transpose = 0
-        self.activeCustomSignals = []
-        self.lickRepetitionCounter = 1
-        self.lickMaxRepetition = self.config["times_each_transpose"]
-        self.playOnlyChord = False
+        # self.bassNote = 0
+        # self.chordQuality = "-"
+        # self.transpose = 0
+        # self.activeCustomSignals = []
+        # self.lickRepetitionCounter = 1
+        # self.lickMaxRepetition = self.config["times_each_transpose"]
+        # self.playOnlyChord = False
 
-        self.currentLickIndex = 0
-        self.currentLick = None
+        # self.currentLickIndex = 0
+        # self.currentLick = None
+        #
+        # self.practiseAllLicks = False
+        # self.lastTranspose = 0
+        # self.futureTranspose = 0
+        #
+        # self.playBacktrackThread = None
+        # self.audioThread = None
+        #
+        # self.bass = None
+        # self.mType = None
+        # self.notes = None
+        # self.backtrackVolume = None
 
-        self.practiseAllLicks = False
-        self.lastTranspose = 0
-        self.futureTranspose = 0
+        # self.loadASample(len(self.midiFiles) - 1)
 
-        self.playBacktrackThread = None
-        self.audioThread = None
+        self.allLicksData = self.getAllLicksData(self.allMidiLicksFilePaths)
+        self.allLicksDataForTreeView = self.extractLicksDataForTreeView(self.allLicksData)
+        self.initializeTreeView(self.allLicksDataForTreeView)
+        # print(self.allLicksDataForTreeView)
 
-        self.bass = None
-        self.mType = None
-        self.notes = None
-        self.backtrackVolume = None
+    def initializeTreeView(self, all_list_data_for_tree_view: list):
+        self.view.setUiInitializeTreeView(all_list_data_for_tree_view)
 
-        self.loadASample(len(self.midiFiles) - 1)
+    @staticmethod
+    def getAllLicksData(all_licks_files: list):
+        all_licks_data = []
+        for m_file in all_licks_files:
+            all_licks_data.append(getJsonDataFromFile(m_file))
+        return all_licks_data
 
-        # we need the number of licks in order to show the user
+    @staticmethod
+    def extractLicksDataForTreeView(all_licks_data: list):
+        all_licks_data_short = []
+        for lick in all_licks_data:
+            element = {JsonLickFields.FIELD_LICK_ID.value: lick[JsonLickFields.FIELD_LICK_ID.value],
+                       JsonLickFields.FIELD_LICK_DATE.value: lick[JsonLickFields.FIELD_LICK_DATE.value],
+                       JsonLickFields.FIELD_LICK_NAME.value: lick[JsonLickFields.FIELD_LICK_NAME.value],
+                       JsonLickFields.FIELD_LICK_KEY.value: lick[JsonLickFields.FIELD_LICK_KEY.value]}
+            all_licks_data_short.append(element)
+        return all_licks_data_short
 
     def loadASample(self, index):
-        nbOfSamples = len(self.midiFiles)
+        nbOfSamples = len(self.allMidiLicksFilePaths)
         if nbOfSamples == 0:
-            self.root.lblNotes.config(text="No lick, record one first !")
+            self.view.lblNotes.config(text="No lick, record one first !")
         else:
             # we load last sample
             self.currentLickIndex = index
-            self.loadSelectedItem(self.midiFiles[self.currentLickIndex])
-            self.root.lblMessage.config(text="Lick {} / {} loaded.".format(index + 1, len(self.midiFiles)))
+            self.loadSelectedItem(self.allMidiLicksFilePaths[self.currentLickIndex])
+            self.view.lblMessage.config(text="Lick {} / {} loaded.".format(index + 1, len(self.allMidiLicksFilePaths)))
             self.showUserInfo(0)
-
-    def reloadMidiFiles(self):
-        counter = 0
-        midiFiles = []
-        for filename in os.listdir(self.midiRepository):
-            # get only json files
-            if os.path.splitext(filename)[1] == ".json":
-                mFile = os.path.join(self.midiRepository, filename)
-                midiFiles.append(mFile)
-                counter += 1
-
-        self.midiFiles = midiFiles
-        self.midiFiles.sort()
-        print("Reloading all MIDI files...", len(self.midiFiles))
 
     def loadSelectedItem(self, name):
         self.loadFile(os.path.join(self.midiRepository, name))
@@ -115,24 +120,24 @@ class Game:
                     self.userMessage = self.userMessage[:28] + "..."
                 else:
                     self.userMessage += noteName(note["note"] + transpose) + " "
-        self.root.lblKey.config(foreground="white")
-        self.root.lblKey.config(text="{} {}".format(noteName(self.bass + transpose), self.mType))
-        self.root.lblNotes.config(foreground="white")
-        self.root.lblNotes.config(text=self.userMessage)
-        self.root.lblMessage.config(text="Lick {} / {} loaded.".format(self.currentLickIndex + 1, len(self.midiFiles)))
+        self.view.lblKey.config(foreground="white")
+        self.view.lblKey.config(text="{} {}".format(noteName(self.bass + transpose), self.mType))
+        self.view.lblNotes.config(foreground="white")
+        self.view.lblNotes.config(text=self.userMessage)
+        self.view.lblMessage.config(text="Lick {} / {} loaded.".format(self.currentLickIndex + 1, len(self.allMidiLicksFilePaths)))
         if counter != -1:
-            self.root.lblFollowing.config(
+            self.view.lblFollowing.config(
                 text="{} / {} before transpose...".format(str(counter), str(nbBeforeTranspose)), foreground="white"
             )
         else:
-            self.root.lblFollowing.config(text="")
+            self.view.lblFollowing.config(text="")
 
     def showUserInfoNextTranspose(self, oldTranspose, newTranspose):
         beforeKey = noteName(self.bass + oldTranspose)
         afterKey = noteName(self.bass + newTranspose)
-        self.root.lblKey.config(foreground="orange", text="{}=>{}".format(beforeKey, afterKey + self.mType))
-        self.root.lblNotes.config(foreground="orange", text=formatOutputInterval(newTranspose - oldTranspose))
-        self.root.lblFollowing.config(foreground="orange", text="Transpose next loop...")
+        self.view.lblKey.config(foreground="orange", text="{}=>{}".format(beforeKey, afterKey + self.mType))
+        self.view.lblNotes.config(foreground="orange", text=formatOutputInterval(newTranspose - oldTranspose))
+        self.view.lblFollowing.config(foreground="orange", text="Transpose next loop...")
 
     def loadFile(self, mFile):
         try:
@@ -221,26 +226,26 @@ class Game:
         pygame.mixer.music.stop()
         self.currentLickIndex += -1
         if self.currentLickIndex < 0:
-            self.currentLickIndex = len(self.midiFiles) - 1
-        self.loadFile(self.midiFiles[self.currentLickIndex])
+            self.currentLickIndex = len(self.allMidiLicksFilePaths) - 1
+        self.loadFile(self.allMidiLicksFilePaths[self.currentLickIndex])
         self.showUserInfo(0)
 
     def nextLick(self):
         self.cancelThreads()
         pygame.mixer.music.stop()
         self.currentLickIndex += 1
-        if self.currentLickIndex >= len(self.midiFiles):
+        if self.currentLickIndex >= len(self.allMidiLicksFilePaths):
             self.currentLickIndex = 0
-        self.loadFile(self.midiFiles[self.currentLickIndex])
+        self.loadFile(self.allMidiLicksFilePaths[self.currentLickIndex])
         self.showUserInfo(0)
 
     def playOneLick(self, completeTraining=False):
         if self.isPlaying == False:
-            self.root.btnPractiseLick.config(image=self.pauseImage)
+            self.view.btnPractiseLick.config(image=self.pauseImage)
             self.isPlaying = True
             self.activateAudioThread(completeTraining)
         else:
-            self.root.btnPractiseLick.config(image=self.playImage)
+            self.view.btnPractiseLick.config(image=self.playImage)
             self.audioThread.isAlive = False
             # del self.audioThread
             self.isPlaying = False
@@ -249,7 +254,7 @@ class Game:
 
     def pickRandomLick(self):
         # load a new random sample
-        self.loadASample(random.randint(0, len(self.midiFiles) - 1))
+        self.loadASample(random.randint(0, len(self.allMidiLicksFilePaths) - 1))
         self.playOneLick(completeTraining=True)
 
     def deleteLick(self):
@@ -261,21 +266,21 @@ class Game:
                 os.remove(self.currentLick)
                 self.reloadMidiFiles()
                 self.currentLickIndex = 0
-                if len(self.midiFiles) > 0:
-                    self.currentLick = self.midiFiles[self.currentLickIndex]
+                if len(self.allMidiLicksFilePaths) > 0:
+                    self.currentLick = self.allMidiLicksFilePaths[self.currentLickIndex]
                     self.loadSelectedItem(self.currentLick)
                 else:
-                    self.root.lblNotes.config(text="No lick, record one first !")
-                    self.root.lblKey.config(text="")
-                    self.root.lblFollowing.config(text="")
-                    self.root.lblMessage.config(text="")
+                    self.view.lblNotes.config(text="No lick, record one first !")
+                    self.view.lblKey.config(text="")
+                    self.view.lblFollowing.config(text="")
+                    self.view.lblMessage.config(text="")
             except Exception as e:
                 print("Error trying to delete lick", self.currentLick, e)
             self.reloadMidiFiles()
 
     def cancelThreads(self):
         try:
-            self.root.btnPractiseLick.config(text="Practise Lick")
+            self.view.btnPractiseLick.config(text="Practise Lick")
         except:
             print("can't update screen")
         self.isPlaying = False
@@ -455,4 +460,3 @@ class BackTrackThread(threading.Thread):
         print(self.MelodyNoteOnNotes)
         self.MelodyIndexNoteOn = 0
         self.MelodyIndexNoteOff = 0
-
