@@ -2,7 +2,6 @@ import logging
 import os
 
 import pygame
-import soundfile
 
 from src.game import env
 
@@ -76,23 +75,6 @@ class Audio:
         pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=1024)
         pygame.mixer.init()
         pygame.init()
-
-    # def convertNewFiles(self):
-    #     return
-    #     # we try to convert all files put by the user. It is needed because we only want PCM 16 bits
-    #     # TODO make test to this to easier implementation
-    #     print(self.user_waveDir)
-    #     for filename in os.listdir(self.user_waveDir):
-    #         filenameFull = os.path.join(self.user_waveDir, filename)
-    #         # print("will tyr to convert " , filenameFull)
-    #         try:
-    #             data, sampleRate = soundfile.read(filenameFull)
-    #             outfile = os.path.join(self.processed_waveDir, filename)
-    #             soundfile.write(outfile, data, sampleRate, subtype="PCM_16")
-    #             print("done")
-    #         except Exception as e:
-    #             print("error during conversion", filename)
-    #             logging.exception(e)
 
     def loadTick(self):
         pygame.mixer.music.load(self.metroTick)

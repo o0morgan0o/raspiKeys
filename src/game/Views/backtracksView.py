@@ -2,6 +2,7 @@ import math
 import os
 from functools import partial
 from glob import glob
+from src.customtkinter import CTkButton, CTkProgressBar, CTkLabel
 
 from PIL import Image, ImageTk
 
@@ -32,6 +33,20 @@ class ViewImages:
         IMAGE_SHUFFLE_IMAGE = ImageTk.PhotoImage(Image.open(env.SHUFFLE_IMAGE))
 
 
+class CustomButton(CTkButton):
+    def __init__(self,
+                 corner_radius=18,
+                 *args,
+                 **kwargs,
+                 ):
+        super().__init__(*args,
+                         corner_radius=corner_radius,
+                         fg_color="#333333",
+                         bg_color=Colors.BACKGROUND,
+                         # text_font=(DEFAULT_FONT_NAME, 24, "bold"),
+                         **kwargs)
+
+
 class BacktracksView:
     def __init__(self, master, game_frame: tk.Frame):
         print("launching game {}".format(GameNames.GAME_BACKTRACKS))
@@ -44,41 +59,42 @@ class BacktracksView:
 
         self.tempRecordView = None
 
-        # self.gameFrame.grid_rowconfigure(0, uniform='row_height', weight=1)
-        # self.gameFrame.grid_columnconfigure(0, minsize=200, weight=1)
-        # self.gameFrame.grid_columnconfigure(1, minsize=300, weight=1)
-        # self.gameFrame.grid_propagate(0)
-
-        percentageLeft= 40/100
+        percentageLeft = 40 / 100
         self.frameLeft = tk.Frame(self.gameFrame, bg=Colors.BACKGROUND, padx=LEFT_PANEL_PADDING_X)
-        self.frameLeft.place(x=0, y=0,width=env.GAME_SCREEN_W*percentageLeft, height=env.GAME_SCREEN_H)
+        self.frameLeft.place(x=0, y=0, width=env.GAME_SCREEN_W * percentageLeft, height=env.GAME_SCREEN_H)
         self.frameRight = tk.Frame(self.gameFrame, bg=Colors.BACKGROUND, padx=RIGHT_PANEL_PADDING_X, pady=RIGHT_PANEL_PADDING_Y)
-        self.frameRight.place(x=env.GAME_SCREEN_W*percentageLeft, y=0, width=env.GAME_SCREEN_W*(1-percentageLeft), height=env.GAME_SCREEN_H)
-        # self.frameRight.grid(row=0, column=1, sticky=tk.E)
+        self.frameRight.place(x=env.GAME_SCREEN_W * percentageLeft, y=0, width=env.GAME_SCREEN_W * (1 - percentageLeft), height=env.GAME_SCREEN_H)
 
         # Backtrack Section
-        self.lblTrackTitle = tk.Label(self.frameLeft, text=ViewStrings.STRING_LBL_TRACK_TITLE.value, justify="center", width=20, wraplength=200)
-        self.lblCategory = tk.Label(self.frameLeft, text=ViewStrings.STRING_LBL_TRACK_CATEGORY.value, justify="center")
+        self.lblTrackTitle = tk.Label(self.frameLeft, text=ViewStrings.STRING_LBL_TRACK_TITLE.value, justify="center",
+                                      bg='#333333',fg=Colors.TEXT,
+                                      width=20, wraplength=200, height=10)
+        self.lblCategory = tk.Label(self.frameLeft,
+                                    font=(DEFAULT_FONT_NAME, 24, 'bold'),
+                                    bg=Colors.BACKGROUND,
+                                    fg=Colors.TEXT,
+                                    # text=ViewStrings.STRING_LBL_TRACK_CATEGORY.value,
+                                    justify="center")
         self.progressBar = ttk.Progressbar(self.frameLeft, style=CustomStylesNames.STYLE_PROGRESSBAR_RED.value, value=0)
-        self.btnRecord = CustomButton(self.frameLeft, text="Record")
+        self.btnRecord = CustomButton(master=self.frameLeft, text="Record")
 
         # Metronome section
-        self.btnBpmMinus = CustomButton(self.frameLeft, text="-")
+        self.btnBpmMinus = CustomButton(master=self.frameLeft, text="-")
         self.lblMetro = tk.Label(self.frameLeft, text="metroValue", font=(DEFAULT_FONT_NAME, 80))
-        self.btnBpmPlus = CustomButton(self.frameLeft, text="+")
+        self.btnBpmPlus = CustomButton(master=self.frameLeft, text="+")
         self.slTempo = CustomScale(self.frameLeft, from_=BacktracksConstants.TEMPO_MIN_BPM.value, to=BacktracksConstants.TEMPO_MAX_BPM.value)
 
         # Right Section
-        self.btnMetro = CustomButton(self.frameRight, text="Metro")
-        self.btnMetro.pack(fill=tk.X)
+        self.btnMetro = CustomButton(master=self.frameRight, text="Metro", )
+        self.btnMetro.pack(expand=1, fill=tk.X)
 
-        self.frameCategoryContainers = tk.Frame(self.frameRight,bg=Colors.BACKGROUND, pady=RIGHT_PANEL_PADDING_Y)
+        self.frameCategoryContainers = tk.Frame(self.frameRight, bg=Colors.BACKGROUND, pady=RIGHT_PANEL_PADDING_Y)
         self.frameCategoryContainers.pack(expand=1, fill=tk.BOTH)
 
-        self.btnRandom = CustomButton(self.frameRight, text="Random")
+        self.btnRandom = CustomButton(master=self.frameRight, text="Random")
         self.btnRandom.pack(expand=1, fill=tk.BOTH, side=tk.LEFT, anchor=tk.SW)
 
-        self.btnPlay = CustomButton(self.frameRight, text="PLAY/STOP")
+        self.btnPlay = CustomButton(master=self.frameRight, text="PLAY/STOP")
         self.btnPlay.pack(expand=1, fill=tk.BOTH, side=tk.LEFT, anchor=tk.SE)
 
         # =========== CREATION OF THE VIEW_MODEL ====================
@@ -87,14 +103,12 @@ class BacktracksView:
 
         # after we have sent all the categories to the view, we trigger a function to the view which place all the category buttons on the ui
         self.setUiPlaceAllBtnCategories()
-        # self.setUiShowMetronomeSection()
         self.setUiShowBacktrackSection()
 
         self.btnPlay.config(command=self.viewModel.onBtnPlayClick)
         self.btnRandom.config(command=self.viewModel.onBtnRandomClick)
         self.btnRecord.config(command=self.viewModel.onBtnRecordClick)
-
-        self.btnMetro.config(command=self.viewModel.onBtnMetronomeClick)
+        self.btnMetro.config(command=self.viewModel.onBtnPlayClick)
         self.btnBpmPlus.config(command=self.viewModel.onBtnBpmPlusClick)
         self.btnBpmMinus.config(command=self.viewModel.onBtnBpmMinusClick)
         self.slTempo.bind("<ButtonRelease-1>", self.viewModel.onSliderTempoMoved)
@@ -139,15 +153,17 @@ class BacktracksView:
 
     def setUiUpdateProgress(self, percentage):
         self.progressBar.config(value=percentage)
+        # self.progressBar.set(percentage/100)
 
     def setUiCurrentBacktrack(self, category: str, filename: str, index: int, category_length: int):
-        self.lblCategory.config(text=category)
-        text = "Playing {}\n({}/{})".format(filename, index + 1, category_length)
+        category_text = "{} ({}/{})".format(category.upper(), index+1, category_length)
+        self.lblCategory.config(text=category_text)
+        text = "Playing \n{}".format(filename)
         self.lblTrackTitle.config(text=text)
 
     def setUiAddBtnCategory(self, category_id: int, category_name: str, quantity: int):
         btnLabel = category_name + " (" + str(quantity) + ")"
-        self.backtracksCategoriesTuples.append((category_id, category_name, CustomButton(self.frameCategoryContainers, text=btnLabel), quantity))
+        self.backtracksCategoriesTuples.append((category_id, category_name, CustomButton(master=self.frameCategoryContainers, text=btnLabel), quantity))
 
     def setUiPlaceAllBtnCategories(self):
         starting_row = 0
@@ -159,7 +175,7 @@ class BacktracksView:
         numberOfRows = math.ceil(numberOfCategories / columns_per_row)
         for i in range(0, columns_per_row):
             self.frameCategoryContainers.grid_columnconfigure(i, weight=1)
-        for i in range(0,numberOfRows):
+        for i in range(0, numberOfRows):
             self.frameCategoryContainers.grid_rowconfigure(i, weight=1)
         for (category_id, category_name, category_btn, category_quantity) in self.backtracksCategoriesTuples:
             category_btn.config(command=partial(self.viewModel.onBtnCategoryClick, category_name))

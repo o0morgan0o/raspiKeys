@@ -1,6 +1,7 @@
 from src.game.GamesNames import GameNames
 from src.game.ViewModels.FooterViewModel import FooterViewModel
 from src.game.utils.customElements.customElements import *
+from src.customtkinter import CTkButton
 
 
 class ViewStrings(Enum):
@@ -9,55 +10,74 @@ class ViewStrings(Enum):
     STRING_BTN_OPTIONS = "Opts"
 
 
+class CustomFooterButton(CTkButton):
+    def __init__(self,
+                 corner_radius=18,
+                 *args,
+                 **kwargs,
+                 ):
+        super().__init__(*args,
+                         corner_radius=corner_radius,
+                         fg_color="#333333",
+                         bg_color=Colors.BACKGROUND,
+                         text_font=(DEFAULT_FONT_NAME, 24, "bold"),
+                         **kwargs)
+
+
 class FooterView:
 
     def __init__(self, master, game_frame: tk.Frame):
         self.master = master
         self.gameFrame = game_frame
 
-        DEFAULT_PADDING = 10
+        FRAME_PADDING_X = 10
+        FRAME_PADDING_Y = 20
 
-        self.gameFrame.grid_rowconfigure(0, weight=0, )
-        self.gameFrame.grid_rowconfigure(1, weight=1, )
+        BTN_PADDING_X = 1
+        BTN_PADDING_Y = 10
 
-        self.gameFrame.grid_columnconfigure(0, weight=1)
-        self.gameFrame.grid_columnconfigure(1, weight=1, )
-        self.gameFrame.grid_columnconfigure(2, weight=1, )
-        self.gameFrame.grid_columnconfigure(3, weight=1, )
-        self.gameFrame.grid_columnconfigure(4, weight=1, )
+        self.footerFrame1 = tk.Frame(self.gameFrame, bg=Colors.BACKGROUND)
+        self.footerFrame1.pack(side=tk.LEFT, fill=tk.BOTH,
+                               padx=(FRAME_PADDING_X, FRAME_PADDING_X / 2))
+        self.footerFrame2 = tk.Frame(self.gameFrame, bg=Colors.BACKGROUND)
+        self.footerFrame2.pack(side=tk.LEFT, fill=tk.BOTH,
+                               padx=(FRAME_PADDING_X / 2, FRAME_PADDING_X / 2))
+        self.footerFrame3 = tk.Frame(self.gameFrame, bg=Colors.BACKGROUND)
+        self.footerFrame3.pack(side=tk.RIGHT, expand=1, fill=tk.BOTH,
+                               padx=(FRAME_PADDING_X / 2, FRAME_PADDING_X))
 
-        self.lblAudioVolume = ttk.Label(self.gameFrame, text=ViewStrings.STRING_LBL_AUDIO_VOLUME, style=CustomStylesNames.STYLE_LBL_FULL.value, padding=0)
-        self.lblAudioVolume.grid(row=0, column=0, columnspan=2, sticky=tk.NSEW)
+        self.lblAudioVolume = ttk.Label(self.footerFrame1, text=ViewStrings.STRING_LBL_AUDIO_VOLUME, style=CustomStylesNames.STYLE_LBL_FULL.value, padding=0)
+        self.lblAudioVolume.pack(side=tk.TOP, fill=tk.BOTH)
+        self.btnAudioMinus = CustomFooterButton(master=self.footerFrame1, text="-", command=lambda: self.viewModel.audioMinusClicked())
+        self.btnAudioPlus = CustomFooterButton(master=self.footerFrame1, text="+", command=lambda: self.viewModel.audioPlusClicked())
+        self.btnAudioMinus.pack(side=tk.LEFT, expand=1, fill=tk.BOTH,
+                                padx=BTN_PADDING_X,
+                                pady=BTN_PADDING_Y)
+        self.btnAudioPlus.pack(side=tk.RIGHT, expand=1, fill=tk.BOTH,
+                               padx=BTN_PADDING_X,
+                               pady=BTN_PADDING_Y)
 
-        self.lblMidiVolume = ttk.Label(self.gameFrame, text=ViewStrings.STRING_LBL_MIDI_VOLUME, style=CustomStylesNames.STYLE_LBL_FULL.value, padding=0)
-        self.lblMidiVolume.grid(row=0, column=3, columnspan=2, sticky=tk.NSEW)
+        self.lblMidiVolume = ttk.Label(self.footerFrame2, text=ViewStrings.STRING_LBL_MIDI_VOLUME, style=CustomStylesNames.STYLE_LBL_FULL.value, padding=0)
+        self.lblMidiVolume.pack(side=tk.TOP, fill=tk.X)
+        self.btnMidiMinus = CustomFooterButton(master=self.footerFrame2, text="-", command=lambda: self.viewModel.midiMinusClicked())
+        self.btnMidiMinus.pack(side=tk.LEFT, expand=1, fill=tk.BOTH,
+                               padx=BTN_PADDING_X,
+                               pady=BTN_PADDING_Y)
+        self.btnMidiPlus = CustomFooterButton(master=self.footerFrame2, text="+", command=lambda: self.viewModel.midiPlusClicked())
+        self.btnMidiPlus.pack(side=tk.RIGHT, expand=1, fill=tk.BOTH,
+                              padx=BTN_PADDING_X,
+                              pady=BTN_PADDING_Y)
 
-        self.btnAudioMinus = CustomFooterButton(self.gameFrame, text="-", style=CustomStylesNames.STYLE_BTN_FOOTER_PLUS_MINUS.value)
-        self.btnAudioMinus.grid(row=1, column=0, sticky=tk.NSEW)
-        self.btnAudioPlus = CustomFooterButton(self.gameFrame, text="+", style=CustomStylesNames.STYLE_BTN_FOOTER_PLUS_MINUS.value)
-        self.btnAudioPlus.grid(row=1, column=1, sticky=tk.NSEW)
-
-        self.btnMidiMinus = CustomFooterButton(self.gameFrame, text="-", style=CustomStylesNames.STYLE_BTN_FOOTER_PLUS_MINUS.value)
-        self.btnMidiMinus.grid(row=1, column=3, sticky=tk.NSEW)
-        self.btnMidiPlus = CustomFooterButton(self.gameFrame, text="+", style=CustomStylesNames.STYLE_BTN_FOOTER_PLUS_MINUS.value)
-        self.btnMidiPlus.grid(row=1, column=4, sticky=tk.NSEW)
-
-        self.btnOptions = CustomFooterButton(self.gameFrame, text=ViewStrings.STRING_BTN_OPTIONS.value, style=CustomStylesNames.STYLE_BTN_DARK.value)
-        self.btnOptions.config(command=lambda: self.master.new_window(GameNames.GAME_OPTIONS))
-        self.btnOptions.grid(row=0, column=2, rowspan=2, sticky=tk.NSEW, padx=DEFAULT_PADDING)
-        # self.slAudioVolume = tk.Scale(self.gameFrame, from_=1, to=100, orient=tk.HORIZONTAL, showvalue=1)
-        # self.slAudioVolume.grid(row=0, column=0, sticky=tk.NSEW)
-
-        # self.slMidiVolume = tk.Scale(self.gameFrame, from_=1, to=127, orient=tk.HORIZONTAL, showvalue=1)
-        # self.slMidiVolume.grid(row=0, column=1, sticky=tk.NSEW)
+        self.btnOptions = CustomFooterButton(master=self.footerFrame3, text=ViewStrings.STRING_BTN_OPTIONS.value,
+                                             corner_radius=30,
+                                             command=lambda: self.master.new_window(GameNames.GAME_OPTIONS))
+        self.btnOptions.pack(expand=1, fill=tk.BOTH,
+                             padx=BTN_PADDING_X,
+                             pady=BTN_PADDING_Y)
 
         # =========== CREATION OF THE VIEW_MODEL ====================
         self.viewModel = FooterViewModel(self)
         # ===========================================================
-        self.btnAudioMinus.config(command=self.viewModel.audioMinusClicked)
-        self.btnAudioPlus.config(command=self.viewModel.audioPlusClicked)
-        self.btnMidiMinus.config(command=self.viewModel.midiMinusClicked)
-        self.btnMidiPlus.config(command=self.viewModel.midiPlusClicked)
 
     def setUiInitialization(self, audio_volume: int, midi_volume: int):
         self.lblAudioVolume.config(text=ViewStrings.STRING_LBL_AUDIO_VOLUME.value + str(round(audio_volume, 2)))

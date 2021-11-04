@@ -20,7 +20,7 @@ class CustomStylesNames(Enum):
     STYLE_BTN_FOOTER_PLUS_MINUS = "custom_footer_plus_minus.TButton"
     STYLE_BTN_CONTROLS_PLUS_MINUS = "custom_controls.TButton"
     STYLE_LBL_FULL = "custom.Inverse.TLabel"
-    STYLE_PROGRESSBAR_RED = "danger.Horizontal.TProgressbar"
+    STYLE_PROGRESSBAR_RED = "custom.Horizontal.TProgressbar"
 
 
 def getCustomStyles():
@@ -41,6 +41,12 @@ def getCustomStyles():
     style.configure(CustomStylesNames.STYLE_BTN_CONTROLS_PLUS_MINUS.value,
                     background=Colors.BACKGROUND,
                     font=(DEFAULT_FONT_NAME, 40)
+                    )
+    style.configure(CustomStylesNames.STYLE_PROGRESSBAR_RED.value,
+                    background=Colors.PRIMARY,
+                    bordercolor=Colors.BACKGROUND,
+                    # foreground=Colors.BACKGROUND,
+                    troughcolor=Colors.BACKGROUND
                     )
 
 

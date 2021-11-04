@@ -119,7 +119,7 @@ class BacktracksViewModel:
             print("Empty backtrack list in category", category_name)
             return
         # we pick  a random track in the tuple selected
-        random_index = random.randint(0, len(category_backtracks))
+        random_index = random.randint(0, len(category_backtracks)-1)
         random_backtrack = category_backtracks[random_index]
         self.currentBacktrack = random_backtrack
         filename = os.path.basename(random_backtrack)

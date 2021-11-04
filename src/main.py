@@ -58,7 +58,7 @@ class MainApplication(tk.Tk):
         self.new_window(self.currentGameMode)
 
     # # method to load a new game mode
-    def new_window(self, new_game_mode: GameNames):
+    def new_window(self, new_game_mode: GameNames, event=None):
         # Import style for ttk.bootstrap styles
         getCustomStyles()
         self.audioInstance.stopPlay()
