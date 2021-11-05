@@ -28,8 +28,8 @@ class MainApplication(tk.Tk):
         # initialisation of default mode, this tracks the current active state of the application
         # self.currentGameMode = GameNames.GAME_OPTIONS
         # self.currentGameMode = GameNames.GAME_EAR_TRAINING_NOTE
-        # self.currentGameMode = GameNames.GAME_LICKS_PRACTISE
-        self.currentGameMode = GameNames.GAME_BACKTRACKS
+        self.currentGameMode = GameNames.GAME_LICKS_PRACTISE
+        # self.currentGameMode = GameNames.GAME_BACKTRACKS
         self.app = None
         self.audioInstance = Autoload.get_instance().getAudioInstance()
 
@@ -53,7 +53,6 @@ class MainApplication(tk.Tk):
         self.footerFrame.place(x=env.NAVBAR_WIDTH, y=env.FULL_SCREEN_H - env.FOOTER_HEIGHT, width=env.FULL_SCREEN_W - env.NAVBAR_WIDTH, height=env.FOOTER_HEIGHT)
         self.footer = FooterView(self, self.footerFrame)
 
-        # initialization
         # Load default Screen
         self.new_window(self.currentGameMode)
 

@@ -54,12 +54,13 @@ class CustomButton(tk.Button):
     def __init__(self, parent, text="",
                  font=DEFAULT_FONT,
                  background=Colors.BTN_STANDARD_BACKGROUND,
-                 foreground=Colors.TEXT,
+                 foreground=Colors.TEXT_WHITE,
                  command=None,
-                 borderwidth=None,
+                 borderwidth=3,
                  highlightbackground="red",
                  highlightthickness=12,
-                 highlightcolor="red"
+                 highlightcolor="red",
+                 relief=tk.RIDGE
                  ):
         super().__init__(parent, text=text,
                          font=font,
@@ -69,7 +70,8 @@ class CustomButton(tk.Button):
                          borderwidth=borderwidth,
                          highlightbackground=highlightbackground,
                          highlightthickness=highlightthickness,
-                         highlightcolor=highlightcolor
+                         highlightcolor=highlightcolor,
+                         relief=relief
                          )
 
 
@@ -77,7 +79,7 @@ class CustomFooterButton(tk.Button):
     def __init__(self, parent, text="",
                  font=DEFAULT_FONT,
                  background=Colors.BTN_FOOTER_BACKGROUND,
-                 foreground=Colors.TEXT,
+                 foreground=Colors.TEXT_WHITE,
                  command=None,
                  style=None,
                  ):
@@ -95,7 +97,7 @@ class CustomLabel(tk.Label):
                  font=DEFAULT_FONT,
                  justify=None,
                  background=Colors.BACKGROUND,
-                 foreground=Colors.TEXT,
+                 foreground=Colors.TEXT_WHITE,
                  padx=None,
                  pady=None,
                  width=None,
@@ -117,7 +119,7 @@ class CustomLabel(tk.Label):
 class CustomScale(tk.Scale):
     def __init__(self, parent: tk.Frame,
                  background=Colors.ERROR,
-                 foreground=Colors.TEXT,
+                 foreground=Colors.TEXT_WHITE,
                  relief=tk.FLAT,
                  from_=0,
                  to=100,

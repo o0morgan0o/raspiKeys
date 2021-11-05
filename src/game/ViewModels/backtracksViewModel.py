@@ -1,16 +1,20 @@
 import os
 import random
 import threading
-from functools import partial
+from enum import Enum
 
 from src.game.autoload import Autoload
 from src.game.utils.config import getMetroBpm, getAudioVolume, updateMetroBpm
-from enum import Enum
 
 
 class BacktracksConstants(Enum):
     TEMPO_MIN_BPM = 10
     TEMPO_MAX_BPM = 190
+
+
+class GameStatesNames(Enum):
+    GAME_STATE_BACKTRACK_MODE_ACTIVE = "game_state_backtrack_mode_active"
+    GAME_STATE_METRO_MODE_ACTIVE = "game_state_metro_mode_active"
 
 
 class ProgressThread(threading.Thread):
@@ -27,6 +31,7 @@ class ProgressThread(threading.Thread):
             percentage_played_full = self.audioInstance.getTimePlayed() / self.audioInstance.currentFileLength
             percentage_played = percentage_played_full % 1
             self.view.setUiUpdateProgress(percentage_played * 100)
+        self.view.setUiUpdateProgress(0.0)
         print("PROGRESS THREAD FINISHED")
 
 
@@ -45,23 +50,27 @@ class BacktracksViewModel:
         self.allBacktracksInAllCategories = self.audioInstance.getAllBacktracksInAllFolders()
         self.currentBacktrack = None
 
-        # recording variables
-        # self.recordingBassLick = False
-        # self.recordingNotes = False
-
-        # self.recordingCustomChords = False
-        # self.recordedNotes = []
-        # self.recordedCustomChords = []
-        #
-        # self.damper = []
-        # self.damperActive = False
         self.initializeAudio()
         self.initializeBacktracks(self.allBacktracksInAllCategories)
+
+        self.gameState = None
 
         # DEBUG
         # TODO Remove this
         # self.currentBacktrack = 'D:\\code\\raspiKeys\\src\\res\\backtracks\\processed_wav\\house\\S_L_127_BEATS_30.wav'
-        self.onBtnRecordClick()
+        # self.onBtnRecordClick()
+
+    def switchToBacktrackGameMode(self):
+        self.stopPlayWithProgressBarReset()
+        self.view.setUiShowBacktrackSection()
+        self.gameState = GameStatesNames.GAME_STATE_BACKTRACK_MODE_ACTIVE.value
+
+    def switchToMetroGameMode(self):
+        if self.gameState != GameStatesNames.GAME_STATE_METRO_MODE_ACTIVE.value:
+            self.stopPlayWithProgressBarReset()
+            self.view.setUiShowMetronomeSection()
+            self.gameState = GameStatesNames.GAME_STATE_METRO_MODE_ACTIVE.value
+            self.audioInstance.playRealMetro(self.tempoMetronome)
 
     def initializeAudio(self):
         volume = getAudioVolume()
@@ -85,19 +94,26 @@ class BacktracksViewModel:
         return None
 
     def onBtnRecordClick(self):
-        self.audioInstance.stopPlay()
+        self.stopPlayWithProgressBarReset()
         if self.currentBacktrack is not None:
             self.view.setUiSpawnRecordWindow(self.currentBacktrack)
 
     def onBtnPlayClick(self):
-        if self.currentBacktrack is None:
-            return self.onBtnRandomClick()
+        print("STATE", self.gameState, "IS playing ", self.audioInstance.getIsPlaying())
         if self.audioInstance.getIsPlaying():
-            self.audioInstance.stopPlay()
-        else:
-            self.playBacktrack(self.currentBacktrack)
+            return self.stopPlayWithProgressBarReset()
+        if self.gameState == GameStatesNames.GAME_STATE_BACKTRACK_MODE_ACTIVE.value:
+            if self.currentBacktrack is None:
+                return self.onBtnRandomClick()
+            if self.audioInstance.getIsPlaying():
+                self.stopPlayWithProgressBarReset()
+            else:
+                self.playBacktrack(self.currentBacktrack)
+        elif self.gameState == GameStatesNames.GAME_STATE_METRO_MODE_ACTIVE.value:
+            self.onBtnMetronomeClick()
 
     def onBtnRandomClick(self):
+        self.gameState = GameStatesNames.GAME_STATE_BACKTRACK_MODE_ACTIVE.value
         # TODO: Refactor this section with random choice method
         # we must get only non null categories
         non_empty_categories = []
@@ -112,6 +128,7 @@ class BacktracksViewModel:
         self.onBtnCategoryClick(random_result[0])
 
     def onBtnCategoryClick(self, category_name: str):
+        self.gameState = GameStatesNames.GAME_STATE_BACKTRACK_MODE_ACTIVE.value
         # TODO should display somewhere the number of files in the category and the index
         category_tuple_clicked = self.getCategoryByCategoryNameInAllBacktracks(self.allBacktracksInAllCategories, category_name)
         category_name, category_backtracks = category_tuple_clicked
@@ -119,7 +136,7 @@ class BacktracksViewModel:
             print("Empty backtrack list in category", category_name)
             return
         # we pick  a random track in the tuple selected
-        random_index = random.randint(0, len(category_backtracks)-1)
+        random_index = random.randint(0, len(category_backtracks) - 1)
         random_backtrack = category_backtracks[random_index]
         self.currentBacktrack = random_backtrack
         filename = os.path.basename(random_backtrack)
@@ -128,8 +145,10 @@ class BacktracksViewModel:
         self.playBacktrack(self.currentBacktrack)
 
     def onBtnMetronomeClick(self):
+        self.switchToMetroGameMode()
+        # if self.audioInstance.getIsPlaying():
+        #     return self.audioInstance.stopPlay()
         self.audioInstance.playRealMetro(self.tempoMetronome)
-        self.view.setUiShowMetronomeSection()
 
     def onBtnBpmPlusClick(self):
         self.modifyMetroBpm(+10)
@@ -145,7 +164,7 @@ class BacktracksViewModel:
         updateMetroBpm(self.tempoMetronome)
 
     def restartMetronome(self):
-        self.audioInstance.stopPlay()
+        self.stopPlayWithProgressBarReset()
         self.onBtnMetronomeClick()
 
     def modifyMetroBpm(self, variation: int):
@@ -160,16 +179,6 @@ class BacktracksViewModel:
         self.restartMetronome()
         updateMetroBpm(self.tempoMetronome)
 
-    # def showWithOrWithoutBacktrackWindow(self, ):
-    #     self.cancelThreads()
-    #     try:
-    #         del self.parent.recordWindow
-    #     except Exception as e:
-    #         print(e)
-    #     self.parent.destroy()
-    #     self.destroy()
-    #     self.globalRoot.recordWindow = RecordWithBacktrack(self.globalRoot, self.app)
-
     def playBacktrack(self, current_track: str):
         self.view.setUiShowBacktrackSection()
         if self.progressThread is not None and self.progressThread.isAlive():
@@ -179,6 +188,10 @@ class BacktracksViewModel:
 
         self.progressThread = ProgressThread(self.view, self.audioInstance)
         self.progressThread.start()
+
+    def stopPlayWithProgressBarReset(self):
+        self.audioInstance.stopPlay()
+        self.view.resetProgressBar()
 
     def destroy(self):
         self.audioInstance.stopPlay()

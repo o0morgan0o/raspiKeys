@@ -68,12 +68,12 @@ class FooterView:
                               padx=BTN_PADDING_X,
                               pady=BTN_PADDING_Y)
 
-        self.btnOptions = CustomFooterButton(master=self.footerFrame3, text=ViewStrings.STRING_BTN_OPTIONS.value,
-                                             corner_radius=30,
-                                             command=lambda: self.master.new_window(GameNames.GAME_OPTIONS))
-        self.btnOptions.pack(expand=1, fill=tk.BOTH,
-                             padx=BTN_PADDING_X,
-                             pady=BTN_PADDING_Y)
+        # self.btnOptions = CustomFooterButton(master=self.footerFrame3, text=ViewStrings.STRING_BTN_OPTIONS.value,
+        #                                      corner_radius=30,
+        #                                      command=lambda: self.master.new_window(GameNames.GAME_OPTIONS))
+        # self.btnOptions.pack(expand=1, fill=tk.BOTH,
+        #                      padx=BTN_PADDING_X,
+        #                      pady=BTN_PADDING_Y)
 
         # =========== CREATION OF THE VIEW_MODEL ====================
         self.viewModel = FooterViewModel(self)

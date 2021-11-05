@@ -1,16 +1,16 @@
 class Colors:
-    BTN_STANDARD_BACKGROUND= "#fead84"
-    BTN_FOOTER_BACKGROUND= "#ab3481"
-    NAVBAR_BACKGROUND = "white"
-    BACKGROUND = "black"
-    BTN_BACKGROUND = "#333333"
-    PRIMARY="orange"
-    TEXT = "white"
-    ERROR = "red"
+    BTN_FOOTER_BACKGROUND = "#ab3481"
+    NAVBAR_BACKGROUND = "#eeeeee"
+    BACKGROUND = "#030303"
+    DARK = "#333333"
+    PRIMARY = "orange"
+    TEXT_WHITE = "white"
+    TEXT_BLACK = "black"
+    ERROR = "#dc3545"
     SUCCESS = "green"
     WARNING = "orange"
     SLIDER_BACKGROUND = "#222222"
 
-
+    BTN_STANDARD_BACKGROUND = BACKGROUND
     BTN_SIDEBAR_NEUTRAL = NAVBAR_BACKGROUND
-    BTN_SIDEBAR_PUSHED = "black"
+    BTN_SIDEBAR_PUSHED = BACKGROUND

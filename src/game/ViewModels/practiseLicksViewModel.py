@@ -71,13 +71,24 @@ class PractiseLicksViewModel:
 
         # self.loadASample(len(self.midiFiles) - 1)
 
+        self.currentLickData= None
         self.allLicksData = self.getAllLicksData(self.allMidiLicksFilePaths)
         self.allLicksDataForTreeView = self.extractLicksDataForTreeView(self.allLicksData)
         self.initializeTreeView(self.allLicksDataForTreeView)
-        # print(self.allLicksDataForTreeView)
 
     def initializeTreeView(self, all_list_data_for_tree_view: list):
         self.view.setUiInitializeTreeView(all_list_data_for_tree_view)
+
+    def onLickSelectedInTreeView(self, values: dict):
+        (lick_uuid, lick_key, lick_description, lick_date) = values
+        # we retrieve the complete original midi data
+        self.currentLickData = self.findLickDataFromLickUuid(lick_uuid)
+
+    def findLickDataFromLickUuid(self, lick_uuid: str):
+        for lick in self.allLicksData:
+            if lick['lick_id'] == lick_uuid:
+                return lick
+
 
     @staticmethod
     def getAllLicksData(all_licks_files: list):

@@ -155,9 +155,9 @@ class Audio:
         # and again
         raw_array += raw_array  # (8 ticks)
         self.realMetro = pygame.mixer.Sound(buffer=raw_array)
-        self.isPlaying = True
         print("PLAYING METRO, VOLUME: ", self.audioVolume)
         self.setVolume(self.audioVolume)
+        self.isPlaying = True
         self.realMetro.play(-1)
 
     def stopPlay(self):

@@ -1,5 +1,6 @@
 import math
 import os
+import tkinter.font
 from functools import partial
 from glob import glob
 from src.customtkinter import CTkButton, CTkProgressBar, CTkLabel
@@ -33,20 +34,6 @@ class ViewImages:
         IMAGE_SHUFFLE_IMAGE = ImageTk.PhotoImage(Image.open(env.SHUFFLE_IMAGE))
 
 
-class CustomButton(CTkButton):
-    def __init__(self,
-                 corner_radius=18,
-                 *args,
-                 **kwargs,
-                 ):
-        super().__init__(*args,
-                         corner_radius=corner_radius,
-                         fg_color="#333333",
-                         bg_color=Colors.BACKGROUND,
-                         # text_font=(DEFAULT_FONT_NAME, 24, "bold"),
-                         **kwargs)
-
-
 class BacktracksView:
     def __init__(self, master, game_frame: tk.Frame):
         print("launching game {}".format(GameNames.GAME_BACKTRACKS))
@@ -67,35 +54,40 @@ class BacktracksView:
 
         # Backtrack Section
         self.lblTrackTitle = tk.Label(self.frameLeft, text=ViewStrings.STRING_LBL_TRACK_TITLE.value, justify="center",
-                                      bg='#333333',fg=Colors.TEXT,
-                                      width=20, wraplength=200, height=10)
+                                      bg=Colors.DARK, fg=Colors.TEXT_WHITE,
+                                      font= (DEFAULT_FONT_NAME, 14),
+                                      width=20, wraplength=250, height=4)
         self.lblCategory = tk.Label(self.frameLeft,
-                                    font=(DEFAULT_FONT_NAME, 24, 'bold'),
+                                    font=(DEFAULT_FONT_NAME, 24, tkinter.font.BOLD),
                                     bg=Colors.BACKGROUND,
-                                    fg=Colors.TEXT,
+                                    fg=Colors.TEXT_WHITE,
                                     # text=ViewStrings.STRING_LBL_TRACK_CATEGORY.value,
                                     justify="center")
         self.progressBar = ttk.Progressbar(self.frameLeft, style=CustomStylesNames.STYLE_PROGRESSBAR_RED.value, value=0)
-        self.btnRecord = CustomButton(master=self.frameLeft, text="Record")
+        self.btnRecord = CustomButton(self.frameLeft, text="REC", font=(DEFAULT_FONT_NAME, DEFAULT_FONT_SIZE, tkinter.font.BOLD), background=Colors.ERROR)
 
         # Metronome section
-        self.btnBpmMinus = CustomButton(master=self.frameLeft, text="-")
+        self.btnBpmMinus = CustomButton(self.frameLeft, text="-")
         self.lblMetro = tk.Label(self.frameLeft, text="metroValue", font=(DEFAULT_FONT_NAME, 80))
-        self.btnBpmPlus = CustomButton(master=self.frameLeft, text="+")
+        self.btnBpmPlus = CustomButton(self.frameLeft, text="+")
         self.slTempo = CustomScale(self.frameLeft, from_=BacktracksConstants.TEMPO_MIN_BPM.value, to=BacktracksConstants.TEMPO_MAX_BPM.value)
 
         # Right Section
-        self.btnMetro = CustomButton(master=self.frameRight, text="Metro", )
-        self.btnMetro.pack(expand=1, fill=tk.X)
-
         self.frameCategoryContainers = tk.Frame(self.frameRight, bg=Colors.BACKGROUND, pady=RIGHT_PANEL_PADDING_Y)
         self.frameCategoryContainers.pack(expand=1, fill=tk.BOTH)
 
-        self.btnRandom = CustomButton(master=self.frameRight, text="Random")
-        self.btnRandom.pack(expand=1, fill=tk.BOTH, side=tk.LEFT, anchor=tk.SW)
-
-        self.btnPlay = CustomButton(master=self.frameRight, text="PLAY/STOP")
-        self.btnPlay.pack(expand=1, fill=tk.BOTH, side=tk.LEFT, anchor=tk.SE)
+        self.rowControls = tk.Frame(self.frameRight)
+        self.rowControls.pack(side=tk.BOTTOM, expand=1, fill=tk.BOTH)
+        self.rowControls.grid_rowconfigure(0, weight=1)
+        self.rowControls.grid_rowconfigure(1, weight=1)
+        self.rowControls.grid_columnconfigure(0, weight=1)
+        self.rowControls.grid_columnconfigure(1, weight=1)
+        self.btnMetro = CustomButton(self.rowControls, text="Metro", )
+        self.btnMetro.grid(row=0, column=0,sticky=tk.NSEW)
+        self.btnRandom = CustomButton(self.rowControls, text="Random")
+        self.btnRandom.grid(row=1, column=0, sticky=tk.NSEW)
+        self.btnPlay = CustomButton(self.rowControls, text="PLAY")
+        self.btnPlay.grid(row=0,rowspan=2, column=1, sticky=tk.NSEW)
 
         # =========== CREATION OF THE VIEW_MODEL ====================
         self.viewModel = BacktracksViewModel(self)
@@ -103,12 +95,12 @@ class BacktracksView:
 
         # after we have sent all the categories to the view, we trigger a function to the view which place all the category buttons on the ui
         self.setUiPlaceAllBtnCategories()
-        self.setUiShowBacktrackSection()
+        self.viewModel.switchToBacktrackGameMode()
 
         self.btnPlay.config(command=self.viewModel.onBtnPlayClick)
         self.btnRandom.config(command=self.viewModel.onBtnRandomClick)
         self.btnRecord.config(command=self.viewModel.onBtnRecordClick)
-        self.btnMetro.config(command=self.viewModel.onBtnPlayClick)
+        self.btnMetro.config(command=self.viewModel.onBtnMetronomeClick)
         self.btnBpmPlus.config(command=self.viewModel.onBtnBpmPlusClick)
         self.btnBpmMinus.config(command=self.viewModel.onBtnBpmMinusClick)
         self.slTempo.bind("<ButtonRelease-1>", self.viewModel.onSliderTempoMoved)
@@ -120,6 +112,11 @@ class BacktracksView:
             self.tempRecordView.attributes('-fullscreen', True)
         RecordLickView(self.tempRecordView, current_backtrack_file)
         # self.tempRecordView.destroy()
+
+    def resetProgressBar(self):
+        # TODO Doesn't work, i don't know why
+        self.progressBar.config(value=0)
+        self.progressBar.stop()
 
     def setUiUnspawnRecordWindow(self):
         if self.tempRecordView is not None:
@@ -156,14 +153,14 @@ class BacktracksView:
         # self.progressBar.set(percentage/100)
 
     def setUiCurrentBacktrack(self, category: str, filename: str, index: int, category_length: int):
-        category_text = "{} ({}/{})".format(category.upper(), index+1, category_length)
+        category_text = "{} ({}/{})".format(category.upper(), index + 1, category_length)
         self.lblCategory.config(text=category_text)
-        text = "Playing \n{}".format(filename)
+        text = "Playing\n\n{}".format(filename)
         self.lblTrackTitle.config(text=text)
 
     def setUiAddBtnCategory(self, category_id: int, category_name: str, quantity: int):
         btnLabel = category_name + " (" + str(quantity) + ")"
-        self.backtracksCategoriesTuples.append((category_id, category_name, CustomButton(master=self.frameCategoryContainers, text=btnLabel), quantity))
+        self.backtracksCategoriesTuples.append((category_id, category_name, CustomButton(self.frameCategoryContainers, text=btnLabel), quantity))
 
     def setUiPlaceAllBtnCategories(self):
         starting_row = 0
