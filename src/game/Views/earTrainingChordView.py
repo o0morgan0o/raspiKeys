@@ -46,7 +46,7 @@ class EarTrainingChordView:
 
         # self.slInterval = CustomScale(self.gameFrame, from_=3, to=18)
         # self.slInterval.grid(row=current_row, column=0, sticky=tk.EW, padx=(10, 10))
-        self.slDelay = CustomScale(self.gameFrame, from_=200, to=1000)
+        self.slDelay = CustomScale(self.gameFrame, from_=0.2, to=1, resolution=0.05)
         self.slDelay.grid(row=current_row, column=1, sticky=tk.EW, padx=(10, 10))
 
         current_row += 1
@@ -69,7 +69,6 @@ class EarTrainingChordView:
 
         current_row += 1
 
-        # self.btnSkip = CustomButton(self.gameFrame, text="SKIP", filename="btn_round.png")
         self.btnSkip = CustomButton(self.gameFrame, text="Skip")
         self.btnSkip.grid(row=0, rowspan=current_row, column=0, columnspan=2, sticky=tk.SE, padx=12, pady=12)
 
@@ -79,6 +78,7 @@ class EarTrainingChordView:
         # =========== CREATION OF THE VIEW_MODEL ====================
         self.viewModel = EarTrainingChordViewModel(self)
         # ===========================================================
+        self.slDelay.bind('<ButtonRelease-1>', self.viewModel.onSliderDelayMoved)
 
     def reinitializeUi(self):
         self.pickNote.config(text=GameStrings.LABEL_PICK_NOTE.value)

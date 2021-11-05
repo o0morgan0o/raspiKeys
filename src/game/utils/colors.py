@@ -1,4 +1,5 @@
 class Colors:
+    WHITE = 'white'
     BTN_FOOTER_BACKGROUND = "#ab3481"
     NAVBAR_BACKGROUND = "#eeeeee"
     BACKGROUND = "#030303"

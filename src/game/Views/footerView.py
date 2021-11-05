@@ -18,7 +18,8 @@ class CustomFooterButton(CTkButton):
                  ):
         super().__init__(*args,
                          corner_radius=corner_radius,
-                         fg_color="#333333",
+                         text_color=Colors.TEXT_WHITE,
+                         fg_color=Colors.DARK,
                          bg_color=Colors.BACKGROUND,
                          text_font=(DEFAULT_FONT_NAME, 24, "bold"),
                          **kwargs)
@@ -37,13 +38,10 @@ class FooterView:
         BTN_PADDING_Y = 10
 
         self.footerFrame1 = tk.Frame(self.gameFrame, bg=Colors.BACKGROUND)
-        self.footerFrame1.pack(side=tk.LEFT, fill=tk.BOTH,
+        self.footerFrame1.pack(side=tk.LEFT, fill=tk.BOTH, expand=1,
                                padx=(FRAME_PADDING_X, FRAME_PADDING_X / 2))
         self.footerFrame2 = tk.Frame(self.gameFrame, bg=Colors.BACKGROUND)
-        self.footerFrame2.pack(side=tk.LEFT, fill=tk.BOTH,
-                               padx=(FRAME_PADDING_X / 2, FRAME_PADDING_X / 2))
-        self.footerFrame3 = tk.Frame(self.gameFrame, bg=Colors.BACKGROUND)
-        self.footerFrame3.pack(side=tk.RIGHT, expand=1, fill=tk.BOTH,
+        self.footerFrame2.pack(side=tk.RIGHT, fill=tk.BOTH, expand=1,
                                padx=(FRAME_PADDING_X / 2, FRAME_PADDING_X))
 
         self.lblAudioVolume = ttk.Label(self.footerFrame1, text=ViewStrings.STRING_LBL_AUDIO_VOLUME, style=CustomStylesNames.STYLE_LBL_FULL.value, padding=0)
@@ -67,13 +65,6 @@ class FooterView:
         self.btnMidiPlus.pack(side=tk.RIGHT, expand=1, fill=tk.BOTH,
                               padx=BTN_PADDING_X,
                               pady=BTN_PADDING_Y)
-
-        # self.btnOptions = CustomFooterButton(master=self.footerFrame3, text=ViewStrings.STRING_BTN_OPTIONS.value,
-        #                                      corner_radius=30,
-        #                                      command=lambda: self.master.new_window(GameNames.GAME_OPTIONS))
-        # self.btnOptions.pack(expand=1, fill=tk.BOTH,
-        #                      padx=BTN_PADDING_X,
-        #                      pady=BTN_PADDING_Y)
 
         # =========== CREATION OF THE VIEW_MODEL ====================
         self.viewModel = FooterViewModel(self)

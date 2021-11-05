@@ -1,3 +1,4 @@
+import logging
 import tkinter as tk
 from tkinter import ttk
 
@@ -29,11 +30,22 @@ class PractiseLicksView:
         self.configTreeView()
         self.treeView.pack(expand=1, fill=tk.BOTH, padx=DEFAULT_PADDING_X, pady=DEFAULT_PADDING_Y)
 
-        self.btnDeleteLick = CustomButton(self.frameRight, text="DELETE")
-        self.btnDeleteLick.pack(anchor=tk.NE, padx=(0, DEFAULT_PADDING_X), pady=(DEFAULT_PADDING_Y, 0))
-
-        self.lblLickKey = tk.Label(self.frameRight, text="LICK_KEY", font=(DEFAULT_FONT_NAME, 40), fg=Colors.TEXT_WHITE, bg=Colors.BACKGROUND)
-        self.lblLickKey.pack(expand=1, fill=tk.BOTH, padx=(0, DEFAULT_PADDING_X))
+        self.frameRightUpperSection = tk.Frame(self.frameRight)
+        self.frameRightUpperSection.grid_rowconfigure(0, weight=1)
+        self.frameRightUpperSection.grid_rowconfigure(1, weight=1)
+        self.frameRightUpperSection.grid_rowconfigure(2, weight=1)
+        self.frameRightUpperSection.grid_columnconfigure(0, weight=1)
+        self.frameRightUpperSection.grid_columnconfigure(1, weight=1)
+        self.frameRightUpperSection.grid_columnconfigure(2, weight=1)
+        self.frameRightUpperSection.pack(expand=1, fill=tk.BOTH, padx=(0, DEFAULT_PADDING_X), pady=(DEFAULT_PADDING_Y, 0))
+        self.lblLickKey = tk.Label(self.frameRightUpperSection, text="LICK_KEY", font=(DEFAULT_FONT_NAME, 40), fg=Colors.TEXT_WHITE, bg='red')
+        self.lblLickKey.grid(row=0, rowspan=3, column=0, columnspan=3, sticky=tk.NSEW)
+        self.btnDeleteLick = CustomButton(self.frameRightUpperSection, text="DELETE")
+        self.btnDeleteLick.grid(row=0, column=2, sticky=tk.NE)
+        self.btnTreeViewItemPlus = CustomButton(self.frameRightUpperSection, text=">", command=lambda: self.selectTreeViewNextItem())
+        self.btnTreeViewItemPlus.grid(row=0, column=0, sticky=tk.SW)
+        self.btnTreeViewItemMinus = CustomButton(self.frameRightUpperSection, text="<", command=lambda: self.selectTreeViewPreviousItem())
+        self.btnTreeViewItemMinus.grid(row=1, column=0, sticky=tk.NW)
 
         self.progressBar = ttk.Progressbar(self.frameRight, style=CustomStylesNames.STYLE_PROGRESSBAR_RED.value, value=0)
         self.progressBar.pack(fill=tk.X, padx=DEFAULT_PADDING_X, pady=8)
@@ -54,13 +66,48 @@ class PractiseLicksView:
         self.btnRandomLick.pack(side=tk.LEFT, expand=1, fill=tk.X)
         self.btnNextKey = CustomButton(self.rowRandom, text="NEXT_KEY")
         self.btnNextKey.pack(side=tk.LEFT, expand=1, fill=tk.X)
-        self.btnPlay = CustomButton(self.rowRandom, text="PLAY")
+        self.btnPlay = CustomButton(self.rowRandom, text="PLAY", command=lambda: self.viewModel.onBtnPlayClick())
         self.btnPlay.pack(side=tk.LEFT, expand=1, fill=tk.X)
         self.rowRandom.pack(side=tk.BOTTOM, fill=tk.X, padx=(0, DEFAULT_PADDING_X), pady=(0, DEFAULT_PADDING_Y))
 
         # =========== CREATION OF THE VIEW_MODEL ====================
         self.viewModel = PractiseLicksViewModel(self)
         # ===========================================================
+
+    def selectTreeViewPreviousItem(self):
+        self.moveTreeViewSelectionItem(+1)
+
+    def selectTreeViewNextItem(self):
+        self.moveTreeViewSelectionItem(-1)
+
+    def moveTreeViewSelectionItem(self, offset: int):
+        all_items = self.treeView.get_children()
+        current_item = self.treeView.focus()
+        found_index = -99
+        counter = 0
+        for item in all_items:
+            if item == current_item:
+                found_index = counter
+            counter += 1
+        new_index = found_index + offset
+        if new_index < 0:
+            new_index = len(all_items) - 1
+        if new_index >= len(all_items):
+            new_index = 0
+        new_item = all_items[new_index]
+        self.setTreeViewSelectItem(new_item)
+
+    def getFirstTreeViewItem(self):
+        try:
+            return self.treeView.get_children()[0]
+        except Exception as e:
+            print("Empty treeView")
+            logging.exception(e)
+        return None
+
+    def setTreeViewSelectItem(self, item):
+        self.treeView.focus(item)
+        self.treeView.selection_set(item)
 
     def configTreeView(self):
         style = ttk.Style()
@@ -80,7 +127,7 @@ class PractiseLicksView:
         self.treeView.heading('DATE', text='DATE', anchor=tk.CENTER)
         self.treeView.bind('<<TreeviewSelect>>', self.identifySelectedItemInTreeView)
 
-    def setUiUpdateLblForLickSelected(self, lick_key: str, lick_name: str, lick_date: str):
+    def setUiUpdateLblForLickSelected(self, lick_key: str, lick_name: str = None, lick_date: str = None):
         self.lblLickKey.config(text=lick_key)
 
     def identifySelectedItemInTreeView(self, event):

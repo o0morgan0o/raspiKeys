@@ -8,6 +8,7 @@ from tkinter import messagebox
 import pygame
 from PIL import Image, ImageTk
 
+from src.game.utils.questionNote import CustomNote
 from src.game import env
 from src.game.autoload import Autoload
 from src.game.utils.midiToNotenames import noteName
@@ -19,16 +20,17 @@ class PractiseLicksViewModel:
     def __init__(self, view):
         self.view = view
 
+        self.midiIO = Autoload.get_instance().getMidiInstance()
+        self.audioInstance = Autoload.get_instance().getAudioInstance()
+
+        # Default path
+        self.midiRepository = env.MIDI_FOLDER
+
+        self.customNotesList = []
         # images
         # self.playImage = ImageTk.PhotoImage(Image.open(env.PLAY_IMAGE))
         # self.pauseImage = ImageTk.PhotoImage(Image.open(env.PAUSE_IMAGE))
         # self.shuffleImage = ImageTk.PhotoImage(Image.open(env.SHUFFLE_IMAGE))
-
-        self.midiIO = Autoload.get_instance().getMidiInstance()
-        # self.midiIO.setCallback(self.handleMIDIInput)
-
-        # Default path
-        self.midiRepository = env.MIDI_FOLDER
 
         # Callbacks for buttons
         # self.root.btnRecord.config(command=self.showWithOrWithoutBacktrackWindow)
@@ -38,13 +40,8 @@ class PractiseLicksViewModel:
         # self.view.btnPrev.config(command=self.previousLick)
         # self.view.btnNext.config(command=self.nextLick)
 
-        self.allMidiLicksFilePaths = getAllMidiLicksFiles()
         # self.fileIndex = 0
         # self.recordNotes = None
-
-        self.midiIO = Autoload.get_instance().getMidiInstance()
-        self.audioInstance = Autoload.get_instance().getAudioInstance()
-        # self.midiIO.setCallback(self.handleMIDIInput)
 
         # self.bassNote = 0
         # self.chordQuality = "-"
@@ -71,24 +68,83 @@ class PractiseLicksViewModel:
 
         # self.loadASample(len(self.midiFiles) - 1)
 
-        self.currentLickData= None
+        self.allMidiLicksFilePaths = getAllMidiLicksFiles()
+        self.currentLickData = None
         self.allLicksData = self.getAllLicksData(self.allMidiLicksFilePaths)
         self.allLicksDataForTreeView = self.extractLicksDataForTreeView(self.allLicksData)
         self.initializeTreeView(self.allLicksDataForTreeView)
 
     def initializeTreeView(self, all_list_data_for_tree_view: list):
         self.view.setUiInitializeTreeView(all_list_data_for_tree_view)
+        first_item = self.view.getFirstTreeViewItem()
+        if first_item is not None:
+            self.view.setTreeViewSelectItem(first_item)
+
+    def onBtnPlayClick(self):
+        print(self.currentLickData)
+        if self.currentLickData is None:
+            return print("No lick data found")
+        lick_midi_key = self.currentLickData[JsonLickFields.FIELD_LICK_KEY.value]
+        backtrack_file = self.currentLickData[JsonLickFields.FIELD_BACKTRACK_FILE.value]
+        number_of_loops_recording = self.currentLickData[JsonLickFields.FIELD_NUMBER_OF_LOOPS.value]
+        chord_notes = self.currentLickData[JsonLickFields.FIELD_CHORD_NOTES.value]
+        melody_notes = self.currentLickData[JsonLickFields.FIELD_MELODY_NOTES.value]
+        self.playChordNotes(chord_notes)
+        self.audioInstance.simplePlay(backtrack_file)
 
     def onLickSelectedInTreeView(self, values: dict):
+        print('selected', values)
         (lick_uuid, lick_key, lick_description, lick_date) = values
         # we retrieve the complete original midi data
+        self.view.setUiUpdateLblForLickSelected(lick_key=lick_key)
         self.currentLickData = self.findLickDataFromLickUuid(lick_uuid)
+
+    def playChordNotes(self, chord_notes: list):
+        self.customNotesList = []
+        for note_data in chord_notes:
+            print(note_data)
+            customNote = CustomNote(
+                midi_instance=self.midiIO,
+                note=note_data['note'],
+                delay_on=note_data['time']/1000,
+                note_type=note_data['type'],
+                velocity=note_data['velocity']
+            )
+
+
+        # notes_on_timing =[]
+        # notes_on_notes=[]
+        # notes_on_velocity=[]
+        # notes_off_timing=[]
+        # notes_off_notes=[]
+        # for note_data in self.chord_notes:
+        #     if note_data["type"] == "note_on":
+        #         notes_on_timing.append(note_data["time"])
+        #         notes_on_notes.append(note_data["note_data"]+transpose)
+        #         notes_on_velocity.append(note_data["velocity"])
+        #     elif note_data["type"]== "note_off":
+        #         notes_off_timing.append(note_data["time"])
+        #         notes_off_notes.append(note_data["note_data"]+transpose)
+        # print(notes_on_timing)
+        # print(notes_on_notes)
+
+        # self.playingThread= TestThread(self,notes_on_timing, notes_on_notes, notes_on_velocity, notes_off_timing, notes_off_notes)
+        # self.playingThreadChord = TestThread(self, self.chord_notes, transpose)
+        # self.playingThreadChord.start()
+
+        # for note_data in self.chord_notes:
+        #     self.activeCustomSignals.append(CustomSignal(
+        #         self,
+        #         note_data["type"],
+        #         note_data["note_data"] + transpose,
+        #         note_data["velocity"],
+        #         note_data["time"]
+        #     ))
 
     def findLickDataFromLickUuid(self, lick_uuid: str):
         for lick in self.allLicksData:
             if lick['lick_id'] == lick_uuid:
                 return lick
-
 
     @staticmethod
     def getAllLicksData(all_licks_files: list):
@@ -99,6 +155,8 @@ class PractiseLicksViewModel:
 
     @staticmethod
     def extractLicksDataForTreeView(all_licks_data: list):
+        if len(all_licks_data) == 0:
+            return
         all_licks_data_short = []
         for lick in all_licks_data:
             element = {JsonLickFields.FIELD_LICK_ID.value: lick[JsonLickFields.FIELD_LICK_ID.value],

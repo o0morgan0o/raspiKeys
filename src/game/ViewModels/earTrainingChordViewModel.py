@@ -2,10 +2,10 @@ from enum import Enum
 
 from src.game.autoload import Autoload
 from src.game.utils.config import getMidiVolume
-from src.game.utils.config import getNoteDelay
 from src.game.utils.midiChords import MidiChords
 from src.game.utils.midiToNotenames import noteNameFull
 from src.game.utils.questionNote import CustomNote, playWinMelody
+from src.game.utils.config import updateEarTrainingNoteDelay, getNoteDelay
 
 
 class GameStates(Enum):
@@ -31,14 +31,13 @@ class EarTrainingChordViewModel:
         self.midiIO = Autoload.get_instance().getMidiInstance()
         self.midiIO.setCallback(self.handleMIDIInput)
 
-        self.delay = getNoteDelay()
-
         # variable for user score
         self.counter = 0
         self.score = 0
 
         self.originNote = None
 
+        self.noteDelay = getNoteDelay()
         self.waitingNotes = []
         self.questionArray = []
         self.questionChord = None
@@ -50,6 +49,8 @@ class EarTrainingChordViewModel:
 
         # startGame
         self.startGame()
+
+        self.initializeNoteDelaySlider()
 
     # def skip(self):
     #     try:
@@ -63,6 +64,9 @@ class EarTrainingChordViewModel:
     #         self.changeGameState("waitingUserInput")  # if we gave the good answer, we want a new note
     #     except Exception as e:
     #         print("Impossible to skip question", e)
+
+    def initializeNoteDelaySlider(self):
+        self.view.slDelay.set(self.noteDelay)
 
     def getQuestionChordNotes(self) -> list:
         chord_quality, origin_note, notes = self.questionChord
@@ -78,6 +82,10 @@ class EarTrainingChordViewModel:
         for note in question_notes:
             human_readable_notes.append(noteNameFull(note))
         return human_readable_notes
+
+    def onSliderDelayMoved(self, event):
+        self.noteDelay = self.view.slDelay.get()
+        updateEarTrainingNoteDelay(new_value=self.noteDelay)
 
     def startGame(self):
         self.midiIO.setListening(True)
@@ -192,21 +200,6 @@ class EarTrainingChordViewModel:
         for note in chord_notes:
             midi_converted_notes.append(starting_note + note)
         return chord_name, starting_note, midi_converted_notes
-
-    def changeAllBg(self, new_color):
-        self.view.label1["bg"] = new_color
-        self.view.label2["bg"] = new_color
-        self.view.label3["bg"] = new_color
-        self.view.label1["fg"] = "white"
-        self.view.label2["fg"] = "white"
-        self.view.label3["fg"] = "white"
-
-    # def calcRectWidthOnCanvas(self):
-    #     canvasW = 200
-    #     nbRect = len(self.questionArray)
-    #     # calculus savant !
-    #     w = 2 * nbRect + 3
-    #     return canvasW / w
 
     def handleMIDIInput(self, msg):
         if not self.midiIO.getListeningState():

@@ -119,7 +119,7 @@ class EarTrainingNoteViewModel:
             self.changeGameState(GameStates.GAME_CPU_PLAY_NOTE.value)
 
         elif new_state == GameStates.GAME_CPU_PLAY_NOTE.value:
-            delay_before_on = float(self.delay) / 1000
+            delay_before_on = float(self.delay)
             note_duration = 0.4
             CustomNote(self.midiIO,
                        note=self.questionNote,

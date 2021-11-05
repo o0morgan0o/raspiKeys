@@ -1,3 +1,6 @@
+import tkinter.font
+import tkinter as tk
+
 from src.game.GamesNames import GameNames
 from src.game.ViewModels.earTrainingNoteViewModel import EarTrainingNoteViewModel
 from src.game.utils.customElements.customElements import *
@@ -41,7 +44,7 @@ class EarTrainingNoteView:
 
         self.slInterval = CustomScale(self.gameFrame, from_=3, to=18)
         self.slInterval.grid(row=current_row, column=0, sticky=tk.EW, padx=(10, 10))
-        self.slDelay = CustomScale(self.gameFrame, from_=200, to=1000)
+        self.slDelay = CustomScale(self.gameFrame, from_=0.2, to=1, resolution=0.05)
         self.slDelay.grid(row=current_row, column=1, sticky=tk.EW, padx=(10, 10))
 
         current_row += 1
@@ -51,15 +54,15 @@ class EarTrainingNoteView:
 
         current_row += 1
 
-        self.lblNoteUser = CustomLabel(self.gameFrame, justify=tk.LEFT, font=(DEFAULT_FONT_NAME, 90, "bold"), text="", padx=32)
+        self.lblNoteUser = CustomLabel(self.gameFrame, justify=tk.LEFT, font=(DEFAULT_FONT_NAME, 90, tk.font.BOLD), text="", padx=32)
         self.lblNoteUser.grid(row=current_row, column=1, sticky=tk.NSEW)
 
-        self.lblNote = CustomLabel(self.gameFrame, justify=tk.RIGHT, font=(DEFAULT_FONT_NAME, 90, "bold"), text="?", padx=32)
+        self.lblNote = CustomLabel(self.gameFrame, justify=tk.RIGHT, font=(DEFAULT_FONT_NAME, 90, tk.font.BOLD ), text="?", padx=32)
         self.lblNote.grid(row=current_row, column=0, columnspan=2, sticky=tk.NSEW)
 
         current_row += 1
 
-        self.result = CustomLabel(self.gameFrame, padx=10, pady=10, font=(DEFAULT_FONT_NAME, 18, "bold"), text="", height=2)
+        self.result = CustomLabel(self.gameFrame, padx=10, pady=10, font=(DEFAULT_FONT_NAME, 18, tk.font.BOLD), text="", height=2)
         self.result.grid(row=current_row, columnspan=2)
 
         current_row += 1
@@ -68,7 +71,7 @@ class EarTrainingNoteView:
         self.btnSkip = CustomButton(self.gameFrame, text="Skip")
         self.btnSkip.grid(row=0, rowspan=current_row, column=0, columnspan=2, sticky=tk.SE, padx=12, pady=12)
 
-        self.score = CustomLabel(self.gameFrame, font=(DEFAULT_FONT_NAME, DEFAULT_FONT_SIZE, "bold"), text=GameStrings.LABEL_SCORE.value)
+        self.score = CustomLabel(self.gameFrame, font=(DEFAULT_FONT_NAME, DEFAULT_FONT_SIZE, tk.font.BOLD), text=GameStrings.LABEL_SCORE.value)
         self.score.grid(row=0, rowspan=current_row, column=0, sticky=tk.SW, padx=12, pady=12)
 
         # =========== CREATION OF THE VIEW_MODEL ====================

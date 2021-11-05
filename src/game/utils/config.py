@@ -57,7 +57,7 @@ def updateEarTrainingNoteMaxInterval(new_value: int):
     writeConfig(config)
 
 
-def updateEarTrainingNoteDelay(new_value: int):
+def updateEarTrainingNoteDelay(new_value: float):
     config = loadConfig()
     config[ConfigurationFields.EAR_TRAINING_NOTE_QUESTION_DELAY.value] = new_value
     writeConfig(config)

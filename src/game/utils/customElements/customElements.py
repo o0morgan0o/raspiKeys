@@ -56,8 +56,8 @@ class CustomButton(tk.Button):
                  background=Colors.BTN_STANDARD_BACKGROUND,
                  foreground=Colors.TEXT_WHITE,
                  command=None,
-                 borderwidth=3,
-                 highlightbackground="red",
+                 borderwidth=1,
+                 highlightbackground=Colors.WHITE,
                  highlightthickness=12,
                  highlightcolor="red",
                  relief=tk.RIDGE
@@ -128,6 +128,7 @@ class CustomScale(tk.Scale):
                  label=None,
                  showvalue=0,
                  troughcolor=Colors.SLIDER_BACKGROUND,
+                 resolution=None,
                  ):
         super().__init__(parent,
                          highlightcolor="green",
@@ -143,4 +144,5 @@ class CustomScale(tk.Scale):
                          showvalue=showvalue,
                          troughcolor=troughcolor,
                          borderwidth=0,
+                         resolution=resolution
                          )
