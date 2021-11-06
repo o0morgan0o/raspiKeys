@@ -52,17 +52,19 @@ def getCustomStyles():
 
 class CustomButton(tk.Button):
     def __init__(self, parent, text="",
+                 image=None,
                  font=DEFAULT_FONT,
                  background=Colors.BTN_STANDARD_BACKGROUND,
                  foreground=Colors.TEXT_WHITE,
                  command=None,
                  borderwidth=1,
                  highlightbackground=Colors.WHITE,
-                 highlightthickness=12,
-                 highlightcolor="red",
+                 highlightthickness=Colors.BTN_BORDER_THICKNESS,
+                 highlightcolor=Colors.BTN_BORDER_COLOR,
                  relief=tk.RIDGE
                  ):
         super().__init__(parent, text=text,
+                         image=image,
                          font=font,
                          background=background,
                          foreground=foreground,

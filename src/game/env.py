@@ -32,6 +32,7 @@ PLAY_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "playWhite.png")
 PAUSE_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "pauseWhite.png")
 SHUFFLE_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "shuffleWhite.png")
 RECORD_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "rec.png")
+METRONOME_IMAGE= os.path.join(ROOT_DIR, "res", "icons", "metronome.png")
 
 NAVBAR_WIDTH = 80
 FOOTER_HEIGHT = 80

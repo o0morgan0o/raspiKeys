@@ -14,7 +14,6 @@ from src.game.Views.recordLickView import RecordLickView
 from src.game.utils.customElements.customElements import *
 from src.game.utils.customElements.labels import *
 
-# from src.game.ViewModels.backtracksViewModel import BacktracksViewModel
 BTN_PADDING_X = 4
 BTN_PADDING_Y = 4
 LEFT_PANEL_PADDING_X = 20
@@ -29,14 +28,16 @@ class ViewStrings(Enum):
 
 class ViewImages:
     def __init__(self):
-        IMAGE_PLAY_IMAGE = ImageTk.PhotoImage(Image.open(env.PLAY_IMAGE))
-        IMAGE_PAUSE_IMAGE = ImageTk.PhotoImage(Image.open(env.PAUSE_IMAGE))
-        IMAGE_SHUFFLE_IMAGE = ImageTk.PhotoImage(Image.open(env.SHUFFLE_IMAGE))
+        self.IMAGE_PLAY_IMAGE = ImageTk.PhotoImage(Image.open(env.PLAY_IMAGE))
+        self.IMAGE_PAUSE_IMAGE = ImageTk.PhotoImage(Image.open(env.PAUSE_IMAGE))
+        self.IMAGE_SHUFFLE_IMAGE = ImageTk.PhotoImage(Image.open(env.SHUFFLE_IMAGE))
+        self.IMAGE_METRONOME_IMAGE= ImageTk.PhotoImage(Image.open(env.METRONOME_IMAGE))
 
 
 class BacktracksView:
     def __init__(self, master, game_frame: tk.Frame):
         print("launching game {}".format(GameNames.GAME_BACKTRACKS))
+        self.images = ViewImages()
         self.master = master
         self.viewModel = None
         self.gameFrame = game_frame
@@ -55,7 +56,7 @@ class BacktracksView:
         # Backtrack Section
         self.lblTrackTitle = tk.Label(self.frameLeft, text=ViewStrings.STRING_LBL_TRACK_TITLE.value, justify="center",
                                       bg=Colors.DARK, fg=Colors.TEXT_WHITE,
-                                      font= (DEFAULT_FONT_NAME, 14),
+                                      font=(DEFAULT_FONT_NAME, 14),
                                       width=20, wraplength=250, height=4)
         self.lblCategory = tk.Label(self.frameLeft,
                                     font=(DEFAULT_FONT_NAME, 24, tkinter.font.BOLD),
@@ -82,12 +83,12 @@ class BacktracksView:
         self.rowControls.grid_rowconfigure(1, weight=1)
         self.rowControls.grid_columnconfigure(0, weight=1)
         self.rowControls.grid_columnconfigure(1, weight=1)
-        self.btnMetro = CustomButton(self.rowControls, text="Metro", )
-        self.btnMetro.grid(row=0, column=0,sticky=tk.NSEW)
-        self.btnRandom = CustomButton(self.rowControls, text="Random")
+        self.btnMetro = CustomButton(self.rowControls, image=self.images.IMAGE_METRONOME_IMAGE )
+        self.btnMetro.grid(row=0, column=0, sticky=tk.NSEW)
+        self.btnRandom = CustomButton(self.rowControls, image=self.images.IMAGE_SHUFFLE_IMAGE)
         self.btnRandom.grid(row=1, column=0, sticky=tk.NSEW)
-        self.btnPlay = CustomButton(self.rowControls, text="PLAY")
-        self.btnPlay.grid(row=0,rowspan=2, column=1, sticky=tk.NSEW)
+        self.btnPlay = CustomButton(self.rowControls, image=self.images.IMAGE_PLAY_IMAGE)
+        self.btnPlay.grid(row=0, rowspan=2, column=1, sticky=tk.NSEW)
 
         # =========== CREATION OF THE VIEW_MODEL ====================
         self.viewModel = BacktracksViewModel(self)
@@ -155,7 +156,8 @@ class BacktracksView:
     def setUiCurrentBacktrack(self, category: str, filename: str, index: int, category_length: int):
         category_text = "{} ({}/{})".format(category.upper(), index + 1, category_length)
         self.lblCategory.config(text=category_text)
-        text = "Playing\n\n{}".format(filename)
+        compressed_filename = filename[:50] + "..."
+        text = "{}".format(compressed_filename)
         self.lblTrackTitle.config(text=text)
 
     def setUiAddBtnCategory(self, category_id: int, category_name: str, quantity: int):
