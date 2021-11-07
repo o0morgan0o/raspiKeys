@@ -56,6 +56,7 @@ class CustomNote:
         self.delayBeforeOn = delay_on
         self.noteDuration = note_duration
         self.note = note
+        self.timer = None
         if note_type is None:
             self.timer = Timer(
                 self.delayBeforeOn,

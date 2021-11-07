@@ -2,19 +2,27 @@ import tkinter as tk
 from tkinter import ttk
 import os
 
+from PIL import Image, ImageTk
+
 from src.game.ViewModels.recordLickViewModel import RecordLickViewModel
 from src.game.utils.colors import Colors
 from src.game.utils.customElements.customElements import CustomButton, DEFAULT_FONT_NAME
 from src.game.utils.customElements.customElements import CustomStylesNames
+from src.game import env
 
 DEFAULT_PADDING_X = 20
 DEFAULT_PADDING_Y = 20
 
 LBL_BACKTRACK_FONT_SIZE = 18
 LBL_DEFAULT_FONT_SIZE = 24
-LBL_ERROR_FONT_SIZE= 18
+LBL_ERROR_FONT_SIZE = 18
 LBL_FONT_SIZE_VERY_BIG = 40
 BTN_NUMBER_OF_LOOPS_PADDING_X = 20
+
+
+class ViewImages:
+    def __init__(self):
+        self.IMAGE_RECORD_IMAGE = ImageTk.PhotoImage(Image.open(env.RECORD_IMAGE))
 
 
 class RecordLickView:
@@ -22,6 +30,8 @@ class RecordLickView:
         self.recordFrame = record_frame
         self.recordFrame.config(bg=Colors.BACKGROUND)
         self.currentBacktrack = current_backtrack_file
+
+        self.images = ViewImages()
 
         self.recordFrame.grid_rowconfigure(0)
         self.recordFrame.grid_rowconfigure(1, weight=1)
@@ -40,7 +50,7 @@ class RecordLickView:
                                  bg=Colors.ERROR,
                                  foreground=Colors.TEXT_WHITE
                                  )
-        self.lblError.pack(side=tk.BOTTOM, fill=tk.BOTH,)
+        self.lblError.pack(side=tk.BOTTOM, fill=tk.BOTH, )
 
         # ==============================
         # Frame containing main logic
@@ -83,16 +93,29 @@ class RecordLickView:
 
         # ==============================
         # frame containing chord record logic
-        self.frameRecordKey = tk.Frame(self.recordFrame, bg="orange")
-        self.lblRecordReady = tk.Label(self.frameRecordKey, text="READY, Pick a note to start")
+        self.frameRecordKey = tk.Frame(self.recordFrame, background=Colors.BACKGROUND)
+        self.lblRecordReady = tk.Label(self.frameRecordKey,
+                                       foreground=Colors.TEXT_WHITE,
+                                       background=Colors.BACKGROUND,
+                                       font=(DEFAULT_FONT_NAME, LBL_BACKTRACK_FONT_SIZE),
+                                       text="READY, Pick a note to start")
         self.lblRecordReady.pack(expand=1)
-        self.lblRecordingInProgress = tk.Label(self.frameRecordKey, text="Recording in progress")
+        # self.lblRecordingInProgress = tk.Label(self.frameRecordKey, text="Recording in progress")
+        self.lblRecordingInProgress = tk.Label(self.frameRecordKey,
+                                               background=Colors.BACKGROUND,
+                                               image=self.images.IMAGE_RECORD_IMAGE)
 
         # ==============================
         # frame containing finished recording
-        self.frameFinishedRecording = tk.Frame(self.recordFrame, bg="green")
-        self.lblFinishedRecording = tk.Label(self.frameFinishedRecording, text="Finished recording")
-        self.lblFinishedRecording.pack(expand=1)
+        self.frameFinishedRecording = tk.Frame(self.recordFrame,
+                                               background=Colors.BACKGROUND
+                                               )
+        self.lblFinishedRecording = tk.Label(self.frameFinishedRecording,
+                                             foreground=Colors.TEXT_WHITE,
+                                             background=Colors.BACKGROUND,
+                                             font=(DEFAULT_FONT_NAME, LBL_BACKTRACK_FONT_SIZE),
+                                             text="Recording Finished !")
+        self.lblFinishedRecording.pack(expand=1, fill=tk.BOTH)
         self.btnSave = CustomButton(self.frameFinishedRecording, text="Save Lick")
         self.btnSave.pack(expand=1)
 

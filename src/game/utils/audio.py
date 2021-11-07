@@ -26,6 +26,9 @@ class Audio:
         self.activeSample = None
         self.activeFolder = None
 
+    def getCurrentFileLength(self):
+        return self.currentFileLength
+
     @staticmethod
     def findAllBacktracksInAllFolders(base_backtracks_folder: str, backtrack_folders: list):
         all_results = []
@@ -83,7 +86,7 @@ class Audio:
     def playTick():
         pygame.mixer.music.play()
 
-    def simplePlay(self, audio_file_path: str, loops: int = -1):
+    def simplePlay(self, audio_file_path: str, loops: int = -1, fade_in=200):
         self.stopPlay()
         try:
             pygame.mixer.music.load(audio_file_path)
@@ -95,7 +98,7 @@ class Audio:
             print("Current audio file is ... :",
                   sound.get_length(), " ms, ", self.currentFile)
             # _thread.start_new_thread(self.testLatency, (time.time(),))
-            pygame.mixer.music.play(loops=loops, fade_ms=200)
+            pygame.mixer.music.play(loops=loops, fade_ms=fade_in)
             self.isPlaying = True
         except Exception as e:
             logging.exception(e)

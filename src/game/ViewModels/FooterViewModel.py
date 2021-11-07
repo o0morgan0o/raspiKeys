@@ -12,7 +12,7 @@ class FooterViewModel:
         self.initializeView()
 
         self.audioIncrement: float = 0.07
-        self.midiIncrement: int = 10
+        self.midiIncrement: float = .1
 
     def initializeView(self):
         audioVolume = getAudioVolume()
@@ -56,13 +56,13 @@ class FooterViewModel:
             updateAudioVolume(new_volume)
             self.view.updateLblAudioVolume(new_volume)
 
-    def changeMidiVolume(self, volume_change: int):
+    def changeMidiVolume(self, volume_change: float):
         current_volume = getMidiVolume()
         new_volume = current_volume + volume_change
         if new_volume <= 0:
             new_volume = 0
-        elif new_volume >= 127:
-            new_volume = 127
+        elif new_volume >= 1:
+            new_volume = 1
         if current_volume != new_volume:
             self.midiIO.setMidiVolume(new_volume)
             # write to config file the new volume

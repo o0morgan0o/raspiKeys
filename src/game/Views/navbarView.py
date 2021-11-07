@@ -1,6 +1,7 @@
 import tkinter
 import tkinter.font
 from functools import partial
+import os
 
 from PIL import Image, ImageTk
 
@@ -18,6 +19,9 @@ class NavBarView:
         self.master = master
         self.parent = parent
         self.viewModel = None
+
+        if os.name != 'nt':
+            self.parent.config(cursor="none")
 
         # images
         self.volumeImage = ImageTk.PhotoImage(Image.open(env.VOLUME_IMAGE))
@@ -80,7 +84,7 @@ class NavBarView:
             self.btnBacktracks.configure(background=Colors.BTN_SIDEBAR_PUSHED, image=self.imageWhiteBacktracks)
         elif game_mode.value == GameNames.GAME_LICKS_PRACTISE.value:
             self.btnPractiseLicks.configure(background=Colors.BTN_SIDEBAR_PUSHED, image=self.imageWhitePractiseLicks)
-        elif game_mode.value== GameNames.GAME_OPTIONS.value:
+        elif game_mode.value == GameNames.GAME_OPTIONS.value:
             self.btnOpts.configure(background=Colors.BTN_SIDEBAR_PUSHED, foreground=Colors.TEXT_WHITE)
         else:
             pass

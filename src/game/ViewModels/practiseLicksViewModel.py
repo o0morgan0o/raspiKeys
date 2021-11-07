@@ -1,72 +1,87 @@
-import json
-import os
 import random
 import threading
-import time
-from tkinter import messagebox
+from enum import Enum
 
 import pygame
 from PIL import Image, ImageTk
 
-from src.game.utils.questionNote import CustomNote
 from src.game import env
 from src.game.autoload import Autoload
-from src.game.utils.midiToNotenames import noteName
-from src.game.utils.utilFunctions import formatOutputInterval
 from src.game.utils.licksUtils import getAllMidiLicksFiles, getJsonDataFromFile, JsonLickFields
+from src.game.utils.midiToNotenames import noteNameFull
+from src.game.utils.questionNote import CustomNote
+
+MUSIC_FINISHED = pygame.USEREVENT + 1
+MUSIC_CANCELED = pygame.USEREVENT + 2
+
+
+class TranspositionMode(Enum):
+    TRANSPOSE_RANDOM = "transpose_random"
+    TRANSPOSE_SEQUENTIAL = "transpose_sequential"
+
+
+class ProgressThread(threading.Thread):
+    def __init__(self, view, audio_instance, number_of_loops, number_of_cycles_each_transpose, callback, cycle_counter):
+        threading.Thread.__init__(self)
+        self.view = view
+        self.audioInstance = audio_instance
+        self.numberOfLoops = number_of_loops
+        self.cycleCounter = cycle_counter
+        self.numberOfCyclesEachTranspose = number_of_cycles_each_transpose
+        self.callback = callback
+        self.progressThreadAlive = True
+        self.innerTest = False
+
+    def run(self):
+        while self.progressThreadAlive:
+            # calculate the percentage played
+            total_length = self.audioInstance.getCurrentFileLength() * self.numberOfLoops * self.numberOfCyclesEachTranspose
+            percentage_played_full = (self.audioInstance.getTimePlayed()) / total_length
+            percentage_played = percentage_played_full + (self.cycleCounter / self.numberOfCyclesEachTranspose)
+            self.view.setUiUpdateProgress(percentage_played * 100)
+            for event in pygame.event.get():
+                if event.type == MUSIC_FINISHED:
+                    print("BACKTRACK FINISHED")
+                    self.progressThreadAlive = False
+                    self.callback()
+                if event.type == MUSIC_CANCELED:
+                    self.progressThreadAlive = False
+        self.view.setUiUpdateProgress(0.0)
+        print("PROGRESS THREAD FINISHED")
+
+
+class ViewImages:
+    def __init__(self):
+        self.playImage = ImageTk.PhotoImage(Image.open(env.PLAY_IMAGE))
+        self.pauseImage = ImageTk.PhotoImage(Image.open(env.PAUSE_IMAGE))
+        self.shuffleImage = ImageTk.PhotoImage(Image.open(env.SHUFFLE_IMAGE))
 
 
 class PractiseLicksViewModel:
     def __init__(self, view):
         self.view = view
-
         self.midiIO = Autoload.get_instance().getMidiInstance()
         self.audioInstance = Autoload.get_instance().getAudioInstance()
+
+        self.images = ViewImages()
+        self.progressThread = None
 
         # Default path
         self.midiRepository = env.MIDI_FOLDER
 
         self.customNotesList = []
-        # images
-        # self.playImage = ImageTk.PhotoImage(Image.open(env.PLAY_IMAGE))
-        # self.pauseImage = ImageTk.PhotoImage(Image.open(env.PAUSE_IMAGE))
-        # self.shuffleImage = ImageTk.PhotoImage(Image.open(env.SHUFFLE_IMAGE))
 
-        # Callbacks for buttons
-        # self.root.btnRecord.config(command=self.showWithOrWithoutBacktrackWindow)
-        # self.view.btnPractiseLick.config(image=self.playImage, command=self.playOneLick)
-        # self.view.btnRandomLick.config(image=self.shuffleImage, command=self.pickRandomLick)
-        # self.view.btnDeleteSelected.config(command=self.deleteLick)
-        # self.view.btnPrev.config(command=self.previousLick)
-        # self.view.btnNext.config(command=self.nextLick)
+        self.lick_midi_key = None
+        self.backtrack_file = None
+        self.number_of_loops_recording = None
+        self.chord_notes = None
+        self.melody_notes = None
 
-        # self.fileIndex = 0
-        # self.recordNotes = None
+        self.transpositionMode = TranspositionMode.TRANSPOSE_RANDOM.value
+        self.cyclesCounter = 0
+        self.currentTranspose = 0
 
-        # self.bassNote = 0
-        # self.chordQuality = "-"
-        # self.transpose = 0
-        # self.activeCustomSignals = []
-        # self.lickRepetitionCounter = 1
-        # self.lickMaxRepetition = self.config["times_each_transpose"]
-        # self.playOnlyChord = False
-
-        # self.currentLickIndex = 0
-        # self.currentLick = None
-        #
-        # self.practiseAllLicks = False
-        # self.lastTranspose = 0
-        # self.futureTranspose = 0
-        #
-        # self.playBacktrackThread = None
-        # self.audioThread = None
-        #
-        # self.bass = None
-        # self.mType = None
-        # self.notes = None
-        # self.backtrackVolume = None
-
-        # self.loadASample(len(self.midiFiles) - 1)
+        self.numberOfCyclesForEachTranspose = 2
 
         self.allMidiLicksFilePaths = getAllMidiLicksFiles()
         self.currentLickData = None
@@ -80,17 +95,82 @@ class PractiseLicksViewModel:
         if first_item is not None:
             self.view.setTreeViewSelectItem(first_item)
 
+    def reloadLicks(self):
+        self.view.clearTreeView()
+        self.allMidiLicksFilePaths = getAllMidiLicksFiles()
+        self.currentLickData = None
+        self.allLicksData = self.getAllLicksData(self.allMidiLicksFilePaths)
+        self.allLicksDataForTreeView = self.extractLicksDataForTreeView(self.allLicksData)
+        self.initializeTreeView(self.allLicksDataForTreeView)
+
+    def playCycle(self):
+        nextTranspose = None
+        self.view.setUiResetLblNextKeyIndication()
+        if self.cyclesCounter == self.numberOfCyclesForEachTranspose - 1:
+            nextTranspose = self.getNextTransposeOffset(transposition_mode=self.transpositionMode, current_transpose=self.currentTranspose)
+            humanReadableNextTranspose = noteNameFull(nextTranspose)[:-1]
+            self.view.setUiUpdateLblNextKeyIndication(next_key=humanReadableNextTranspose)
+        if self.cyclesCounter == self.numberOfCyclesForEachTranspose:
+            self.cyclesCounter = 0
+
+        new_readable_key = noteNameFull(self.lick_midi_key + self.currentTranspose)[:-1]  # we remove the octave
+        self.view.setUiUpdateLblForLickSelected(lick_key=new_readable_key)
+
+        self.audioInstance.simplePlay(self.backtrack_file, loops=self.number_of_loops_recording, fade_in=0)
+        self.progressThread = ProgressThread(self.view,
+                                             audio_instance=self.audioInstance,
+                                             number_of_loops=self.number_of_loops_recording,
+                                             number_of_cycles_each_transpose=self.numberOfCyclesForEachTranspose,
+                                             callback=self.cycleFinished,
+                                             cycle_counter=self.cyclesCounter,
+                                             )
+        self.playChordNotes(self.chord_notes, transpose=self.currentTranspose)
+        self.progressThread.start()
+        self.cyclesCounter += 1
+        if nextTranspose is not None:
+            self.currentTranspose = nextTranspose
+
+    def cancelPlayingThread(self):
+        pygame.mixer.music.set_endevent(MUSIC_CANCELED)
+        self.cyclesCounter = 0
+        self.currentTranspose = 0
+        self.audioInstance.stopPlay()
+        noteList = self.customNotesList
+        if len(noteList) != 0:
+            for custom_note in noteList:
+                custom_note.timer.cancel()
+        self.midiIO.panic()
+
+    def cycleFinished(self):
+        print("CYCLE CALLBACK !!")
+        self.playCycle()
+
     def onBtnPlayClick(self):
-        print(self.currentLickData)
+        if self.audioInstance.getIsPlaying():
+            self.cancelPlayingThread()
+            return
+        self.cancelPlayingThread()
+        # print(self.currentLickData)
         if self.currentLickData is None:
             return print("No lick data found")
-        lick_midi_key = self.currentLickData[JsonLickFields.FIELD_LICK_KEY.value]
-        backtrack_file = self.currentLickData[JsonLickFields.FIELD_BACKTRACK_FILE.value]
-        number_of_loops_recording = self.currentLickData[JsonLickFields.FIELD_NUMBER_OF_LOOPS.value]
-        chord_notes = self.currentLickData[JsonLickFields.FIELD_CHORD_NOTES.value]
-        melody_notes = self.currentLickData[JsonLickFields.FIELD_MELODY_NOTES.value]
-        self.playChordNotes(chord_notes)
-        self.audioInstance.simplePlay(backtrack_file)
+        self.lick_midi_key = self.currentLickData[JsonLickFields.FIELD_LICK_KEY.value]
+        self.backtrack_file = self.currentLickData[JsonLickFields.FIELD_BACKTRACK_FILE.value]
+        self.number_of_loops_recording = self.currentLickData[JsonLickFields.FIELD_NUMBER_OF_LOOPS.value]
+        self.chord_notes = self.currentLickData[JsonLickFields.FIELD_CHORD_NOTES.value]
+        self.melody_notes = self.currentLickData[JsonLickFields.FIELD_MELODY_NOTES.value]
+
+        self.playCycle()
+        pygame.mixer.music.set_endevent(MUSIC_FINISHED)
+
+    @staticmethod
+    def getNextTransposeOffset(transposition_mode, current_transpose: int) -> int:
+        # we have 3 modes here, random, or regular transposition
+        if transposition_mode == TranspositionMode.TRANSPOSE_RANDOM.value:
+            return random.choice([i for i in range(-5, 6) if i not in [current_transpose]])
+        elif transposition_mode == TranspositionMode.TRANSPOSE_SEQUENTIAL.value:
+            pass
+        else:
+            raise Exception("Unknown transposition mode")
 
     def onLickSelectedInTreeView(self, values: dict):
         print('selected', values)
@@ -99,47 +179,18 @@ class PractiseLicksViewModel:
         self.view.setUiUpdateLblForLickSelected(lick_key=lick_key)
         self.currentLickData = self.findLickDataFromLickUuid(lick_uuid)
 
-    def playChordNotes(self, chord_notes: list):
+    def playChordNotes(self, chord_notes: list, transpose: int):
         self.customNotesList = []
         for note_data in chord_notes:
             print(note_data)
-            customNote = CustomNote(
-                midi_instance=self.midiIO,
-                note=note_data['note'],
-                delay_on=note_data['time']/1000,
-                note_type=note_data['type'],
-                velocity=note_data['velocity']
-            )
-
-
-        # notes_on_timing =[]
-        # notes_on_notes=[]
-        # notes_on_velocity=[]
-        # notes_off_timing=[]
-        # notes_off_notes=[]
-        # for note_data in self.chord_notes:
-        #     if note_data["type"] == "note_on":
-        #         notes_on_timing.append(note_data["time"])
-        #         notes_on_notes.append(note_data["note_data"]+transpose)
-        #         notes_on_velocity.append(note_data["velocity"])
-        #     elif note_data["type"]== "note_off":
-        #         notes_off_timing.append(note_data["time"])
-        #         notes_off_notes.append(note_data["note_data"]+transpose)
-        # print(notes_on_timing)
-        # print(notes_on_notes)
-
-        # self.playingThread= TestThread(self,notes_on_timing, notes_on_notes, notes_on_velocity, notes_off_timing, notes_off_notes)
-        # self.playingThreadChord = TestThread(self, self.chord_notes, transpose)
-        # self.playingThreadChord.start()
-
-        # for note_data in self.chord_notes:
-        #     self.activeCustomSignals.append(CustomSignal(
-        #         self,
-        #         note_data["type"],
-        #         note_data["note_data"] + transpose,
-        #         note_data["velocity"],
-        #         note_data["time"]
-        #     ))
+            self.customNotesList.append(
+                CustomNote(
+                    midi_instance=self.midiIO,
+                    note=note_data['note'] + transpose,
+                    delay_on=note_data['time'] / 1000,
+                    note_type=note_data['type'],
+                    velocity=note_data['velocity']
+                ))
 
     def findLickDataFromLickUuid(self, lick_uuid: str):
         for lick in self.allLicksData:
@@ -165,367 +216,3 @@ class PractiseLicksViewModel:
                        JsonLickFields.FIELD_LICK_KEY.value: lick[JsonLickFields.FIELD_LICK_KEY.value]}
             all_licks_data_short.append(element)
         return all_licks_data_short
-
-    def loadASample(self, index):
-        nbOfSamples = len(self.allMidiLicksFilePaths)
-        if nbOfSamples == 0:
-            self.view.lblNotes.config(text="No lick, record one first !")
-        else:
-            # we load last sample
-            self.currentLickIndex = index
-            self.loadSelectedItem(self.allMidiLicksFilePaths[self.currentLickIndex])
-            self.view.lblMessage.config(text="Lick {} / {} loaded.".format(index + 1, len(self.allMidiLicksFilePaths)))
-            self.showUserInfo(0)
-
-    def loadSelectedItem(self, name):
-        self.loadFile(os.path.join(self.midiRepository, name))
-
-    def showUserInfo(self, transpose, counter=-1, nbBeforeTranspose=-1):
-        self.userMessage = ""
-        for note in self.notes:
-            # print(note)
-            if note["type"] == "note_on":
-                if len(self.userMessage) > 30:
-                    self.userMessage = self.userMessage[:28] + "..."
-                else:
-                    self.userMessage += noteName(note["note"] + transpose) + " "
-        self.view.lblKey.config(foreground="white")
-        self.view.lblKey.config(text="{} {}".format(noteName(self.bass + transpose), self.mType))
-        self.view.lblNotes.config(foreground="white")
-        self.view.lblNotes.config(text=self.userMessage)
-        self.view.lblMessage.config(text="Lick {} / {} loaded.".format(self.currentLickIndex + 1, len(self.allMidiLicksFilePaths)))
-        if counter != -1:
-            self.view.lblFollowing.config(
-                text="{} / {} before transpose...".format(str(counter), str(nbBeforeTranspose)), foreground="white"
-            )
-        else:
-            self.view.lblFollowing.config(text="")
-
-    def showUserInfoNextTranspose(self, oldTranspose, newTranspose):
-        beforeKey = noteName(self.bass + oldTranspose)
-        afterKey = noteName(self.bass + newTranspose)
-        self.view.lblKey.config(foreground="orange", text="{}=>{}".format(beforeKey, afterKey + self.mType))
-        self.view.lblNotes.config(foreground="orange", text=formatOutputInterval(newTranspose - oldTranspose))
-        self.view.lblFollowing.config(foreground="orange", text="Transpose next loop...")
-
-    def loadFile(self, mFile):
-        try:
-            with open(mFile, "r") as f:
-                datastore = json.load(f)
-                self.currentLick = mFile
-                self.bass = datastore["bass"]
-                self.notes = datastore["notes"]
-                self.mType = datastore["type"]
-                self.backtrackVolume = datastore["volumeBacktrack"]
-                self.showUserInfo(0)
-        except Exception as e:
-            print("problem loading file :", mFile, e)
-
-    # def showWithOrWithoutBacktrackWindow(self):
-    #     self.cancelThreads()
-    #     try :
-    #         del self.globalRoot.recordWindow
-    #     except Exception as e:
-    #         print(e)
-    #     self.root.destroy()
-    #     self.destroy()
-    #     self.globalRoot.recordWindow= RecordWithBacktrack(self.globalRoot, self.app)
-
-    def playChords(self, transpose):
-        # notes_on_timing =[]
-        # notes_on_notes=[]
-        # notes_on_velocity=[]
-        # notes_off_timing=[]
-        # notes_off_notes=[]
-        # for note in self.chord_notes:
-        #     if note["type"] == "note_on":
-        #         notes_on_timing.append(note["time"])
-        #         notes_on_notes.append(note["note"]+transpose)
-        #         notes_on_velocity.append(note["velocity"])
-        #     elif note["type"]== "note_off":
-        #         notes_off_timing.append(note["time"])
-        #         notes_off_notes.append(note["note"]+transpose)
-        # print(notes_on_timing)
-        # print(notes_on_notes)
-
-        # self.playingThread= TestThread(self,notes_on_timing, notes_on_notes, notes_on_velocity, notes_off_timing, notes_off_notes)
-        self.playingThreadChord = TestThread(self, self.chord_notes, transpose)
-        self.playingThreadChord.start()
-
-        # for note in self.chord_notes:
-        #     self.activeCustomSignals.append(CustomSignal(
-        #         self,
-        #         note["type"],
-        #         note["note"] + transpose,
-        #         note["velocity"],
-        #         note["time"]
-        #     ))
-
-    def playMelody(self, transpose):
-        # for note in self.melodyNotes:
-        #     self.activeCustomSignals.append(CustomSignal(
-        #         self,
-        #         note["type"],
-        #         note["note"] + transpose,
-        #         note["velocity"],
-        #         note["time"]
-        #     ))
-        self.playingThreadMelody = TestThread(self, self.melodyNotes, transpose)
-        self.playingThreadMelody.start()
-
-    def activateAudioThread(self, completeTraining):
-        # self.cancelThreads()
-        with open(self.currentLick, "r") as jsonfile:
-            jsonLick = json.load(jsonfile)
-        self.key = jsonLick["bass"]
-        self.mType = jsonLick["type"]
-        self.melodyNotes = jsonLick["notes"]
-        self.chord_notes = jsonLick["chord_notes"]
-        self.nbOfLoops = jsonLick["nbOfLoops"]
-        self.backtrack = jsonLick["backtrack"]
-        self.duration = jsonLick["backtrackDuration"] * self.nbOfLoops
-
-        print("Current file has nb of notes :" + str(len(self.melodyNotes) + len(self.chord_notes)))
-
-        self.audioThread = BackTrackThread(self, self.backtrack, self.nbOfLoops, completeTraining)
-        self.audioThread.start()
-
-    def previousLick(self):
-        self.cancelThreads()
-        pygame.mixer.music.stop()
-        self.currentLickIndex += -1
-        if self.currentLickIndex < 0:
-            self.currentLickIndex = len(self.allMidiLicksFilePaths) - 1
-        self.loadFile(self.allMidiLicksFilePaths[self.currentLickIndex])
-        self.showUserInfo(0)
-
-    def nextLick(self):
-        self.cancelThreads()
-        pygame.mixer.music.stop()
-        self.currentLickIndex += 1
-        if self.currentLickIndex >= len(self.allMidiLicksFilePaths):
-            self.currentLickIndex = 0
-        self.loadFile(self.allMidiLicksFilePaths[self.currentLickIndex])
-        self.showUserInfo(0)
-
-    def playOneLick(self, completeTraining=False):
-        if self.isPlaying == False:
-            self.view.btnPractiseLick.config(image=self.pauseImage)
-            self.isPlaying = True
-            self.activateAudioThread(completeTraining)
-        else:
-            self.view.btnPractiseLick.config(image=self.playImage)
-            self.audioThread.isAlive = False
-            # del self.audioThread
-            self.isPlaying = False
-            self.cancelThreads()
-            return
-
-    def pickRandomLick(self):
-        # load a new random sample
-        self.loadASample(random.randint(0, len(self.allMidiLicksFilePaths) - 1))
-        self.playOneLick(completeTraining=True)
-
-    def deleteLick(self):
-        self.cancelThreads()
-        pygame.mixer.music.stop()
-        if messagebox.askokcancel("delete ?", message="are you sure you want to delete the current Lick ?") == True:
-            try:
-                print("-->try to delete lick :", self.currentLick)
-                os.remove(self.currentLick)
-                self.reloadMidiFiles()
-                self.currentLickIndex = 0
-                if len(self.allMidiLicksFilePaths) > 0:
-                    self.currentLick = self.allMidiLicksFilePaths[self.currentLickIndex]
-                    self.loadSelectedItem(self.currentLick)
-                else:
-                    self.view.lblNotes.config(text="No lick, record one first !")
-                    self.view.lblKey.config(text="")
-                    self.view.lblFollowing.config(text="")
-                    self.view.lblMessage.config(text="")
-            except Exception as e:
-                print("Error trying to delete lick", self.currentLick, e)
-            self.reloadMidiFiles()
-
-    def cancelThreads(self):
-        try:
-            self.view.btnPractiseLick.config(text="Practise Lick")
-        except:
-            print("can't update screen")
-        self.isPlaying = False
-        try:
-            self.audioThread.isAlive = False
-        except Exception as e:
-            print("no threads to cancel", e)
-        # we try to kill all notes no already played
-        try:
-            self.playingThreadChord.isAlive = False
-        except Exception as e:
-            print("no threads to cancel", e)
-        try:
-            self.playingThreadMelody.isAlive = False
-        except Exception as e:
-            print("no threads to cancel", e)
-        for signal in self.activeCustomSignals:
-            signal.timer.cancel()
-        del self.activeCustomSignals
-        self.activeCustomSignals = []
-        self.midiIO.panic()
-
-    def destroy(self):
-        self.cancelThreads()
-        pygame.mixer.music.stop()
-        try:
-            del self.activeCustomSignals
-            del self.precountTimer
-        except Exception as e:
-            print("error in destroy :", e)
-        del self
-
-    def handleMIDIInput(self, msg):
-        pass
-
-
-class BackTrackThread(threading.Thread):
-    def __init__(self, parent, backtrack, nbOfLoops, completeTraining):
-        self.parent = parent
-        threading.Thread.__init__(self)
-        self.backtrack = backtrack
-        self.isAlive = True
-        self.nbOfLoops = nbOfLoops
-        pygame.mixer.music.stop()
-        pygame.event.clear()
-        self.MUSIC_END = pygame.USEREVENT + 1
-        pygame.mixer.music.set_endevent(self.MUSIC_END)
-        pygame.mixer.music.load(self.backtrack)
-        pygame.mixer.music.set_volume(self.parent.backtrackVolume * 100)
-        pygame.mixer.music.play(loops=self.nbOfLoops)
-
-        self.transpose = 0
-        self.newTranspose = -99
-        self.prepareChordArray()
-        self.prepareMelodyArray()
-        self.time0 = int(round(time.time() * 1000))
-
-        self.counter = 0
-        print("Initialisation AUDIO THREAD")
-        self.nbBeforeTranspose = 2
-        self.parent.showUserInfo(self.transpose, self.counter + 1, self.nbBeforeTranspose)
-
-    def run(self):
-        print("Running thread...")
-
-        while self.isAlive == True:
-
-            for event in pygame.event.get():
-                print(event.type)
-                if event.type == self.MUSIC_END:
-                    if self.newTranspose != -99:
-                        self.transpose = self.newTranspose
-                        self.newTranspose = -99
-
-                    self.ChordIndexNoteOn = 0
-                    self.ChordIndexNoteOff = 0
-                    self.MelodyIndexNoteOn = 0
-                    self.MelodyIndexNoteOff = 0
-                    self.time0 = int(round(time.time() * 1000))
-                    # if pygame.mixer.music.get_busy() == False: # means it is not playing => reload a new loop
-                    # self.parent.playingThreadChord.reset()
-                    self.counter += 1
-                    self.parent.showUserInfo(self.transpose, self.counter + 1, self.nbBeforeTranspose)
-                    print("Relaunching backtrack loop ", self.counter, self.transpose)
-                    pygame.mixer.music.play(self.nbOfLoops)
-                    # self.parent.replayLick()
-                    # self.parent.playChords(self.transpose)
-                    # if self.counter % 2 == 0: # play melody one time on 2
-                    # self.parent.playMelody(self.transpose)
-
-                    if self.counter == self.nbBeforeTranspose - 1:
-                        self.newTranspose = random.randint(-7, 6)
-                        print("Transposing next loop ...", self.transpose)
-                        self.parent.showUserInfoNextTranspose(self.transpose, self.newTranspose)
-                        # self.transpose = newTranspose
-                        self.counter = -1
-
-            timeT = int(round(time.time() * 1000)) - self.time0
-            if self.counter == 0:
-                self.checkMelody(timeT, self.transpose)
-            self.checkChords(timeT, self.transpose)
-
-        # def playMelody(self):
-
-        pygame.mixer.music.stop()
-
-    def checkChords(self, timeT, transpose):
-        if self.ChordIndexNoteOn <= len(self.ChordNoteOnTiming) - 1:
-            if timeT >= self.ChordNoteOnTiming[self.ChordIndexNoteOn]:
-                noteToPlay = self.ChordNoteOnNotes[self.ChordIndexNoteOn]
-                velocity = self.ChordNoteOnVelocity[self.ChordIndexNoteOn]
-                # print("note on", noteToPlay, velocity)
-                # t1 = time.time()
-                self.parent.midiIO.sendOut("note_on", noteToPlay + transpose, velocity)
-                # t2 = time.time()
-                # print("time loosed: ", t2 - t1)
-                self.ChordIndexNoteOn += 1
-        if self.ChordIndexNoteOff <= len(self.ChordNoteOffTiming) - 1:
-            if timeT >= self.ChordNoteOffTiming[self.ChordIndexNoteOff]:
-                noteToEnd = self.ChordNoteOffNotes[self.ChordIndexNoteOff]
-                self.parent.midiIO.sendOut("note_off", noteToEnd + transpose)
-                self.ChordIndexNoteOff += 1
-
-    def checkMelody(self, timeT, transpose):
-        if self.MelodyIndexNoteOn <= len(self.MelodyNoteOnTiming) - 1:
-            if timeT >= self.MelodyNoteOnTiming[self.MelodyIndexNoteOn]:
-                noteToPlay = self.MelodyNoteOnNotes[self.MelodyIndexNoteOn]
-                velocity = self.MelodyNoteOnVelocity[self.MelodyIndexNoteOn]
-                # print("note on", noteToPlay, velocity)
-                # t1 = time.time()
-                self.parent.midiIO.sendOut("note_on", noteToPlay + transpose, velocity)
-                # t2 = time.time()
-                # print("time loosed: ", t2 - t1)
-                self.MelodyIndexNoteOn += 1
-        if self.MelodyIndexNoteOff <= len(self.MelodyNoteOffTiming) - 1:
-            if timeT >= self.MelodyNoteOffTiming[self.MelodyIndexNoteOff]:
-                noteToEnd = self.MelodyNoteOffNotes[self.MelodyIndexNoteOff]
-                self.parent.midiIO.sendOut("note_off", noteToEnd + transpose)
-                self.MelodyIndexNoteOff += 1
-
-    def prepareChordArray(self):
-        self.ChordNotes = self.parent.chord_notes
-        self.ChordNoteOnTiming = []
-        self.ChordNoteOnNotes = []
-        self.ChordNoteOnVelocity = []
-        self.ChordNoteOffTiming = []
-        self.ChordNoteOffNotes = []
-        for note in self.ChordNotes:
-            if note["type"] == "note_on":
-                self.ChordNoteOnTiming.append(note["time"])
-                self.ChordNoteOnNotes.append(note["note"])
-                self.ChordNoteOnVelocity.append(note["velocity"])
-            elif note["type"] == "note_off":
-                self.ChordNoteOffTiming.append(note["time"])
-                self.ChordNoteOffNotes.append(note["note"])
-        print(self.ChordNoteOnTiming)
-        print(self.ChordNoteOnNotes)
-        self.ChordIndexNoteOn = 0
-        self.ChordIndexNoteOff = 0
-
-    def prepareMelodyArray(self):
-        self.MelodyNotes = self.parent.melodyNotes
-        self.MelodyNoteOnTiming = []
-        self.MelodyNoteOnNotes = []
-        self.MelodyNoteOnVelocity = []
-        self.MelodyNoteOffTiming = []
-        self.MelodyNoteOffNotes = []
-        for note in self.MelodyNotes:
-            if note["type"] == "note_on":
-                self.MelodyNoteOnTiming.append(note["time"])
-                self.MelodyNoteOnNotes.append(note["note"])
-                self.MelodyNoteOnVelocity.append(note["velocity"])
-            elif note["type"] == "note_off":
-                self.MelodyNoteOffTiming.append(note["time"])
-                self.MelodyNoteOffNotes.append(note["note"])
-        print(self.MelodyNoteOnTiming)
-        print(self.MelodyNoteOnNotes)
-        self.MelodyIndexNoteOn = 0
-        self.MelodyIndexNoteOff = 0

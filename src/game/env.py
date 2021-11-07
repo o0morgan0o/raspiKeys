@@ -33,6 +33,8 @@ PAUSE_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "pauseWhite.png")
 SHUFFLE_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "shuffleWhite.png")
 RECORD_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "rec.png")
 METRONOME_IMAGE= os.path.join(ROOT_DIR, "res", "icons", "metronome.png")
+ARROW_UP_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "arrow_up.png")
+ARROW_DOWN_IMAGE= os.path.join(ROOT_DIR, "res", "icons", "arrow_down.png")
 
 NAVBAR_WIDTH = 80
 FOOTER_HEIGHT = 80

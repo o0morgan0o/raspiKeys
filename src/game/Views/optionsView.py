@@ -1,3 +1,5 @@
+import os
+
 from src.game.GamesNames import GameNames
 from src.game.ViewModels.optionsViewModel import OptionsViewModel
 from src.game.utils.customElements.customElements import *
@@ -19,7 +21,9 @@ class OptionsView:
         self.game = None
         self.master = master
         self.gameFrame = game_frame
-        self.gameFrame.config(bg="black")
+        if os.name != 'nt':
+            self.gameFrame.config(cursor='none')
+        self.gameFrame.config(bg=Colors.BACKGROUND)
 
         DEFAULT_PADDING = 3
 

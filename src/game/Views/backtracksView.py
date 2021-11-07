@@ -3,7 +3,7 @@ import os
 import tkinter.font
 from functools import partial
 from glob import glob
-from src.customtkinter import CTkButton, CTkProgressBar, CTkLabel
+from tkinter import ttk
 
 from PIL import Image, ImageTk
 
@@ -14,11 +14,13 @@ from src.game.Views.recordLickView import RecordLickView
 from src.game.utils.customElements.customElements import *
 from src.game.utils.customElements.labels import *
 
-BTN_PADDING_X = 4
-BTN_PADDING_Y = 4
-LEFT_PANEL_PADDING_X = 20
-RIGHT_PANEL_PADDING_X = 20
-RIGHT_PANEL_PADDING_Y = 20
+BTN_PADDING_X = 0
+BTN_PADDING_Y = 0
+LEFT_PANEL_PADDING_X = 18
+RIGHT_PANEL_PADDING_X = 18
+RIGHT_PANEL_PADDING_Y = 18
+
+FONT_SIZE_BTN_PLUS_AND_MINUS = 28
 
 
 class ViewStrings(Enum):
@@ -31,7 +33,8 @@ class ViewImages:
         self.IMAGE_PLAY_IMAGE = ImageTk.PhotoImage(Image.open(env.PLAY_IMAGE))
         self.IMAGE_PAUSE_IMAGE = ImageTk.PhotoImage(Image.open(env.PAUSE_IMAGE))
         self.IMAGE_SHUFFLE_IMAGE = ImageTk.PhotoImage(Image.open(env.SHUFFLE_IMAGE))
-        self.IMAGE_METRONOME_IMAGE= ImageTk.PhotoImage(Image.open(env.METRONOME_IMAGE))
+        self.IMAGE_METRONOME_IMAGE = ImageTk.PhotoImage(Image.open(env.METRONOME_IMAGE))
+        self.IMAGE_RECORD_IMAGE = ImageTk.PhotoImage(Image.open(env.RECORD_IMAGE))
 
 
 class BacktracksView:
@@ -54,8 +57,8 @@ class BacktracksView:
         self.frameRight.place(x=env.GAME_SCREEN_W * percentageLeft, y=0, width=env.GAME_SCREEN_W * (1 - percentageLeft), height=env.GAME_SCREEN_H)
 
         # Backtrack Section
-        self.lblTrackTitle = tk.Label(self.frameLeft, text=ViewStrings.STRING_LBL_TRACK_TITLE.value, justify="center",
-                                      bg=Colors.DARK, fg=Colors.TEXT_WHITE,
+        self.lblTrackTitle = tk.Label(self.frameLeft, text=ViewStrings.STRING_LBL_TRACK_TITLE.value, justify=tk.CENTER,
+                                      bg=Colors.BACKGROUND, fg=Colors.TEXT_WHITE,
                                       font=(DEFAULT_FONT_NAME, 14),
                                       width=20, wraplength=250, height=4)
         self.lblCategory = tk.Label(self.frameLeft,
@@ -63,32 +66,38 @@ class BacktracksView:
                                     bg=Colors.BACKGROUND,
                                     fg=Colors.TEXT_WHITE,
                                     # text=ViewStrings.STRING_LBL_TRACK_CATEGORY.value,
-                                    justify="center")
+                                    justify=tk.CENTER)
         self.progressBar = ttk.Progressbar(self.frameLeft, style=CustomStylesNames.STYLE_PROGRESSBAR_RED.value, value=0)
-        self.btnRecord = CustomButton(self.frameLeft, text="REC", font=(DEFAULT_FONT_NAME, DEFAULT_FONT_SIZE, tkinter.font.BOLD), background=Colors.ERROR)
+        self.btnRecord = CustomButton(self.frameLeft, image=self.images.IMAGE_RECORD_IMAGE,
+                                      background=Colors.BACKGROUND, height=80)
 
         # Metronome section
-        self.btnBpmMinus = CustomButton(self.frameLeft, text="-")
-        self.lblMetro = tk.Label(self.frameLeft, text="metroValue", font=(DEFAULT_FONT_NAME, 80))
-        self.btnBpmPlus = CustomButton(self.frameLeft, text="+")
-        self.slTempo = CustomScale(self.frameLeft, from_=BacktracksConstants.TEMPO_MIN_BPM.value, to=BacktracksConstants.TEMPO_MAX_BPM.value)
+        self.btnBpmMinus = CustomButton(self.frameLeft, text="-", font=(DEFAULT_FONT_NAME,FONT_SIZE_BTN_PLUS_AND_MINUS, tkinter.font.BOLD ))
+        self.lblMetro = tk.Label(self.frameLeft,
+                                 background=Colors.BACKGROUND, foreground=Colors.TEXT_WHITE,
+                                 font=(DEFAULT_FONT_NAME, 80))
+        self.btnBpmPlus = CustomButton(self.frameLeft, text="+", font=(DEFAULT_FONT_NAME,FONT_SIZE_BTN_PLUS_AND_MINUS,tkinter.font.BOLD))
+        self.slTempo = CustomScale(self.frameLeft,
+                                   from_=BacktracksConstants.TEMPO_MIN_BPM.value, to=BacktracksConstants.TEMPO_MAX_BPM.value,
+                                   command=lambda event: self.lblMetro.config(text=str(event))
+                                   )
 
         # Right Section
-        self.frameCategoryContainers = tk.Frame(self.frameRight, bg=Colors.BACKGROUND, pady=RIGHT_PANEL_PADDING_Y)
-        self.frameCategoryContainers.pack(expand=1, fill=tk.BOTH)
+        self.frameCategoryContainers = tk.Frame(self.frameRight, bg=Colors.BACKGROUND)
+        self.frameCategoryContainers.pack(expand=1, fill=tk.BOTH, pady=(0, RIGHT_PANEL_PADDING_Y))
 
         self.rowControls = tk.Frame(self.frameRight)
-        self.rowControls.pack(side=tk.BOTTOM, expand=1, fill=tk.BOTH)
         self.rowControls.grid_rowconfigure(0, weight=1)
-        self.rowControls.grid_rowconfigure(1, weight=1)
+        self.rowControls.grid_rowconfigure(1, weight=2)
         self.rowControls.grid_columnconfigure(0, weight=1)
         self.rowControls.grid_columnconfigure(1, weight=1)
-        self.btnMetro = CustomButton(self.rowControls, image=self.images.IMAGE_METRONOME_IMAGE )
+        self.btnMetro = CustomButton(self.rowControls, image=self.images.IMAGE_METRONOME_IMAGE)
         self.btnMetro.grid(row=0, column=0, sticky=tk.NSEW)
         self.btnRandom = CustomButton(self.rowControls, image=self.images.IMAGE_SHUFFLE_IMAGE)
         self.btnRandom.grid(row=1, column=0, sticky=tk.NSEW)
         self.btnPlay = CustomButton(self.rowControls, image=self.images.IMAGE_PLAY_IMAGE)
         self.btnPlay.grid(row=0, rowspan=2, column=1, sticky=tk.NSEW)
+        self.rowControls.pack(expand=0, fill=tk.BOTH)
 
         # =========== CREATION OF THE VIEW_MODEL ====================
         self.viewModel = BacktracksViewModel(self)
@@ -112,7 +121,6 @@ class BacktracksView:
         if os.name != 'nt':
             self.tempRecordView.attributes('-fullscreen', True)
         RecordLickView(self.tempRecordView, current_backtrack_file)
-        # self.tempRecordView.destroy()
 
     def resetProgressBar(self):
         # TODO Doesn't work, i don't know why
@@ -129,10 +137,10 @@ class BacktracksView:
         self.progressBar.pack_forget()
         self.btnRecord.pack_forget()
 
-        self.btnBpmPlus.pack(expand=1)
+        self.btnBpmPlus.pack(expand=1, fill=tk.BOTH, padx=LEFT_PANEL_PADDING_X, pady=LEFT_PANEL_PADDING_X)
         self.lblMetro.pack(expand=1)
-        self.btnBpmMinus.pack(expand=1)
-        self.slTempo.pack(expand=1, fill=tk.X)
+        self.slTempo.pack(expand=1, fill=tk.X, padx=LEFT_PANEL_PADDING_X)
+        self.btnBpmMinus.pack(expand=1, fill=tk.BOTH, padx=LEFT_PANEL_PADDING_X, pady=LEFT_PANEL_PADDING_X)
 
     def setUiShowBacktrackSection(self):
         self.btnBpmMinus.pack_forget()
@@ -183,6 +191,12 @@ class BacktracksView:
             if column_counter >= starting_column + columns_per_row:
                 column_counter = starting_column
                 row_counter += 1
+
+    def setUiChangePlayingIcons(self, is_playing: bool):
+        if is_playing:
+            self.btnPlay.config(image=self.images.IMAGE_PLAY_IMAGE)
+        else:
+            self.btnPlay.config(image=self.images.IMAGE_PAUSE_IMAGE)
 
     @staticmethod
     def getAllWavFolders():

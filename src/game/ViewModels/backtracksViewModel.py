@@ -70,7 +70,8 @@ class BacktracksViewModel:
             self.stopPlayWithProgressBarReset()
             self.view.setUiShowMetronomeSection()
             self.gameState = GameStatesNames.GAME_STATE_METRO_MODE_ACTIVE.value
-            self.audioInstance.playRealMetro(self.tempoMetronome)
+            return True
+        return False
 
     def initializeAudio(self):
         volume = getAudioVolume()
@@ -145,10 +146,17 @@ class BacktracksViewModel:
         self.playBacktrack(self.currentBacktrack)
 
     def onBtnMetronomeClick(self):
-        self.switchToMetroGameMode()
-        # if self.audioInstance.getIsPlaying():
-        #     return self.audioInstance.stopPlay()
-        self.audioInstance.playRealMetro(self.tempoMetronome)
+        hasChangedState = self.switchToMetroGameMode()
+        if hasChangedState:
+            self.audioInstance.playRealMetro(self.tempoMetronome)
+            self.view.setUiChangePlayingIcons(is_playing=True)
+            return
+        if self.audioInstance.getIsPlaying():
+            self.audioInstance.stopPlay()
+            self.view.setUiChangePlayingIcons(is_playing=False)
+        else:
+            self.audioInstance.playRealMetro(self.tempoMetronome)
+            self.view.setUiChangePlayingIcons(is_playing=True)
 
     def onBtnBpmPlusClick(self):
         self.modifyMetroBpm(+10)
@@ -185,13 +193,16 @@ class BacktracksViewModel:
             # we cancel previous progress thread
             self.progressThread.progressThreadAlive = False
         self.audioInstance.simplePlay(current_track)
+        self.view.setUiChangePlayingIcons(is_playing=True)
 
         self.progressThread = ProgressThread(self.view, self.audioInstance)
         self.progressThread.start()
 
     def stopPlayWithProgressBarReset(self):
         self.audioInstance.stopPlay()
+        self.view.setUiChangePlayingIcons(is_playing=False)
         self.view.resetProgressBar()
 
     def destroy(self):
         self.audioInstance.stopPlay()
+        self.view.setUiChangePlayingIcons(is_playing=False)

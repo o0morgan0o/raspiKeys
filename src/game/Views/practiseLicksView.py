@@ -1,6 +1,9 @@
 import logging
+import os
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
+
+from PIL import Image, ImageTk
 
 from src.game import env
 from src.game.GamesNames import GameNames
@@ -13,12 +16,26 @@ DEFAULT_PADDING_X = 20
 DEFAULT_PADDING_Y = 20
 
 
+class ViewImages:
+    def __init__(self):
+        self.IMAGE_PLAY_IMAGE = ImageTk.PhotoImage(Image.open(env.PLAY_IMAGE))
+        self.IMAGE_PAUSE_IMAGE = ImageTk.PhotoImage(Image.open(env.PAUSE_IMAGE))
+        self.IMAGE_SHUFFLE_IMAGE = ImageTk.PhotoImage(Image.open(env.SHUFFLE_IMAGE))
+        self.IMAGE_METRONOME_IMAGE = ImageTk.PhotoImage(Image.open(env.METRONOME_IMAGE))
+        self.IMAGE_ARROW_UP = ImageTk.PhotoImage(Image.open(env.ARROW_UP_IMAGE))
+        self.IMAGE_ARROW_DOWN = ImageTk.PhotoImage(Image.open(env.ARROW_DOWN_IMAGE))
+
+
 class PractiseLicksView:
     def __init__(self, master, game_frame: tk.Frame):
         print("launching game {}".format(GameNames.GAME_LICKS_PRACTISE))
         self.master = master
         self.viewModel = None
         self.gameFrame = game_frame
+        if os.name != 'nt':
+            self.gameFrame.config(cursor='none')
+
+        self.images = ViewImages()
 
         percentageLeft = 40 / 100
         self.frameLeft = tk.Frame(self.gameFrame, bg=Colors.BACKGROUND)
@@ -33,22 +50,29 @@ class PractiseLicksView:
         self.frameRightUpperSection = tk.Frame(self.frameRight)
         self.frameRightUpperSection.grid_rowconfigure(0, weight=1)
         self.frameRightUpperSection.grid_rowconfigure(1, weight=1)
-        self.frameRightUpperSection.grid_rowconfigure(2, weight=1)
         self.frameRightUpperSection.grid_columnconfigure(0, weight=1)
         self.frameRightUpperSection.grid_columnconfigure(1, weight=1)
         self.frameRightUpperSection.grid_columnconfigure(2, weight=1)
         self.frameRightUpperSection.pack(expand=1, fill=tk.BOTH, padx=(0, DEFAULT_PADDING_X), pady=(DEFAULT_PADDING_Y, 0))
-        self.lblLickKey = tk.Label(self.frameRightUpperSection, text="LICK_KEY", font=(DEFAULT_FONT_NAME, 40), fg=Colors.TEXT_WHITE, bg='red')
-        self.lblLickKey.grid(row=0, rowspan=3, column=0, columnspan=3, sticky=tk.NSEW)
-        self.btnDeleteLick = CustomButton(self.frameRightUpperSection, text="DELETE")
+
+        self.lblLickKey = tk.Label(self.frameRightUpperSection, text="LICK_KEY", font=(DEFAULT_FONT_NAME, 40),
+                                   fg=Colors.TEXT_WHITE, bg=Colors.BACKGROUND)
+        self.lblLickKey.grid(row=0, rowspan=2, column=0, columnspan=3, sticky=tk.NSEW)
+        self.lblLickNextKey = tk.Label(self.frameRightUpperSection, text="NEXT_KEY", font=(DEFAULT_FONT_NAME, 40),
+                                       fg='orange', bg=Colors.BACKGROUND)
+
+        self.btnDeleteLick = CustomButton(self.frameRightUpperSection, text="DELETE", command=self.onBtnDeleteLickClick)
         self.btnDeleteLick.grid(row=0, column=2, sticky=tk.NE)
-        self.btnTreeViewItemPlus = CustomButton(self.frameRightUpperSection, text=">", command=lambda: self.selectTreeViewNextItem())
+        self.btnTreeViewItemPlus = CustomButton(self.frameRightUpperSection, image=self.images.IMAGE_ARROW_UP,
+                                                command=lambda: self.selectTreeViewNextItem())
         self.btnTreeViewItemPlus.grid(row=0, column=0, sticky=tk.SW)
-        self.btnTreeViewItemMinus = CustomButton(self.frameRightUpperSection, text="<", command=lambda: self.selectTreeViewPreviousItem())
+        self.btnTreeViewItemMinus = CustomButton(self.frameRightUpperSection, image=self.images.IMAGE_ARROW_DOWN,
+                                                 command=lambda: self.selectTreeViewPreviousItem())
         self.btnTreeViewItemMinus.grid(row=1, column=0, sticky=tk.NW)
 
         self.progressBar = ttk.Progressbar(self.frameRight, style=CustomStylesNames.STYLE_PROGRESSBAR_RED.value, value=0)
         self.progressBar.pack(fill=tk.X, padx=DEFAULT_PADDING_X, pady=8)
+        self.progressBar.config(value=0)
 
         self.rowCycles = tk.Frame(self.frameRight)
         self.btnChangeKeyManual = CustomButton(self.rowCycles, text="MANUAL")
@@ -57,7 +81,7 @@ class PractiseLicksView:
         self.btnChangeKeyAfter1Cycle.pack(side=tk.LEFT, expand=1, fill=tk.X)
         self.btnChangeKeyAfter2Cycles = CustomButton(self.rowCycles, text="x2")
         self.btnChangeKeyAfter2Cycles.pack(side=tk.LEFT, expand=1, fill=tk.X)
-        self.btnChangeKeyAfter4Cycles = CustomButton(self.rowCycles, text="x4")
+        self.btnChangeKeyAfter4Cycles = CustomButton(self.rowCycles, text="x4", command=lambda: self.viewModel.cancelPlayingThread())
         self.btnChangeKeyAfter4Cycles.pack(side=tk.LEFT, expand=1, fill=tk.X)
         self.rowCycles.pack(expand=0, fill=tk.X, padx=(0, DEFAULT_PADDING_X))
 
@@ -98,8 +122,11 @@ class PractiseLicksView:
         self.setTreeViewSelectItem(new_item)
 
     def getFirstTreeViewItem(self):
+        treeView_children = self.treeView.get_children()
+        if len(treeView_children) == 0:
+            return None
         try:
-            return self.treeView.get_children()[0]
+            return treeView_children[0]
         except Exception as e:
             print("Empty treeView")
             logging.exception(e)
@@ -127,15 +154,45 @@ class PractiseLicksView:
         self.treeView.heading('DATE', text='DATE', anchor=tk.CENTER)
         self.treeView.bind('<<TreeviewSelect>>', self.identifySelectedItemInTreeView)
 
+    def setUiUpdateProgress(self, value: int):
+        self.progressBar.config(value=value)
+
     def setUiUpdateLblForLickSelected(self, lick_key: str, lick_name: str = None, lick_date: str = None):
         self.lblLickKey.config(text=lick_key)
+
+    def setUiUpdateLblNextKeyIndication(self, next_key: str):
+        self.lblLickNextKey.config(text="Next key => {}".format(next_key))
+        self.lblLickNextKey.grid(row=1, column=0, columnspan=3, sticky=tk.NSEW)
+        self.lblLickKey.grid(row=0, rowspan=1, column=0, columnspan=3, sticky=tk.NSEW)
+
+    def setUiResetLblNextKeyIndication(self):
+        self.lblLickNextKey.grid_forget()
+        self.lblLickKey.grid(row=0, rowspan=2, column=0, columnspan=3, sticky=tk.NSEW)
 
     def identifySelectedItemInTreeView(self, event):
         selected_item = self.treeView.selection()[0]
         values = self.treeView.item(selected_item)['values']
         self.viewModel.onLickSelectedInTreeView(values)
 
+    def onBtnDeleteLickClick(self):
+        delete_lick_confirm = messagebox.askyesno(title="Delete Lick", message="Delete Lick ?", icon='warning')
+        if delete_lick_confirm:
+            item_selected = self.treeView.selection()[0]
+            item_data = self.getItemTreeViewDataByItem(item_selected)
+            self.viewModel.onBtnDeleteLickClick(item_data)
+
+    def getItemTreeViewDataByItem(self, user_item):
+        for item in self.treeView.get_children():
+            if item == user_item:
+                item_data = self.treeView.item(item)
+                return item_data
+        return None
+
     def setUiInitializeTreeView(self, licks_data: list):
+        if licks_data is None:
+            print('No Data')
+            self.lblLickKey.config(text="NOTHING")
+            return
         counter = 0
         for lick in licks_data:
             lick_id = lick[JsonLickFields.FIELD_LICK_ID.value]
@@ -147,8 +204,8 @@ class PractiseLicksView:
             if counter % 2 == 0:
                 tag = 'even'
             self.treeView.insert(parent='', index=tk.END, values=(lick_id, lick_key, lick_name, lick_date), tags=tag)
-        self.treeView.insert(parent='', index=tk.END, values=('filename11', 'aa', 'bb', 'dd'))
-        self.treeView.insert(parent='', index=tk.END, values=('filename11', 'aa', 'bb', 'dd'))
-        self.treeView.insert(parent='', index=tk.END, values=('filename11', 'aa', 'bb', 'dd'))
         self.treeView.tag_configure('odd', background='#E8E8E8')
         self.treeView.tag_configure('even', background='#DFDFDF')
+
+    def clearTreeView(self):
+        self.treeView.delete(*self.treeView.get_children())

@@ -51,6 +51,7 @@ class EarTrainingChordViewModel:
         self.startGame()
 
         self.initializeNoteDelaySlider()
+        self.view.updateLblNoteDelay(self.noteDelay)
 
     # def skip(self):
     #     try:
@@ -86,6 +87,7 @@ class EarTrainingChordViewModel:
     def onSliderDelayMoved(self, event):
         self.noteDelay = self.view.slDelay.get()
         updateEarTrainingNoteDelay(new_value=self.noteDelay)
+        self.view.updateLblNoteDelay(self.noteDelay)
 
     def startGame(self):
         self.midiIO.setListening(True)

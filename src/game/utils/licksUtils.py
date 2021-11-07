@@ -30,6 +30,15 @@ def writeJsonLick(json_data, filename: str):
         return False
 
 
+def deleteJsonLickFile(filename: str):
+    try:
+        print("Deleting : {}".format(filename))
+        filename_full = os.path.join(env.MIDI_FOLDER, filename)
+        os.remove(filename_full)
+    except Exception as e:
+        logging.exception(e)
+
+
 def getJsonDataFromFile(filename: str):
     file_path = os.path.join(env.MIDI_FOLDER, filename)
     json_file = open(file_path, 'r')

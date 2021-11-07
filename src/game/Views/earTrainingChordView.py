@@ -1,11 +1,15 @@
+import os
+import tkinter.font
+from tkinter import ttk
+
 from src.game.GamesNames import GameNames
+from src.game.ViewModels.earTrainingChordViewModel import EarTrainingChordViewModel
 from src.game.utils.customElements.customElements import *
 from src.game.utils.customElements.labels import *
-from src.game.ViewModels.earTrainingChordViewModel import EarTrainingChordViewModel
 
 
 class GameStrings(Enum):
-    LABEL_SLIDER_NOTE_DELAY = "Delay (ms) : "
+    LABEL_SLIDER_NOTE_DELAY = "Delay (s) : "
     LABEL_PICK_NOTE = "Pick a starting note"
     LABEL_LISTEN = "Listen ..."
     LABEL_SCORE = "Score"
@@ -18,13 +22,8 @@ class EarTrainingChordView:
         self.master = master
         self.viewModel = None
         self.gameFrame = game_frame
-
-        # # canvas
-        # self.gameFrame.canvas = tk.Canvas(self.gameFrame, bg="black", width=200, height=70, highlightthickness=0)
-        #
-        # # placement of different labels
-        # self.placeElements()
-        # self.game = BacktracksViewModel(self.gameFrame, config)
+        if os.name != 'nt':
+            self.gameFrame.config(cursor='none')
 
         DEFAULT_PADDING = 2
         current_row = 0
@@ -37,15 +36,11 @@ class EarTrainingChordView:
         self.gameFrame.grid_columnconfigure(0, weight=1, uniform="col_width")
         self.gameFrame.grid_columnconfigure(1, weight=1, uniform="col_width")
 
-        # self.lblInterval = ttk.Label(self.gameFrame, text=GameStrings.LABEL_SLIDER_INTERVAL, style=CustomStylesNames.STYLE_LBL_FULL.value)
-        # self.lblInterval.grid(row=0, column=0, sticky=tk.EW, padx=10, pady=0)
         self.lblDelay = ttk.Label(self.gameFrame, text=GameStrings.LABEL_SLIDER_NOTE_DELAY, style=CustomStylesNames.STYLE_LBL_FULL.value)
         self.lblDelay.grid(row=0, column=1, sticky=tk.EW, padx=10, pady=0)
 
         current_row += 1
 
-        # self.slInterval = CustomScale(self.gameFrame, from_=3, to=18)
-        # self.slInterval.grid(row=current_row, column=0, sticky=tk.EW, padx=(10, 10))
         self.slDelay = CustomScale(self.gameFrame, from_=0.2, to=1, resolution=0.05)
         self.slDelay.grid(row=current_row, column=1, sticky=tk.EW, padx=(10, 10))
 
@@ -56,15 +51,15 @@ class EarTrainingChordView:
 
         current_row += 1
 
-        self.lblNoteUser = CustomLabel(self.gameFrame, justify=tk.LEFT, font=(DEFAULT_FONT_NAME, 90, "bold"), text="", padx=32)
+        self.lblNoteUser = CustomLabel(self.gameFrame, justify=tk.LEFT, font=(DEFAULT_FONT_NAME, 90, tkinter.font.BOLD), text="", padx=32)
         self.lblNoteUser.grid(row=current_row, column=1, sticky=tk.NSEW)
 
-        self.lblNote = CustomLabel(self.gameFrame, justify=tk.RIGHT, font=(DEFAULT_FONT_NAME, 90, "bold"), text="?", padx=32)
+        self.lblNote = CustomLabel(self.gameFrame, justify=tk.RIGHT, font=(DEFAULT_FONT_NAME, 90, tkinter.font.BOLD), text="?", padx=32)
         self.lblNote.grid(row=current_row, column=0, columnspan=2, sticky=tk.NSEW)
 
         current_row += 1
 
-        self.result = CustomLabel(self.gameFrame, padx=10, pady=10, font=(DEFAULT_FONT_NAME, 18, "bold"), text="", height=2)
+        self.result = CustomLabel(self.gameFrame, padx=10, pady=10, font=(DEFAULT_FONT_NAME, 18, tkinter.font.BOLD), text="", height=2)
         self.result.grid(row=current_row, columnspan=2)
 
         current_row += 1
@@ -72,7 +67,7 @@ class EarTrainingChordView:
         self.btnSkip = CustomButton(self.gameFrame, text="Skip")
         self.btnSkip.grid(row=0, rowspan=current_row, column=0, columnspan=2, sticky=tk.SE, padx=12, pady=12)
 
-        self.score = CustomLabel(self.gameFrame, font=(DEFAULT_FONT_NAME, DEFAULT_FONT_SIZE, "bold"), text=GameStrings.LABEL_SCORE.value)
+        self.score = CustomLabel(self.gameFrame, font=(DEFAULT_FONT_NAME, DEFAULT_FONT_SIZE, tkinter.font.BOLD), text=GameStrings.LABEL_SCORE.value)
         self.score.grid(row=0, rowspan=current_row, column=0, sticky=tk.SW, padx=12, pady=12)
 
         # =========== CREATION OF THE VIEW_MODEL ====================
@@ -82,6 +77,9 @@ class EarTrainingChordView:
 
     def reinitializeUi(self):
         self.pickNote.config(text=GameStrings.LABEL_PICK_NOTE.value)
+
+    def updateLblNoteDelay(self, value: float):
+        self.lblDelay.config(text=GameStrings.LABEL_SLIDER_NOTE_DELAY.value + str(value))
 
     def setUiStateChordQuestion(self, origin_note_readable: str):
         self.pickNote.config(text=GameStrings.LABEL_LISTEN.value)

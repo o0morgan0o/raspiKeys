@@ -9,7 +9,7 @@ class MidiIO:
         self.isListening = True
         self.midoInList = self.getAllMidiInputs()
         self.midoOutList = self.getAllMidiOutputs()
-        self.midiVolume = 100
+        self.midiVolume = 1
 
         print("mido MIDI I/O initial list:", self.midoInList, self.midoOutList)
         # we check if the default interface is present in the list
@@ -98,8 +98,10 @@ class MidiIO:
             print("error in setCallback()", e)
 
     def sendOut(self, msg_type, note: int, velocity: int = 100):
-        print("[+] sending note : ", msg_type, note, velocity)
-        msg = mido.Message(msg_type, note=note, velocity=velocity)
+        # we map the velocity with the global midi volume (global midi_volume is mapped from 0 to 1)
+        out_velocity = int(velocity * self.midiVolume)
+        print("[+] sending note : ", msg_type, note, out_velocity)
+        msg = mido.Message(msg_type, note=note, velocity=out_velocity)
         self.out_port.send(msg)
 
     def panic(self):

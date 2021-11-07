@@ -1,14 +1,14 @@
 {
     "default_mode": 0,
-    "question_delay": 0.4,
+    "question_delay": 0.75,
     "difficulty": 50,
     "times_each_transpose": 4,
     "nb_of_transpose_before_change": 4,
     "MIDI_interface_in": "USB-MIDI 1",
     "MIDI_interface_out": "USB-MIDI 2",
     "midi_hotkey": 50,
-    "audio_volume": 0.15999999999999953,
-    "midi_volume": 67,
-    "metroBpm": 96,
+    "audio_volume": 0.7199999999999998,
+    "midi_volume": 0.5000000000000001,
+    "metroBpm": 62,
     "max_interval_question_note": 10
 }

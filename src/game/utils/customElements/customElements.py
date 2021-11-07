@@ -1,6 +1,5 @@
 import tkinter as tk
 from enum import Enum
-from tkinter import ttk
 
 from ttkbootstrap import Style
 
@@ -45,7 +44,6 @@ def getCustomStyles():
     style.configure(CustomStylesNames.STYLE_PROGRESSBAR_RED.value,
                     background=Colors.PRIMARY,
                     bordercolor=Colors.BACKGROUND,
-                    # foreground=Colors.BACKGROUND,
                     troughcolor=Colors.BACKGROUND
                     )
 
@@ -61,7 +59,8 @@ class CustomButton(tk.Button):
                  highlightbackground=Colors.WHITE,
                  highlightthickness=Colors.BTN_BORDER_THICKNESS,
                  highlightcolor=Colors.BTN_BORDER_COLOR,
-                 relief=tk.RIDGE
+                 relief=tk.RIDGE,
+                 height=None
                  ):
         super().__init__(parent, text=text,
                          image=image,
@@ -73,7 +72,8 @@ class CustomButton(tk.Button):
                          highlightbackground=highlightbackground,
                          highlightthickness=highlightthickness,
                          highlightcolor=highlightcolor,
-                         relief=relief
+                         relief=relief,
+                         height=height
                          )
 
 
@@ -131,6 +131,7 @@ class CustomScale(tk.Scale):
                  showvalue=0,
                  troughcolor=Colors.SLIDER_BACKGROUND,
                  resolution=None,
+                 command=None,
                  ):
         super().__init__(parent,
                          highlightcolor="green",
@@ -146,5 +147,6 @@ class CustomScale(tk.Scale):
                          showvalue=showvalue,
                          troughcolor=troughcolor,
                          borderwidth=0,
-                         resolution=resolution
+                         resolution=resolution,
+                         command=command
                          )

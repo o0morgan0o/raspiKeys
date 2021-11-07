@@ -1,5 +1,7 @@
+import os
 import tkinter.font
 import tkinter as tk
+from tkinter import ttk
 
 from src.game.GamesNames import GameNames
 from src.game.ViewModels.earTrainingNoteViewModel import EarTrainingNoteViewModel
@@ -10,7 +12,7 @@ from src.game.utils.utilFunctions import formatOutputIntervalUnsigned
 
 class GameStrings(Enum):
     LABEL_SLIDER_INTERVAL = "Max interval : "
-    LABEL_SLIDER_NOTE_DELAY = "Delay (ms) : "
+    LABEL_SLIDER_NOTE_DELAY = "Delay (s) : "
     LABEL_PICK_NOTE = "Pick a starting note"
     LABEL_LISTEN = "Listen ..."
     LABEL_SCORE = "Score"
@@ -23,6 +25,8 @@ class EarTrainingNoteView:
         self.master = master
         self.viewModel = None
         self.gameFrame = game_frame
+        if os.name != 'nt':
+            self.gameFrame.config(cursor='none')
 
         DEFAULT_PADDING = 2
         current_row = 0
@@ -57,7 +61,7 @@ class EarTrainingNoteView:
         self.lblNoteUser = CustomLabel(self.gameFrame, justify=tk.LEFT, font=(DEFAULT_FONT_NAME, 90, tk.font.BOLD), text="", padx=32)
         self.lblNoteUser.grid(row=current_row, column=1, sticky=tk.NSEW)
 
-        self.lblNote = CustomLabel(self.gameFrame, justify=tk.RIGHT, font=(DEFAULT_FONT_NAME, 90, tk.font.BOLD ), text="?", padx=32)
+        self.lblNote = CustomLabel(self.gameFrame, justify=tk.RIGHT, font=(DEFAULT_FONT_NAME, 90, tk.font.BOLD), text="?", padx=32)
         self.lblNote.grid(row=current_row, column=0, columnspan=2, sticky=tk.NSEW)
 
         current_row += 1
@@ -90,7 +94,7 @@ class EarTrainingNoteView:
     def updateLblMaxInterval(self, value: int):
         self.lblInterval.config(text=GameStrings.LABEL_SLIDER_INTERVAL.value + formatOutputIntervalUnsigned(value))
 
-    def updateLblNoteDelay(self, value: int):
+    def updateLblNoteDelay(self, value: float):
         self.lblDelay.config(text=GameStrings.LABEL_SLIDER_NOTE_DELAY.value + str(value))
 
     def setUiStateSetNoteQuestion(self, origin_note_readable: str):

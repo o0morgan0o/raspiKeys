@@ -1,3 +1,5 @@
+from tkinter import ttk
+
 from src.game.GamesNames import GameNames
 from src.game.ViewModels.FooterViewModel import FooterViewModel
 from src.game.utils.customElements.customElements import *
@@ -71,11 +73,13 @@ class FooterView:
         # ===========================================================
 
     def setUiInitialization(self, audio_volume: int, midi_volume: int):
-        self.lblAudioVolume.config(text=ViewStrings.STRING_LBL_AUDIO_VOLUME.value + str(round(audio_volume, 2)))
-        self.lblMidiVolume.config(text=ViewStrings.STRING_LBL_MIDI_VOLUME.value + str(midi_volume))
+        # self.lblAudioVolume.config(text=ViewStrings.STRING_LBL_AUDIO_VOLUME.value + str(round(audio_volume, 2)))
+        # self.lblMidiVolume.config(text=ViewStrings.STRING_LBL_MIDI_VOLUME.value + str(midi_volume))
+        self.updateLblAudioVolume(audio_volume)
+        self.updateLblMidiVolume(midi_volume)
 
     def updateLblAudioVolume(self, audio_volume: float):
         self.lblAudioVolume.config(text=ViewStrings.STRING_LBL_AUDIO_VOLUME.value + str(round(audio_volume, 2)))
 
     def updateLblMidiVolume(self, midi_volume: int):
-        self.lblMidiVolume.config(text=ViewStrings.STRING_LBL_MIDI_VOLUME.value + str(midi_volume))
+        self.lblMidiVolume.config(text="{}: {:.2f}".format(ViewStrings.STRING_LBL_MIDI_VOLUME.value, midi_volume))
