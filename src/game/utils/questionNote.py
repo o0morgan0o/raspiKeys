@@ -51,7 +51,7 @@ class CustomNote:
             raise Exception("CustomNote can't have note_duration and note_type at the same time")
         if note_duration is None and note_type is None:
             raise Exception("CustomNote must have at least note_duration or note_type")
-        print("TRIGGER CUSTOM .................", callback_before_note_on, callback_after_note_on, callback_before_note_off, callback_after_note_off)
+        # print("TRIGGER CUSTOM .................", callback_before_note_on, callback_after_note_on, callback_before_note_off, callback_after_note_off)
         self.midiIO = midi_instance
         self.delayBeforeOn = delay_on
         self.noteDuration = note_duration

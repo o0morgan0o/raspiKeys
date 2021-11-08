@@ -132,9 +132,11 @@ class CustomScale(tk.Scale):
                  troughcolor=Colors.SLIDER_BACKGROUND,
                  resolution=None,
                  command=None,
+                 sliderlength=60
                  ):
         super().__init__(parent,
-                         highlightcolor="green",
+                         sliderlength=sliderlength,
+                         highlightcolor=None,
                          highlightthickness=0,
                          foreground=foreground,
                          background=background,

@@ -67,16 +67,17 @@ class BacktracksView:
                                     fg=Colors.TEXT_WHITE,
                                     # text=ViewStrings.STRING_LBL_TRACK_CATEGORY.value,
                                     justify=tk.CENTER)
+        self.slSpeedVariation = CustomScale(self.frameLeft, from_=-1, to=1, resolution=.05, width=40)
         self.progressBar = ttk.Progressbar(self.frameLeft, style=CustomStylesNames.STYLE_PROGRESSBAR_RED.value, value=0)
         self.btnRecord = CustomButton(self.frameLeft, image=self.images.IMAGE_RECORD_IMAGE,
                                       background=Colors.BACKGROUND, height=80)
 
         # Metronome section
-        self.btnBpmMinus = CustomButton(self.frameLeft, text="-", font=(DEFAULT_FONT_NAME,FONT_SIZE_BTN_PLUS_AND_MINUS, tkinter.font.BOLD ))
+        self.btnBpmMinus = CustomButton(self.frameLeft, text="-", font=(DEFAULT_FONT_NAME, FONT_SIZE_BTN_PLUS_AND_MINUS, tkinter.font.BOLD))
         self.lblMetro = tk.Label(self.frameLeft,
                                  background=Colors.BACKGROUND, foreground=Colors.TEXT_WHITE,
                                  font=(DEFAULT_FONT_NAME, 80))
-        self.btnBpmPlus = CustomButton(self.frameLeft, text="+", font=(DEFAULT_FONT_NAME,FONT_SIZE_BTN_PLUS_AND_MINUS,tkinter.font.BOLD))
+        self.btnBpmPlus = CustomButton(self.frameLeft, text="+", font=(DEFAULT_FONT_NAME, FONT_SIZE_BTN_PLUS_AND_MINUS, tkinter.font.BOLD))
         self.slTempo = CustomScale(self.frameLeft,
                                    from_=BacktracksConstants.TEMPO_MIN_BPM.value, to=BacktracksConstants.TEMPO_MAX_BPM.value,
                                    command=lambda event: self.lblMetro.config(text=str(event))
@@ -114,6 +115,7 @@ class BacktracksView:
         self.btnBpmPlus.config(command=self.viewModel.onBtnBpmPlusClick)
         self.btnBpmMinus.config(command=self.viewModel.onBtnBpmMinusClick)
         self.slTempo.bind("<ButtonRelease-1>", self.viewModel.onSliderTempoMoved)
+        self.slSpeedVariation.bind("<ButtonRelease-1>", self.viewModel.onSliderSpeedVariationMoved)
 
     def setUiSpawnRecordWindow(self, current_backtrack_file: str):
         self.tempRecordView = tk.Toplevel()
@@ -121,6 +123,9 @@ class BacktracksView:
         if os.name != 'nt':
             self.tempRecordView.attributes('-fullscreen', True)
         RecordLickView(self.tempRecordView, current_backtrack_file)
+
+    def resetSpeedVariationSlider(self):
+        self.slSpeedVariation.set(0)
 
     def resetProgressBar(self):
         # TODO Doesn't work, i don't know why
@@ -136,6 +141,7 @@ class BacktracksView:
         self.lblCategory.pack_forget()
         self.progressBar.pack_forget()
         self.btnRecord.pack_forget()
+        self.slSpeedVariation.pack_forget()
 
         self.btnBpmPlus.pack(expand=1, fill=tk.BOTH, padx=LEFT_PANEL_PADDING_X, pady=LEFT_PANEL_PADDING_X)
         self.lblMetro.pack(expand=1)
@@ -150,6 +156,7 @@ class BacktracksView:
 
         self.lblCategory.pack(expand=1, fill=tk.X)
         self.lblTrackTitle.pack(expand=1, fill=tk.BOTH)
+        self.slSpeedVariation.pack(expand=0, fill=tk.BOTH)
         self.progressBar.pack(expand=1, fill=tk.X)
         self.btnRecord.pack(expand=1, fill=tk.X)
 

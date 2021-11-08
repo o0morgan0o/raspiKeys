@@ -1,4 +1,5 @@
 import logging
+import subprocess
 import os
 
 import pygame
@@ -25,6 +26,48 @@ class Audio:
         self.realMetro = None
         self.activeSample = None
         self.activeFolder = None
+
+    def buildBacktrackWithModifiedSpeed(self, speed_variation, origin_file):
+        """ Spawn a rubberband-cli in order to convert backtrack to another tempo """
+        if speed_variation == 0:
+            return origin_file
+        # map the value of speed variation from [-1, 1] to [0.5, 2]
+        interpolater = self.make_interpolater(-1, 1, 0.5, 2)
+        speed_multiplier = interpolater(speed_variation)
+        print('will make interpolation to value: ', speed_multiplier)
+
+        out_file_path = self.getFilePathFromTempWavFolder(file_name='modifiedSpeedWav_tmp.wav')
+        in_file_path = origin_file
+        stretch_command = 'rubberband "{}" "{}" -T {} --realtime --quiet'.format(in_file_path, out_file_path, speed_multiplier)
+        print(stretch_command)
+        stretchingSpeedProcess = subprocess.Popen(stretch_command, shell=True, stdout=subprocess.PIPE)
+        stretchingSpeedProcess.wait()
+        stretchingResult = stretchingSpeedProcess.returncode
+        if stretchingResult != 0:
+            print("ERROR During rubberband process")
+        else:
+            print('File converted to {}'.format(out_file_path))
+        return out_file_path, speed_multiplier
+
+
+    @staticmethod
+    def make_interpolater(left_min, left_max, right_min, right_max):
+        # Figure out how 'wide' each range is
+        leftSpan = left_max - left_min
+        rightSpan = right_max - right_min
+        # Compute the scale factor between left and right values
+        scaleFactor = float(rightSpan) / float(leftSpan)
+        print('scaleFactor: ', scaleFactor)
+
+        # create interpolation function using pre-calculated scaleFactor
+        def interp_fn(value):
+            return right_min + (value - left_min) * scaleFactor
+
+        return interp_fn
+
+    @staticmethod
+    def getFilePathFromTempWavFolder(file_name):
+        return os.path.join(env.TEMP_FOLDER_FOR_MODIFIED_SPEED_BACKTRACK, file_name)
 
     def getCurrentFileLength(self):
         return self.currentFileLength
@@ -104,20 +147,6 @@ class Audio:
             logging.exception(e)
             print("can't play file !!")
         # pygame.mixer.music.play(loops=-1, fade_ms=200)
-
-    # doesn't work
-    # def testLatency(self, initialTime):
-    #     print("starting thread latency")
-    #     initialTime = initialTime
-    #     isActive=True
-    #     while isActive==True:
-    #         pos = pygame.mixer.music.get_pos()
-    #         print("waiting", pos)
-    #         if pos > .1:
-    #             newTime = time.time()
-    #             deltaTime = newTime - initialTime
-    #             print(f"Soud is PLAYING !!, latency is {deltaTime*1000}")
-    #             isActive=False
 
     @staticmethod
     def getBusy():

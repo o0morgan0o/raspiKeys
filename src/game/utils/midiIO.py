@@ -100,7 +100,7 @@ class MidiIO:
     def sendOut(self, msg_type, note: int, velocity: int = 100):
         # we map the velocity with the global midi volume (global midi_volume is mapped from 0 to 1)
         out_velocity = int(velocity * self.midiVolume)
-        print("[+] sending note : ", msg_type, note, out_velocity)
+        # print("[+] sending note : ", msg_type, note, out_velocity)
         msg = mido.Message(msg_type, note=note, velocity=out_velocity)
         self.out_port.send(msg)
 

@@ -17,6 +17,7 @@ PROCESSED_WAV_BASE_FOLDER = os.path.join(ROOT_DIR, "res", "backtracks", "process
 METRO_TICK_FILE = os.path.join(ROOT_DIR, "res", "metro", "tick.wav")
 MIDI_FOLDER = os.path.join(ROOT_DIR, "res", "midi")
 CONFIG_FILE = os.path.join(ROOT_DIR, "config.json")
+TEMP_FOLDER_FOR_MODIFIED_SPEED_BACKTRACK = os.path.join(ROOT_DIR, "res", "backtracks", "temp_wav")
 
 VOLUME_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "volume.png")
 SETTINGS_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "settingsBlack.png")
@@ -32,9 +33,9 @@ PLAY_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "playWhite.png")
 PAUSE_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "pauseWhite.png")
 SHUFFLE_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "shuffleWhite.png")
 RECORD_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "rec.png")
-METRONOME_IMAGE= os.path.join(ROOT_DIR, "res", "icons", "metronome.png")
+METRONOME_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "metronome.png")
 ARROW_UP_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "arrow_up.png")
-ARROW_DOWN_IMAGE= os.path.join(ROOT_DIR, "res", "icons", "arrow_down.png")
+ARROW_DOWN_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "arrow_down.png")
 
 NAVBAR_WIDTH = 80
 FOOTER_HEIGHT = 80

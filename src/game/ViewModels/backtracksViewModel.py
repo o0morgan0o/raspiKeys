@@ -35,6 +35,10 @@ class ProgressThread(threading.Thread):
         print("PROGRESS THREAD FINISHED")
 
 
+
+# TODO try to implement a waveform viewer
+# https: // github.com / bbc / audiowaveform  # usage
+
 class BacktracksViewModel:
     def __init__(self, view):
         self.view = view
@@ -49,11 +53,13 @@ class BacktracksViewModel:
         self.tempoMetronome = getMetroBpm()
         self.allBacktracksInAllCategories = self.audioInstance.getAllBacktracksInAllFolders()
         self.currentBacktrack = None
+        self.currentBacktrackModifiedSpeed = None
 
         self.initializeAudio()
         self.initializeBacktracks(self.allBacktracksInAllCategories)
 
         self.gameState = None
+        self.speedVariation = 0
 
         # DEBUG
         # TODO Remove this
@@ -100,6 +106,7 @@ class BacktracksViewModel:
             self.view.setUiSpawnRecordWindow(self.currentBacktrack)
 
     def onBtnPlayClick(self):
+        self.view.resetSpeedVariationSlider()
         print("STATE", self.gameState, "IS playing ", self.audioInstance.getIsPlaying())
         if self.audioInstance.getIsPlaying():
             return self.stopPlayWithProgressBarReset()
@@ -114,6 +121,7 @@ class BacktracksViewModel:
             self.onBtnMetronomeClick()
 
     def onBtnRandomClick(self):
+        self.view.resetSpeedVariationSlider()
         self.gameState = GameStatesNames.GAME_STATE_BACKTRACK_MODE_ACTIVE.value
         # TODO: Refactor this section with random choice method
         # we must get only non null categories
@@ -129,6 +137,7 @@ class BacktracksViewModel:
         self.onBtnCategoryClick(random_result[0])
 
     def onBtnCategoryClick(self, category_name: str):
+        self.view.resetSpeedVariationSlider()
         self.gameState = GameStatesNames.GAME_STATE_BACKTRACK_MODE_ACTIVE.value
         # TODO should display somewhere the number of files in the category and the index
         category_tuple_clicked = self.getCategoryByCategoryNameInAllBacktracks(self.allBacktracksInAllCategories, category_name)
@@ -170,6 +179,22 @@ class BacktracksViewModel:
         self.view.setUiLblMetronome(self.tempoMetronome)
         self.restartMetronome()
         updateMetroBpm(self.tempoMetronome)
+
+    def onSliderSpeedVariationMoved(self, event):
+        speedVariation = self.view.slSpeedVariation.get()
+        print(speedVariation)
+        if speedVariation == 0:
+            return
+        self.speedVariation = speedVariation
+        self.audioInstance.stopPlay()
+        self.audioInstance.unloadAudio()
+        if self.currentBacktrack is not None and self.currentBacktrack is not None:
+            # Here we get a modified audio file at the wanted speed
+            self.currentBacktrackModifiedSpeed, speed_multiplier = self.audioInstance.buildBacktrackWithModifiedSpeed(self.speedVariation, self.currentBacktrack)
+            print("TRY TO PLAY MODIFIED ", self.currentBacktrackModifiedSpeed)
+            self.playBacktrack(self.currentBacktrackModifiedSpeed)
+        else:
+            print("Not enough data to build track with modified speed", self.speedVariation, self.currentBacktrack)
 
     def restartMetronome(self):
         self.stopPlayWithProgressBarReset()

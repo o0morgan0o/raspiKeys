@@ -1,6 +1,7 @@
 import logging
 import os
 import tkinter as tk
+from functools import partial
 from tkinter import ttk, messagebox
 
 from PIL import Image, ImageTk
@@ -11,6 +12,7 @@ from src.game.ViewModels.practiseLicksViewModel import PractiseLicksViewModel, J
 from src.game.utils.colors import Colors
 from src.game.utils.customElements.customElements import CustomStylesNames, CustomButton, DEFAULT_FONT_NAME
 from src.game.utils.midiToNotenames import noteNameFull
+from src.game.ViewModels.practiseLicksViewModel import TranspositionMode
 
 DEFAULT_PADDING_X = 20
 DEFAULT_PADDING_Y = 20
@@ -48,6 +50,21 @@ class PractiseLicksView:
         self.treeView.pack(expand=1, fill=tk.BOTH, padx=DEFAULT_PADDING_X, pady=DEFAULT_PADDING_Y)
 
         self.frameRightUpperSection = tk.Frame(self.frameRight)
+
+        self.frameRightUpperSectionInner = tk.Frame(self.frameRightUpperSection, bg=Colors.BACKGROUND)
+        self.frameRightUpperSectionInner.grid(row=0, column=0, rowspan=2, columnspan=3, sticky=tk.NSEW)
+        self.lblLickKey = tk.Label(self.frameRightUpperSectionInner, text="LICK_KEY", font=(DEFAULT_FONT_NAME, 40), fg=Colors.TEXT_WHITE, bg=Colors.BACKGROUND)
+        # self.lblLickKey.grid(row=0, rowspan=2, column=0, columnspan=3, sticky=tk.NSEW)
+        self.lblLickKey.pack(expand=1, fill=tk.BOTH)
+        self.lblLickNextKey = tk.Label(self.frameRightUpperSectionInner, text="RAND_KEY", font=(DEFAULT_FONT_NAME, 40), fg='orange', bg=Colors.BACKGROUND)
+        self.lblCurrentLickInfo = tk.Label(self.frameRightUpperSectionInner, text="INFO", font=(DEFAULT_FONT_NAME, 12), fg=Colors.TEXT_WHITE, bg=Colors.BACKGROUND)
+        self.lblCurrentLickInfo.pack(side=tk.BOTTOM)
+
+        self.btnDeleteLick = CustomButton(self.frameRightUpperSection, text="DELETE", command=self.onBtnDeleteLickClick)
+        self.btnDeleteLick.grid(row=0, column=2, sticky=tk.NE)
+        self.btnTreeViewItemPlus = CustomButton(self.frameRightUpperSection, image=self.images.IMAGE_ARROW_UP, command=lambda: self.selectTreeViewNextItem())
+        self.btnTreeViewItemPlus.grid(row=0, column=0, sticky=tk.SW)
+        self.btnTreeViewItemMinus = CustomButton(self.frameRightUpperSection, image=self.images.IMAGE_ARROW_DOWN, command=lambda: self.selectTreeViewPreviousItem())
         self.frameRightUpperSection.grid_rowconfigure(0, weight=1)
         self.frameRightUpperSection.grid_rowconfigure(1, weight=1)
         self.frameRightUpperSection.grid_columnconfigure(0, weight=1)
@@ -55,19 +72,6 @@ class PractiseLicksView:
         self.frameRightUpperSection.grid_columnconfigure(2, weight=1)
         self.frameRightUpperSection.pack(expand=1, fill=tk.BOTH, padx=(0, DEFAULT_PADDING_X), pady=(DEFAULT_PADDING_Y, 0))
 
-        self.lblLickKey = tk.Label(self.frameRightUpperSection, text="LICK_KEY", font=(DEFAULT_FONT_NAME, 40),
-                                   fg=Colors.TEXT_WHITE, bg=Colors.BACKGROUND)
-        self.lblLickKey.grid(row=0, rowspan=2, column=0, columnspan=3, sticky=tk.NSEW)
-        self.lblLickNextKey = tk.Label(self.frameRightUpperSection, text="NEXT_KEY", font=(DEFAULT_FONT_NAME, 40),
-                                       fg='orange', bg=Colors.BACKGROUND)
-
-        self.btnDeleteLick = CustomButton(self.frameRightUpperSection, text="DELETE", command=self.onBtnDeleteLickClick)
-        self.btnDeleteLick.grid(row=0, column=2, sticky=tk.NE)
-        self.btnTreeViewItemPlus = CustomButton(self.frameRightUpperSection, image=self.images.IMAGE_ARROW_UP,
-                                                command=lambda: self.selectTreeViewNextItem())
-        self.btnTreeViewItemPlus.grid(row=0, column=0, sticky=tk.SW)
-        self.btnTreeViewItemMinus = CustomButton(self.frameRightUpperSection, image=self.images.IMAGE_ARROW_DOWN,
-                                                 command=lambda: self.selectTreeViewPreviousItem())
         self.btnTreeViewItemMinus.grid(row=1, column=0, sticky=tk.NW)
 
         self.progressBar = ttk.Progressbar(self.frameRight, style=CustomStylesNames.STYLE_PROGRESSBAR_RED.value, value=0)
@@ -75,7 +79,7 @@ class PractiseLicksView:
         self.progressBar.config(value=0)
 
         self.rowCycles = tk.Frame(self.frameRight)
-        self.btnChangeKeyManual = CustomButton(self.rowCycles, text="MANUAL")
+        self.btnChangeKeyManual = CustomButton(self.rowCycles, text="x0")
         self.btnChangeKeyManual.pack(side=tk.LEFT, expand=1, fill=tk.X)
         self.btnChangeKeyAfter1Cycle = CustomButton(self.rowCycles, text="x1")
         self.btnChangeKeyAfter1Cycle.pack(side=tk.LEFT, expand=1, fill=tk.X)
@@ -88,15 +92,23 @@ class PractiseLicksView:
         self.rowRandom = tk.Frame(self.frameRight)
         self.btnRandomLick = CustomButton(self.rowRandom, text="RANDOM")
         self.btnRandomLick.pack(side=tk.LEFT, expand=1, fill=tk.X)
-        self.btnNextKey = CustomButton(self.rowRandom, text="NEXT_KEY")
-        self.btnNextKey.pack(side=tk.LEFT, expand=1, fill=tk.X)
-        self.btnPlay = CustomButton(self.rowRandom, text="PLAY", command=lambda: self.viewModel.onBtnPlayClick())
+        self.btnTransposeModeRandom = CustomButton(self.rowRandom, text="RAND_KEY")
+        self.btnTransposeModeRandom.pack(side=tk.LEFT, expand=1, fill=tk.BOTH)
+        self.btnTransposeModeSequential = CustomButton(self.rowRandom, text="CHROMA")
+        self.btnTransposeModeSequential.pack(side=tk.LEFT, expand=1, fill=tk.BOTH)
+        self.btnPlay = CustomButton(self.rowRandom, image=self.images.IMAGE_PLAY_IMAGE,height=80, command=lambda: self.viewModel.onBtnPlayClick())
         self.btnPlay.pack(side=tk.LEFT, expand=1, fill=tk.X)
         self.rowRandom.pack(side=tk.BOTTOM, fill=tk.X, padx=(0, DEFAULT_PADDING_X), pady=(0, DEFAULT_PADDING_Y))
 
         # =========== CREATION OF THE VIEW_MODEL ====================
         self.viewModel = PractiseLicksViewModel(self)
         # ===========================================================
+        self.btnChangeKeyManual.config(command=partial(self.viewModel.onBtnChangeNumberOfCyclesBeforeTransposeClick, -1))
+        self.btnChangeKeyAfter1Cycle.config(command=partial(self.viewModel.onBtnChangeNumberOfCyclesBeforeTransposeClick, 1))
+        self.btnChangeKeyAfter2Cycles.config(command=partial(self.viewModel.onBtnChangeNumberOfCyclesBeforeTransposeClick, 2))
+        self.btnChangeKeyAfter4Cycles.config(command=partial(self.viewModel.onBtnChangeNumberOfCyclesBeforeTransposeClick, 4))
+        self.btnTransposeModeRandom.config(command=partial(self.viewModel.setTransposeMode, TranspositionMode.TRANSPOSE_RANDOM.value))
+        self.btnTransposeModeSequential.config(command=partial(self.viewModel.setTransposeMode, TranspositionMode.TRANSPOSE_SEQUENTIAL.value))
 
     def selectTreeViewPreviousItem(self):
         self.moveTreeViewSelectionItem(+1)
@@ -160,14 +172,28 @@ class PractiseLicksView:
     def setUiUpdateLblForLickSelected(self, lick_key: str, lick_name: str = None, lick_date: str = None):
         self.lblLickKey.config(text=lick_key)
 
+    def setUiUpdateLblForCyclesInfo(self, current_cycle: int, number_of_cycles_per_transpose):
+        if number_of_cycles_per_transpose == -1:
+            self.lblCurrentLickInfo.config(text="No transposition")
+            self.setUiResetLblNextKeyIndication()
+            return
+        if current_cycle > number_of_cycles_per_transpose:
+            self.lblCurrentLickInfo.config(text="Starting at next loop...")
+            self.setUiResetLblNextKeyIndication()
+        else:
+            self.lblCurrentLickInfo.config(text="Loop {}/{} before transposition.".format(current_cycle, number_of_cycles_per_transpose))
+        # easiest way to transpose at the right moment is to call the transpose function from here
+        # if current_cycle == number_of_cycles_per_transpose, we  can transpose, else we should not transpose
+        self.viewModel.updateShouldTransposeNext(current_cycle == number_of_cycles_per_transpose)
+
     def setUiUpdateLblNextKeyIndication(self, next_key: str):
         self.lblLickNextKey.config(text="Next key => {}".format(next_key))
-        self.lblLickNextKey.grid(row=1, column=0, columnspan=3, sticky=tk.NSEW)
-        self.lblLickKey.grid(row=0, rowspan=1, column=0, columnspan=3, sticky=tk.NSEW)
+        self.lblLickNextKey.pack()
+        self.lblLickKey.pack()
 
     def setUiResetLblNextKeyIndication(self):
-        self.lblLickNextKey.grid_forget()
-        self.lblLickKey.grid(row=0, rowspan=2, column=0, columnspan=3, sticky=tk.NSEW)
+        self.lblLickNextKey.pack_forget()
+        self.lblLickKey.pack()
 
     def identifySelectedItemInTreeView(self, event):
         selected_item = self.treeView.selection()[0]
