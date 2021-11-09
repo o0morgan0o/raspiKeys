@@ -32,21 +32,22 @@ class OptionsView:
         self.gameFrame.grid_rowconfigure(2, weight=1, pad=DEFAULT_PADDING)
         self.gameFrame.grid_rowconfigure(3, weight=1, pad=DEFAULT_PADDING)
         self.gameFrame.grid_rowconfigure(4, weight=1, pad=DEFAULT_PADDING)
+        self.gameFrame.grid_rowconfigure(5, weight=1, pad=DEFAULT_PADDING)
 
         self.gameFrame.grid_columnconfigure(0, weight=1, uniform="column_size", pad=DEFAULT_PADDING)
         self.gameFrame.grid_columnconfigure(1, weight=1, uniform="column_size", pad=DEFAULT_PADDING)
 
         current_row: int = 0
 
-        self.section1 = MyLabel12(self.gameFrame, text=ViewStrings.LABEL_HEADER_OPTIONS.value)
+        self.section1 = tk.Label(self.gameFrame, text=ViewStrings.LABEL_HEADER_OPTIONS.value)
         self.section1.grid(row=current_row, column=0, sticky=tk.NW)
 
         current_row += 1
 
-        self.currentMidiIn = MyLabel12(self.gameFrame)
+        self.currentMidiIn = tk.Label(self.gameFrame)
         self.currentMidiIn.grid(row=current_row, column=0, sticky=tk.W, padx=20)
 
-        self.currentMidiOut = MyLabel12(self.gameFrame)
+        self.currentMidiOut = tk.Label(self.gameFrame)
         self.currentMidiOut.grid(row=current_row, column=1, sticky=tk.W, padx=20)
 
         current_row += 1
@@ -61,6 +62,13 @@ class OptionsView:
 
         self.btnConfig = tk.Button(self.gameFrame, text="Return Default")
         self.btnConfig.grid(row=current_row, column=1, sticky=tk.SE, padx=20)
+
+        current_row += 1
+
+        self.lblNoteInIndication = tk.Label(self.gameFrame, text="...")
+        self.lblNoteInIndication.grid(row=current_row, column=0, sticky=tk.NSEW)
+        self.lblNoteOutIndication = tk.Label(self.gameFrame, text="...")
+        self.lblNoteOutIndication.grid(row=current_row, column=1, sticky=tk.NSEW)
 
         # =========== CREATION OF THE VIEW_MODEL ====================
         self.game = OptionsViewModel(self)
@@ -78,6 +86,10 @@ class OptionsView:
 
     def updateUiMidiOut(self, new_midi_out):
         self.currentMidiOut.config(text=ViewStrings.CURRENT_MIDI_OUT.value + new_midi_out)
+
+    def updateUiMIDIMessageReceived(self, message):
+        self.lblNoteInIndication.config(text=message)
+
 
     def destroy(self):
         pass

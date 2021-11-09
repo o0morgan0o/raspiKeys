@@ -135,5 +135,6 @@ class EarTrainingNoteView:
         self.lblNote.config(justify=tk.RIGHT)
         self.lblNote.grid(column=0, columnspan=1, sticky=tk.NSEW)
 
-    def __del__(self):
-        pass
+    def destroy(self):
+        print('Delete EarTrainingNoteView')
+        self.viewModel.destroyViewModel()

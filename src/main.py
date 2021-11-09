@@ -29,8 +29,8 @@ class MainApplication(tk.Tk):
 
         # initialisation of default mode, this tracks the current active state of the application
         # self.currentGameMode = GameNames.GAME_OPTIONS
-        # self.currentGameMode = GameNames.GAME_EAR_TRAINING_NOTE
-        self.currentGameMode = GameNames.GAME_LICKS_PRACTISE
+        self.currentGameMode = GameNames.GAME_EAR_TRAINING_NOTE
+        # self.currentGameMode = GameNames.GAME_LICKS_PRACTISE
         # self.currentGameMode = GameNames.GAME_BACKTRACKS
         # self.currentGameMode = GameNames.GAME_TEST_CANVAS
         self.app = None
@@ -62,10 +62,7 @@ class MainApplication(tk.Tk):
     # # method to load a new game mode
     def new_window(self, new_game_mode: GameNames, event=None):
         if self.app is not None:
-            try:
-                self.app.destroy()
-            except Exception as e:
-                logging.info(e)
+            self.app.destroy()
             del self.app
 
         # Import style for ttk.bootstrap styles
@@ -78,7 +75,6 @@ class MainApplication(tk.Tk):
         # self.body = tk.Frame(self, bg='yellow')
         self.body = tk.Frame(self, bg=Colors.BACKGROUND)
         self.body.place(x=env.NAVBAR_WIDTH, y=0, width=env.FULL_SCREEN_W - env.NAVBAR_WIDTH, height=env.FULL_SCREEN_H - env.FOOTER_HEIGHT)
-
 
         if new_game_mode.value == GameNames.GAME_EAR_TRAINING_NOTE.value:
             self.app = EarTrainingNoteView(self, self.body)
@@ -94,15 +90,10 @@ class MainApplication(tk.Tk):
             return
         self.sideNavBar.highLightActiveMode(new_game_mode)
 
-
     def cleanWindow(self):
         self.audioInstance.stopPlay()
-        try:
-            self.app.destroy()
-        except Exception as e:
-            logging.exception(e)
+        self.app.destroy()
         self.destroy()
-
 
 
 if __name__ == "__main__":

@@ -135,7 +135,7 @@ class EarTrainingChordViewModel:
                                note=note,
                                delay_on=delay_before_on * i,
                                note_duration=note_duration,
-                               velocity=getMidiVolume(),
+                               velocity=100,
                                callback_after_note_off=lambda: self.changeGameState(GameStates.GAME_WAITING_USER_ANSWER.value)
                                )
                 else:
@@ -143,7 +143,7 @@ class EarTrainingChordViewModel:
                                note=note,
                                delay_on=delay_before_on * i,
                                note_duration=note_duration,
-                               velocity=getMidiVolume(),
+                               velocity=100,
                                )
 
         elif new_state == GameStates.GAME_WAITING_USER_ANSWER.value:
@@ -223,3 +223,7 @@ class EarTrainingChordViewModel:
         self.userNotesAnswer.append(note)
         # if we get the correct number of notes, we return True
         return len(self.userNotesAnswer) >= len(self.getQuestionChordNotes())
+
+    def destroyViewModel(self):
+        print('Delete EarTrainingChordViewModel')
+        # self.midiIO.setCallback(None)

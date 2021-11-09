@@ -125,7 +125,7 @@ class EarTrainingNoteViewModel:
                        note=self.questionNote,
                        delay_on=delay_before_on,
                        note_duration=note_duration,
-                       velocity=getMidiVolume(),
+                       velocity=100,
                        callback_after_note_off=lambda: self.changeGameState(GameStates.GAME_WAITING_USER_ANSWER.value)
                        )
 
@@ -199,5 +199,6 @@ class EarTrainingNoteViewModel:
             if msg.type == "note_on" and msg.velocity > 10:
                 self.changeGameState(GameStates.GAME_SHOWING_RESULT.value, msg.note)
 
-    def destroy(self):
+    def destroyViewModel(self):
+        print('Delete EarTrainingNoteViewModel')
         self.midiIO.setCallback(None)

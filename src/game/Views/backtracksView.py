@@ -219,3 +219,8 @@ class BacktracksView:
             else:
                 raise Exception("Unknown operating system")
         return wav_folders
+
+
+    def destroy(self):
+        print("Delete BacktracksView")
+        self.viewModel.destroyViewModel()

@@ -98,3 +98,7 @@ class EarTrainingChordView:
 
     def setUiStateLoose(self):
         self.result.config(text="INCORRECT", bg=Colors.ERROR)
+
+    def destroy(self):
+        print('Delete EarTrainingChordView')
+        self.viewModel.destroyViewModel()

@@ -9,6 +9,8 @@ class OptionsViewModel:
     def __init__(self, view):
         self.view = view
         self.midiIO = Autoload.get_instance().getMidiInstance()
+        self.midiIO.setCallback(self.handleMIDIInput)
+        self.midiIO.setListening(True)
         self.midiInstance = None
         self.window = None
         self.labelCurrentIn = None
@@ -63,6 +65,14 @@ class OptionsViewModel:
         self.view.updateUiMidiOut(item_selected)
         self.midiIO.setMidiOutput(item_selected)
         updateMidiOutConfig(item_selected)
+
+    def handleMIDIInput(self, msg):
+        # check if user has midi  listen
+        if not self.midiIO.getListeningState():
+            print("[--] ignoring queue message...", msg)
+            return
+        print("[-]receiving something", msg)
+        self.view.updateUiMIDIMessageReceived(str(msg))
 
     def destroy(self):
         pass

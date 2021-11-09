@@ -228,6 +228,7 @@ class BacktracksViewModel:
         self.view.setUiChangePlayingIcons(is_playing=False)
         self.view.resetProgressBar()
 
-    def destroy(self):
+    def destroyViewModel(self):
+        print("Delete BacktracksViewModel")
         self.audioInstance.stopPlay()
         self.view.setUiChangePlayingIcons(is_playing=False)
