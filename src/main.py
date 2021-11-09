@@ -9,6 +9,7 @@ from src.game.Views.footerView import FooterView
 from src.game.Views.navbarView import NavBarView
 from src.game.Views.optionsView import OptionsView
 from src.game.Views.practiseLicksView import PractiseLicksView
+from src.game.Views.keyboardCanvasView import KeyboardCanvasView
 from src.game.autoload import Autoload
 from src.game.utils.config import loadConfig
 from src.game.utils.customElements.customElements import *
@@ -28,8 +29,9 @@ class MainApplication(tk.Tk):
         # initialisation of default mode, this tracks the current active state of the application
         # self.currentGameMode = GameNames.GAME_OPTIONS
         # self.currentGameMode = GameNames.GAME_EAR_TRAINING_NOTE
-        # self.currentGameMode = GameNames.GAME_LICKS_PRACTISE
-        self.currentGameMode = GameNames.GAME_BACKTRACKS
+        self.currentGameMode = GameNames.GAME_LICKS_PRACTISE
+        # self.currentGameMode = GameNames.GAME_BACKTRACKS
+        # self.currentGameMode = GameNames.GAME_TEST_CANVAS
         self.app = None
         self.audioInstance = Autoload.get_instance().getAudioInstance()
 
@@ -83,6 +85,8 @@ class MainApplication(tk.Tk):
             self.app = PractiseLicksView(self, self.body)
         elif new_game_mode.value == GameNames.GAME_OPTIONS.value:
             self.app = OptionsView(self, self.body)
+        elif new_game_mode.value == GameNames.GAME_TEST_CANVAS.value:
+            self.app = KeyboardCanvasView(self, self.body)
         else:
             return
         self.sideNavBar.highLightActiveMode(new_game_mode)

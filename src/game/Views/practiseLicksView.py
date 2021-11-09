@@ -13,6 +13,7 @@ from src.game.utils.colors import Colors
 from src.game.utils.customElements.customElements import CustomStylesNames, CustomButton, DEFAULT_FONT_NAME
 from src.game.utils.midiToNotenames import noteNameFull
 from src.game.ViewModels.practiseLicksViewModel import TranspositionMode
+from src.game.Views.keyboardCanvasView import KeyboardCanvasView
 
 DEFAULT_PADDING_X = 20
 DEFAULT_PADDING_Y = 20
@@ -57,6 +58,7 @@ class PractiseLicksView:
         # self.lblLickKey.grid(row=0, rowspan=2, column=0, columnspan=3, sticky=tk.NSEW)
         self.lblLickKey.pack(expand=1, fill=tk.BOTH)
         self.lblLickNextKey = tk.Label(self.frameRightUpperSectionInner, text="RAND_KEY", font=(DEFAULT_FONT_NAME, 40), fg='orange', bg=Colors.BACKGROUND)
+        self.lblLickNextKey.pack()
         self.lblCurrentLickInfo = tk.Label(self.frameRightUpperSectionInner, text="INFO", font=(DEFAULT_FONT_NAME, 12), fg=Colors.TEXT_WHITE, bg=Colors.BACKGROUND)
         self.lblCurrentLickInfo.pack(side=tk.BOTTOM)
 
@@ -96,9 +98,11 @@ class PractiseLicksView:
         self.btnTransposeModeRandom.pack(side=tk.LEFT, expand=1, fill=tk.BOTH)
         self.btnTransposeModeSequential = CustomButton(self.rowRandom, text="CHROMA")
         self.btnTransposeModeSequential.pack(side=tk.LEFT, expand=1, fill=tk.BOTH)
-        self.btnPlay = CustomButton(self.rowRandom, image=self.images.IMAGE_PLAY_IMAGE,height=80, command=lambda: self.viewModel.onBtnPlayClick())
+        self.btnPlay = CustomButton(self.rowRandom, image=self.images.IMAGE_PLAY_IMAGE, height=80, command=lambda: self.viewModel.onBtnPlayClick())
         self.btnPlay.pack(side=tk.LEFT, expand=1, fill=tk.X)
-        self.rowRandom.pack(side=tk.BOTTOM, fill=tk.X, padx=(0, DEFAULT_PADDING_X), pady=(0, DEFAULT_PADDING_Y))
+        self.rowRandom.pack( fill=tk.X, padx=(0, DEFAULT_PADDING_X), pady=(0, DEFAULT_PADDING_Y))
+
+        self.keyboardCanvas = KeyboardCanvasView(self.frameRight)
 
         # =========== CREATION OF THE VIEW_MODEL ====================
         self.viewModel = PractiseLicksViewModel(self)
@@ -192,7 +196,7 @@ class PractiseLicksView:
         self.lblLickKey.pack()
 
     def setUiResetLblNextKeyIndication(self):
-        self.lblLickNextKey.pack_forget()
+        self.lblLickNextKey.config(text="EMPTY")
         self.lblLickKey.pack()
 
     def identifySelectedItemInTreeView(self, event):

@@ -8,3 +8,4 @@ class GameNames(Enum):
     GAME_BACKTRACKS = "Backtracks"
     GAME_LICKS_PRACTISE = "LickPractise"
     GAME_OPTIONS = "Options"
+    GAME_TEST_CANVAS = "TestCanvas"

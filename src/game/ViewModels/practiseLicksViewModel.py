@@ -1,6 +1,7 @@
 import random
 import threading
 from enum import Enum
+from functools import partial
 
 import pygame
 from PIL import Image, ImageTk
@@ -63,6 +64,7 @@ class ViewImages:
 class PractiseLicksViewModel:
     def __init__(self, view):
         self.view = view
+        self.keyboardCanvas = view.keyboardCanvas
         self.midiIO = Autoload.get_instance().getMidiInstance()
         self.audioInstance = Autoload.get_instance().getAudioInstance()
 
@@ -160,6 +162,7 @@ class PractiseLicksViewModel:
 
     def cancelPlayingThread(self):
         pygame.mixer.music.set_endevent(MUSIC_CANCELED)
+        self.keyboardCanvas.resetAllNotes()
         self.cyclesCounter = 0
         self.currentTranspose = 0
         self.audioInstance.stopPlay()
@@ -219,16 +222,46 @@ class PractiseLicksViewModel:
 
     def playChordNotes(self, chord_notes: list, transpose: int):
         self.customNotesList = []
+        note_min = 999
+        note_max = 0
+        for note_data in chord_notes:
+            note_transposed = note_data['note'] + transpose
+            # store min and max data for the keyboard Canvas
+            if note_transposed < note_min:
+                note_min = note_transposed
+            if note_transposed > note_max:
+                note_max = note_transposed
+        self.keyboardCanvas.updateMinAndMaxNotes(note_min, note_max)
+
         for note_data in chord_notes:
             # print(note_data)
+            light_on_callback = None
+            light_off_callback = None
+            note_transposed = note_data['note'] + transpose
+            if note_data['type'] == 'note_on':
+                light_on_callback = partial(self.lightNoteOnKeyboardCanvas, note_transposed)
+            elif note_data['type'] == 'note_off':
+                light_off_callback = partial(self.lightNoteResetKeyboardCanvas, note_transposed)
             self.customNotesList.append(
                 CustomNote(
                     midi_instance=self.midiIO,
-                    note=note_data['note'] + transpose,
+                    note=note_transposed,
                     delay_on=note_data['time'] / 1000,
                     note_type=note_data['type'],
-                    velocity=note_data['velocity']
+                    velocity=note_data['velocity'],
+                    callback_before_note_on=light_on_callback,
+                    callback_after_note_off=light_off_callback
                 ))
+
+    def lightNoteOnKeyboardCanvas(self, midi_note):
+        # print('midi to light', midi_note)
+        print('EXISTING ? ', self.keyboardCanvas)
+        self.keyboardCanvas.lightNote(midi_note)
+        # pass
+        # self.view.keyboad.canvas.
+
+    def lightNoteResetKeyboardCanvas(self, midi_note):
+        self.keyboardCanvas.resetNote(midi_note)
 
     def findLickDataFromLickUuid(self, lick_uuid: str):
         for lick in self.allLicksData:

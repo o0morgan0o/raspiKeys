@@ -81,11 +81,11 @@ class CustomNote:
 
     def prepareNoteOn(self, note: int, velocity: int, callback_before_note_on=None, callback_after_note_on=None, callback_before_note_off=None, callback_after_note_off=None):
         if callback_before_note_on is not None:
-            print("BEFORE NOTE ON")
+            # print("BEFORE NOTE ON")
             callback_before_note_on()
         self.midiIO.sendOut("note_on", note, velocity)
         if callback_after_note_on is not None:
-            print("AFTER NOTE ON")
+            # print("AFTER NOTE ON")
             callback_after_note_on()
         if self.noteDuration is not None:
             tout = Timer(
@@ -96,9 +96,9 @@ class CustomNote:
 
     def prepareNoteOut(self, note, callback_before_note_off=None, callback_after_note_off=None):
         if callback_before_note_off is not None:
-            print("BEFORE NOTE OFF")
+            # print("BEFORE NOTE OFF")
             callback_before_note_off()
         self.midiIO.sendOut("note_off", note)
         if callback_after_note_off is not None:
-            print("AFTER NOTE OFF")
+            # print("AFTER NOTE OFF")
             callback_after_note_off()
