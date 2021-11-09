@@ -108,12 +108,12 @@ class RecordLickViewModel:
 
     def onBtnCancelClick(self):
         self.audioInstance.stopPlay()
-        if self.progressThread is not None and self.progressThread.isAlive():
+        if self.progressThread is not None and self.progressThread.canvasThreadAlive():
             self.progressThread.progressThreadAlive = False
         self.view.recordFrame.destroy()
 
     def startRecording(self):
-        if self.progressThread is not None and self.progressThread.isAlive():
+        if self.progressThread is not None and self.progressThread.canvasThreadAlive():
             # we cancel previous progress thread
             self.progressThread.progressThreadAlive = False
         self.progressThread = ProgressRecordingThread(

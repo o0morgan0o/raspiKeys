@@ -254,11 +254,7 @@ class PractiseLicksViewModel:
                 ))
 
     def lightNoteOnKeyboardCanvas(self, midi_note):
-        # print('midi to light', midi_note)
-        print('EXISTING ? ', self.keyboardCanvas)
         self.keyboardCanvas.lightNote(midi_note)
-        # pass
-        # self.view.keyboad.canvas.
 
     def lightNoteResetKeyboardCanvas(self, midi_note):
         self.keyboardCanvas.resetNote(midi_note)
@@ -296,3 +292,7 @@ class PractiseLicksViewModel:
         file_to_delete = item['values'][0] + ".json"
         deleteJsonLickFile(file_to_delete)
         self.reloadLicks()
+
+    def destroyViewModel(self):
+        print("Deleting PractiseLicksViewModel")
+        self.cancelPlayingThread()

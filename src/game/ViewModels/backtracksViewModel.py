@@ -214,7 +214,7 @@ class BacktracksViewModel:
 
     def playBacktrack(self, current_track: str):
         self.view.setUiShowBacktrackSection()
-        if self.progressThread is not None and self.progressThread.isAlive():
+        if self.progressThread is not None and self.progressThread.canvasThreadAlive():
             # we cancel previous progress thread
             self.progressThread.progressThreadAlive = False
         self.audioInstance.simplePlay(current_track)

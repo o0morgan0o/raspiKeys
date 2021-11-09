@@ -239,3 +239,7 @@ class PractiseLicksView:
 
     def clearTreeView(self):
         self.treeView.delete(*self.treeView.get_children())
+
+    def destroy(self):
+        print("Deleting PractiseLicksView")
+        self.viewModel.destroyViewModel()

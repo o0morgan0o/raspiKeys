@@ -1,3 +1,4 @@
+import logging
 import tkinter as tk
 
 WHITE_NOTE_STRING = "white_note"
@@ -5,7 +6,7 @@ BLACK_NOTE_STRING = "black_note"
 
 
 class KeyboardCanvasView:
-    def __init__(self, game_frame: tk.Frame, note_min=0, note_max=127):
+    def __init__(self, game_frame, note_min=0, note_max=127):
 
         self.canvasDimensions = (200, 100)
         self.octaveMin, self.numberOfOctavesToShow = self.calculateNumberOfOctaveNeeded(note_min, note_max)
@@ -50,7 +51,10 @@ class KeyboardCanvasView:
         self.allBlackNotes = list(self.canvas.find_withtag('black_note'))
 
     def resetNote(self, note_number: int):
-        note_to_reset = self.canvas.find_withtag("tag{}".format(note_number - self.octaveOffset))
+        try:
+            note_to_reset = self.canvas.find_withtag("tag{}".format(note_number - self.octaveOffset))
+        except RuntimeError as e:
+            return
         if len(note_to_reset) != 1:
             # print("No note find in canvas", note_to_reset)
             return
@@ -64,7 +68,10 @@ class KeyboardCanvasView:
             self.canvas.itemconfig(note_to_reset, fill='black')
 
     def lightNote(self, note_number: int):
-        note_to_light = self.canvas.find_withtag("tag{}".format(note_number-self.octaveOffset))
+        try:
+            note_to_light = self.canvas.find_withtag("tag{}".format(note_number - self.octaveOffset))
+        except RuntimeError as e:
+            return
         if len(note_to_light) == 1:
             # We want to map the notes for the first octave, so that we don't need to "move" the canvas
             # note_to_light -= self.octaveOffset
@@ -149,7 +156,7 @@ class Octave:
         counter = 0
         mapped_white_notes_values = [0, 2, 4, 5, 7, 9, 11]
         mapped_black_notes_values = [1, 3, 6, 8, 10]
-        print("OCTAVE_CREATION", self.octaveOrigin)
+        # print("OCTAVE_CREATION", self.octaveOrigin)
         # Handle of white notes
         for i in range(0, 7):
             note_position_X = self.octaveOrigin[0] + i * self.whiteNoteRectWidth

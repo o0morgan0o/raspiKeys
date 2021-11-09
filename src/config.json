@@ -8,7 +8,7 @@
     "MIDI_interface_out": "USB-MIDI 2",
     "midi_hotkey": 50,
     "audio_volume": 1.0,
-    "midi_volume": 0.20000000000000015,
+    "midi_volume": 0.30000000000000016,
     "metroBpm": 62,
     "max_interval_question_note": 10
 }
