@@ -34,13 +34,15 @@ class EarTrainingNoteViewModel:
 
         self.intervalMax = getMaxIntervalQuestionNote()
         self.delay = getNoteDelay()
+        self.velocity = 100
 
         # variable for user score
         self.counter = 0
         self.score = 0
 
-        self.originNote = None
-        self.questionNote = None
+        self.questionCustomNote = None
+        self.originNoteMidiNumber = None
+        self.questionMidiNumber = None
         self.questionInterval = None
 
         # gameState is used to know when the user is guessing
@@ -99,11 +101,11 @@ class EarTrainingNoteViewModel:
             elif coming_from == WaitingInput.WAITING_INPUT_COMING_FROM_LOOSE.value:
                 pass
             elif coming_from == WaitingInput.WAITING_INPUT_COMING_FROM_SKIP.value:
-                if self.questionNote is None or self.originNote is None:
+                if self.questionMidiNumber is None or self.originNoteMidiNumber is None:
                     return self.changeGameState(GameStates.GAME_WAITING_USER_INPUT.value)
-                intervalReadableText = formatOutputInterval(self.questionNote - self.originNote)
+                intervalReadableText = formatOutputInterval(self.questionMidiNumber - self.originNoteMidiNumber)
                 self.questionInterval = self.pickQuestionInterval(self.view.slInterval.get())
-                self.view.setUiStateSkippedQuestion(noteNameFull(self.questionNote), intervalReadableText)
+                self.view.setUiStateSkippedQuestion(noteNameFull(self.questionMidiNumber), intervalReadableText)
                 self.changeGameState(GameStates.GAME_WAITING_USER_INPUT.value)
             else:
                 raise BaseException("Error in Waiting User Input state, No coming_from value set.")
@@ -113,21 +115,21 @@ class EarTrainingNoteViewModel:
             pass
 
         elif new_state == GameStates.GAME_SET_NOTE_QUESTION.value:
-            self.originNote = note_received
-            self.view.setUiStateSetNoteQuestion(noteNameFull(self.originNote))
-            self.questionNote = self.getNewQuestionNote(note_received, self.questionInterval)
+            self.originNoteMidiNumber = note_received
+            self.view.setUiStateSetNoteQuestion(noteNameFull(self.originNoteMidiNumber))
+            self.questionMidiNumber = self.getNewQuestionNote(note_received, self.questionInterval)
             self.changeGameState(GameStates.GAME_CPU_PLAY_NOTE.value)
 
         elif new_state == GameStates.GAME_CPU_PLAY_NOTE.value:
             delay_before_on = float(self.delay)
             note_duration = 0.4
-            CustomNote(self.midiIO,
-                       note=self.questionNote,
-                       delay_on=delay_before_on,
-                       note_duration=note_duration,
-                       velocity=100,
-                       callback_after_note_off=lambda: self.changeGameState(GameStates.GAME_WAITING_USER_ANSWER.value)
-                       )
+            self.questionCustomNote = CustomNote(self.midiIO,
+                                                 note=self.questionMidiNumber,
+                                                 delay_on=delay_before_on,
+                                                 note_duration=note_duration,
+                                                 velocity=self.velocity,
+                                                 callback_after_note_off=lambda: self.changeGameState(GameStates.GAME_WAITING_USER_ANSWER.value)
+                                                 )
 
         elif new_state == GameStates.GAME_WAITING_USER_ANSWER.value:
             self.view.setUiStateWaitingAnswer()
@@ -135,7 +137,7 @@ class EarTrainingNoteViewModel:
 
         elif new_state == GameStates.GAME_SHOWING_RESULT.value:
             self.view.setUiStateShowingResult(noteNameFull(note_received))
-            difference = self.checkAnswer(note_received, self.questionNote)
+            difference = self.checkAnswer(note_received, self.questionMidiNumber)
             print("difference ", difference)
             if difference == 0:
                 # win
@@ -147,23 +149,23 @@ class EarTrainingNoteViewModel:
                 self.processLoose()
 
     def showWinUi(self):
-        intervalReadableText = formatOutputInterval(self.questionNote - self.originNote)
-        self.view.setUiStateWin(noteNameFull(self.questionNote), intervalReadableText)
+        intervalReadableText = formatOutputInterval(self.questionMidiNumber - self.originNoteMidiNumber)
+        self.view.setUiStateWin(noteNameFull(self.questionMidiNumber), intervalReadableText)
 
     def processWin(self):
-        midi_win_melody_volume = int(float(getMidiVolume()) * 3 / 4)
-        playWinMelody(self.midiIO, midi_win_melody_volume,
+        print('SHOULD PLAY WIN')
+        playWinMelody(self.midiIO, self.velocity,
                       callback_after_melody=self.changeGameState(
                           GameStates.GAME_INITIALIZATION.value,
                           coming_from=WaitingInput.WAITING_INPUT_COMING_FROM_WIN.value)
                       )
 
     def showLooseUi(self, note_received: int):
-        intervalReadableText = formatOutputInterval(note_received - self.originNote)
+        intervalReadableText = formatOutputInterval(note_received - self.originNoteMidiNumber)
         self.view.setUiStateLoose(noteNameFull(note_received), intervalReadableText)
 
     def processLoose(self):
-        self.changeGameState(GameStates.GAME_SET_NOTE_QUESTION.value, self.originNote)
+        self.changeGameState(GameStates.GAME_SET_NOTE_QUESTION.value, self.originNoteMidiNumber)
         pass
 
     @staticmethod
@@ -194,7 +196,7 @@ class EarTrainingNoteViewModel:
 
         if self.gameState == GameStates.GAME_WAITING_USER_ANSWER.value:
             # we allow the player to replay the origin note freely
-            if msg.note == self.originNote:
+            if msg.note == self.originNoteMidiNumber:
                 return
             if msg.type == "note_on" and msg.velocity > 10:
                 self.changeGameState(GameStates.GAME_SHOWING_RESULT.value, msg.note)
@@ -202,3 +204,7 @@ class EarTrainingNoteViewModel:
     def destroyViewModel(self):
         print('Delete EarTrainingNoteViewModel')
         self.midiIO.setCallback(None)
+        self.midiIO.setListening(False)
+        if self.questionCustomNote is not None:
+            self.questionCustomNote.timer.cancel()
+

@@ -1,7 +1,7 @@
 from enum import Enum
 
 from src.game.autoload import Autoload
-from src.game.utils.config import getMidiVolume
+from src.game.utils.config import getMidiVolume, getNoteDuration, updateEarTrainingNoteDuration
 from src.game.utils.midiChords import MidiChords
 from src.game.utils.midiToNotenames import noteNameFull
 from src.game.utils.questionNote import CustomNote, playWinMelody
@@ -36,10 +36,12 @@ class EarTrainingChordViewModel:
         self.score = 0
 
         self.originNote = None
+        self.velocity=100
 
         self.noteDelay = getNoteDelay()
-        self.waitingNotes = []
-        self.questionArray = []
+        self.noteDuration = getNoteDuration()
+        print('NOTE DURATION', self.noteDuration)
+
         self.questionChord = None
         self.questionQualityChord = None
         self.userNotesAnswer = []
@@ -51,7 +53,7 @@ class EarTrainingChordViewModel:
         self.startGame()
 
         self.initializeNoteDelaySlider()
-        self.view.updateLblNoteDelay(self.noteDelay)
+        self.initializeNoteDurationSlider()
 
     # def skip(self):
     #     try:
@@ -68,6 +70,11 @@ class EarTrainingChordViewModel:
 
     def initializeNoteDelaySlider(self):
         self.view.slDelay.set(self.noteDelay)
+        self.view.updateLblNoteDelay(self.noteDelay)
+
+    def initializeNoteDurationSlider(self):
+        self.view.slDuration.set(self.noteDuration)
+        self.view.updateLblNoteDuration(self.noteDuration)
 
     def getQuestionChordNotes(self) -> list:
         chord_quality, origin_note, notes = self.questionChord
@@ -88,6 +95,11 @@ class EarTrainingChordViewModel:
         self.noteDelay = self.view.slDelay.get()
         updateEarTrainingNoteDelay(new_value=self.noteDelay)
         self.view.updateLblNoteDelay(self.noteDelay)
+
+    def onSliderDurationMoved(self, event):
+        self.noteDuration = self.view.slDuration.get()
+        updateEarTrainingNoteDuration(new_value = self.noteDuration)
+        self.view.updateLblNoteDuration(self.noteDuration)
 
     def startGame(self):
         self.midiIO.setListening(True)
@@ -125,25 +137,27 @@ class EarTrainingChordViewModel:
             print('question note', self.questionChord)
             self.changeGameState(GameStates.GAME_CPU_PLAY_CHORD.value)
         elif new_state == GameStates.GAME_CPU_PLAY_CHORD.value:
-            delay_before_on = 0.4
-            note_duration = 0.4
+            # additional delay to be more convenient and enjoyable for the user
+            additional_delay_before_playing_question = 0.8
+            delay_before_on = self.noteDelay
+            note_duration = self.noteDuration
             notes = self.getQuestionChordNotes()
             for i in range(0, len(notes)):
                 note = notes[i]
                 if i == len(notes) - 1:
                     CustomNote(self.midiIO,
                                note=note,
-                               delay_on=delay_before_on * i,
+                               delay_on=additional_delay_before_playing_question + delay_before_on * i,
                                note_duration=note_duration,
-                               velocity=100,
+                               velocity=self.velocity,
                                callback_after_note_off=lambda: self.changeGameState(GameStates.GAME_WAITING_USER_ANSWER.value)
                                )
                 else:
                     CustomNote(self.midiIO,
                                note=note,
-                               delay_on=delay_before_on * i,
+                               delay_on=additional_delay_before_playing_question +delay_before_on * i,
                                note_duration=note_duration,
-                               velocity=100,
+                               velocity=self.velocity,
                                )
 
         elif new_state == GameStates.GAME_WAITING_USER_ANSWER.value:
@@ -165,8 +179,7 @@ class EarTrainingChordViewModel:
         self.view.setUiStateWin(noteNameFull(self.originNote), self.getQuestionChordQuality(), self.getQuestionChordNotesHumanReadable())
 
     def processWin(self):
-        midi_win_melody_volume = int(float(getMidiVolume()) * 3 / 4)
-        playWinMelody(self.midiIO, midi_win_melody_volume,
+        playWinMelody(self.midiIO, self.velocity,
                       callback_after_melody=self.changeGameState(
                           GameStates.GAME_INITIALIZATION.value,
                           coming_from=WaitingInput.WAITING_INPUT_COMING_FROM_WIN.value)
@@ -221,9 +234,11 @@ class EarTrainingChordViewModel:
 
     def addNoteToUserAnswer(self, note) -> bool:
         self.userNotesAnswer.append(note)
+        print('question', self.getQuestionChordNotes(), 'current answer : ', self.userNotesAnswer)
         # if we get the correct number of notes, we return True
         return len(self.userNotesAnswer) >= len(self.getQuestionChordNotes())
 
     def destroyViewModel(self):
         print('Delete EarTrainingChordViewModel')
-        # self.midiIO.setCallback(None)
+        self.midiIO.setCallback(None)
+        self.midiIO.setListening(False)

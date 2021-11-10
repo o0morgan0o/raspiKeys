@@ -28,6 +28,7 @@ class MainApplication(tk.Tk):
         # initialisation of default mode, this tracks the current active state of the application
         # self.currentGameMode = GameNames.GAME_OPTIONS
         # self.currentGameMode = GameNames.GAME_EAR_TRAINING_NOTE
+        # self.currentGameMode = GameNames.GAME_EAR_TRAINING_CHORDS
         # self.currentGameMode = GameNames.GAME_LICKS_PRACTISE
         self.currentGameMode = GameNames.GAME_BACKTRACKS
         # self.currentGameMode = GameNames.GAME_TEST_CANVAS

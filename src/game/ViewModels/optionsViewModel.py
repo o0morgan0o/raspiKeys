@@ -13,7 +13,6 @@ class OptionsViewModel:
         self.midiIO.setCallback(self.handleMIDIInput)
         self.midiIO.setListening(True)
         self.midiInstance = None
-        self.window = None
         self.labelCurrentIn = None
         self.labelCurrentOut = None
 

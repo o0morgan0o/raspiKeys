@@ -10,6 +10,7 @@ class ConfigurationFields(Enum):
     DEFAULT_MODE = "default_mode"
     EAR_TRAINING_NOTE_QUESTION_DELAY = "question_delay"
     EAR_TRAINING_NOTE_MAX_INTERVAL = "max_interval_question_note"
+    EAR_TRAINING_NOTE_DURATION = "note_duration"
     DIFFICULTY = "difficulty"
     TIMES_EACH_TRANSPOSE = "times_each_transpose"
     NB_OF_TRANSPOSE_BEFORE_CHANGE = "nb_of_transpose_before_change"
@@ -63,6 +64,12 @@ def updateEarTrainingNoteDelay(new_value: float):
     writeConfig(config)
 
 
+def updateEarTrainingNoteDuration(new_value: float):
+    config = loadConfig()
+    config[ConfigurationFields.EAR_TRAINING_NOTE_DURATION.value] = new_value
+    writeConfig(config)
+
+
 def writeConfig(config):
     json_config = json.dumps(config, indent=4)
     print("saving change in config...")
@@ -103,8 +110,12 @@ def getMidiInterfaceOut() -> str:
     return midi_out_config
 
 
-def getNoteDelay() -> int:
+def getNoteDelay() -> float:
     return loadConfig()[ConfigurationFields.EAR_TRAINING_NOTE_QUESTION_DELAY.value]
+
+
+def getNoteDuration() -> float:
+    return loadConfig()[ConfigurationFields.EAR_TRAINING_NOTE_DURATION.value]
 
 
 def getMaxIntervalQuestionNote() -> int:
@@ -130,6 +141,8 @@ def loadConfigFromFile(config: dict) -> dict:
         (0, config.get(ConfigurationFields.DEFAULT_MODE.value))[ConfigurationFields.DEFAULT_MODE.value in config.keys()]
     config[ConfigurationFields.EAR_TRAINING_NOTE_QUESTION_DELAY.value] = \
         (50, config.get(ConfigurationFields.EAR_TRAINING_NOTE_QUESTION_DELAY.value))[ConfigurationFields.EAR_TRAINING_NOTE_QUESTION_DELAY.value in config.keys()]
+    config[ConfigurationFields.EAR_TRAINING_NOTE_DURATION.value] = \
+        (.8, config.get(ConfigurationFields.EAR_TRAINING_NOTE_DURATION.value))[ConfigurationFields.EAR_TRAINING_NOTE_DURATION.value in config.keys()]
     config[ConfigurationFields.TIMES_EACH_TRANSPOSE.value] = \
         (4, config.get(ConfigurationFields.TIMES_EACH_TRANSPOSE.value))[ConfigurationFields.TIMES_EACH_TRANSPOSE.value in config.keys()]
     config[ConfigurationFields.NB_OF_TRANSPOSE_BEFORE_CHANGE.value] = \

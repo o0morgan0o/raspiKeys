@@ -49,6 +49,7 @@ class BacktracksView:
         self.waveformImage = ImageTk.PhotoImage(Image.open(os.path.join(env.TEMP_FOLDER_FOR_WAVEFORM_TIMELINE_PNG, "empty_waveform_black.png")))
         if os.name != 'nt':
             self.gameFrame.config(cursor="none")
+
         self.backtracksCategoriesTuples = []
 
         self.animation = None

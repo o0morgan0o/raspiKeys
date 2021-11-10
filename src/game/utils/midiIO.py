@@ -48,7 +48,7 @@ class MidiIO:
             print("END ==========")
 
             self.showIOPorts()
-            self.out_port.panic()
+            # self.out_port.panic()
             self.out_port.reset()
         except Exception as e:
             print("Error in function resetInAndOut()")
@@ -63,7 +63,6 @@ class MidiIO:
         print(80 * "=")
 
     def setMidiInput(self, _input):
-        self.resetInAndOut()
         try:
             self.in_port.close()
         except BaseException as e:
@@ -73,9 +72,9 @@ class MidiIO:
         except BaseException as e:
             print("error setting input port", e)
         print("LISTENING ?????? ", self.isListening)
+        self.resetInAndOut()
 
     def setMidiOutput(self, _output):
-        self.resetInAndOut()
         try:
             self.out_port.close()
         except BaseException as e:
@@ -84,13 +83,7 @@ class MidiIO:
             self.out_port = mido.open_output(_output)
         except BaseException as e:
             print("error setting output port", e)
-
-    def destroy(self):
-        self.in_port.callback = None
-        self.out_port.panic()
-        # close ports
-        self.out_port.close()
-        self.in_port.close()
+        self.resetInAndOut()
 
     def setCallback(self, callback):
         try:
@@ -108,7 +101,6 @@ class MidiIO:
     def panic(self):
         self.out_port.panic()
 
-
     def getListeningState(self) -> bool:
         return self.isListening
 
@@ -119,6 +111,13 @@ class MidiIO:
         #     self.isListening = False
         # else:
         #     self.isListening = True
+
+    def destroy(self):
+        self.in_port.callback = None
+        self.out_port.panic()
+        # close ports
+        self.out_port.close()
+        self.in_port.close()
 
     @staticmethod
     def getAllMidiInputs():
@@ -139,6 +138,7 @@ class MidiIO:
     @staticmethod
     def openInput(inputs_arr: dict, index: int):
         if len(inputs_arr) > 0:
+            print('TRY TO OPEN MIDI: ', inputs_arr[index])
             return mido.open_input(inputs_arr[index])
 
     @staticmethod

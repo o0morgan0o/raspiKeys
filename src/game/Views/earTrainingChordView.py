@@ -9,12 +9,15 @@ from src.game.utils.customElements.labels import *
 
 
 class GameStrings(Enum):
-    LABEL_SLIDER_NOTE_DELAY = "Delay (s) : "
+    LABEL_SLIDER_NOTE_DELAY = "Delay (s): "
+    LABEL_SLIDER_NOTE_DURATION = "Note duration (s): "
     LABEL_PICK_NOTE = "Pick a starting note"
     LABEL_LISTEN = "Listen ..."
     LABEL_SCORE = "Score"
     LABEL_WHAT_IS_YOUR_ANSWER = "What is your answer ?"
 
+
+# TODO add keyboard View
 
 class EarTrainingChordView:
     def __init__(self, master, game_frame: tk.Frame):
@@ -39,10 +42,16 @@ class EarTrainingChordView:
         self.lblDelay = ttk.Label(self.gameFrame, text=GameStrings.LABEL_SLIDER_NOTE_DELAY, style=CustomStylesNames.STYLE_LBL_FULL.value)
         self.lblDelay.grid(row=0, column=1, sticky=tk.EW, padx=10, pady=0)
 
+        self.lblNoteDuration = ttk.Label(self.gameFrame, text=GameStrings.LABEL_SLIDER_NOTE_DURATION, style=CustomStylesNames.STYLE_LBL_FULL.value)
+        self.lblNoteDuration.grid(row=0,column=0, sticky=tk.EW, padx=10,pady=10)
+
         current_row += 1
 
-        self.slDelay = CustomScale(self.gameFrame, from_=0.2, to=1, resolution=0.05)
+        self.slDelay = CustomScale(self.gameFrame, from_=0.05, to=1, resolution=0.05)
         self.slDelay.grid(row=current_row, column=1, sticky=tk.EW, padx=(10, 10))
+
+        self.slDuration = CustomScale(self.gameFrame, from_=.05, to=1.5, resolution=0.05)
+        self.slDuration.grid(row=current_row, column=0, sticky=tk.EW, padx=(10,10))
 
         current_row += 1
 
@@ -74,12 +83,16 @@ class EarTrainingChordView:
         self.viewModel = EarTrainingChordViewModel(self)
         # ===========================================================
         self.slDelay.bind('<ButtonRelease-1>', self.viewModel.onSliderDelayMoved)
+        self.slDuration.bind('<ButtonRelease-1>', self.viewModel.onSliderDurationMoved)
 
     def reinitializeUi(self):
         self.pickNote.config(text=GameStrings.LABEL_PICK_NOTE.value)
 
     def updateLblNoteDelay(self, value: float):
         self.lblDelay.config(text=GameStrings.LABEL_SLIDER_NOTE_DELAY.value + str(value))
+
+    def updateLblNoteDuration(self, value: float):
+        self.lblNoteDuration.config(text=GameStrings.LABEL_SLIDER_NOTE_DURATION.value + str(value))
 
     def setUiStateChordQuestion(self, origin_note_readable: str):
         self.pickNote.config(text=GameStrings.LABEL_LISTEN.value)
