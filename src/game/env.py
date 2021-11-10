@@ -18,6 +18,7 @@ METRO_TICK_FILE = os.path.join(ROOT_DIR, "res", "metro", "tick.wav")
 MIDI_FOLDER = os.path.join(ROOT_DIR, "res", "midi")
 CONFIG_FILE = os.path.join(ROOT_DIR, "config.json")
 TEMP_FOLDER_FOR_MODIFIED_SPEED_BACKTRACK = os.path.join(ROOT_DIR, "res", "backtracks", "temp_wav")
+TEMP_FOLDER_FOR_WAVEFORM_TIMELINE_PNG = os.path.join(ROOT_DIR, "res", "backtracks", "temp_png")
 
 VOLUME_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "volume.png")
 SETTINGS_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "settingsBlack.png")

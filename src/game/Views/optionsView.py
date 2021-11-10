@@ -3,8 +3,9 @@ import os
 from src.game.GamesNames import GameNames
 from src.game.ViewModels.optionsViewModel import OptionsViewModel
 from src.game.utils.customElements.customElements import *
-from src.game.utils.customElements.labels import *
 from src.game.utils.customElements.scales import *
+from src.game.utils.questionNote import playWinMelody
+from src.game import env
 
 
 class ViewStrings(Enum):
@@ -18,7 +19,7 @@ class ViewStrings(Enum):
 class OptionsView:
     def __init__(self, master, game_frame: tk.Frame):
         print("launching game {}".format(GameNames.GAME_OPTIONS))
-        self.game = None
+        self.viewModel = None
         self.master = master
         self.gameFrame = game_frame
         if os.name != 'nt':
@@ -27,54 +28,50 @@ class OptionsView:
 
         DEFAULT_PADDING = 3
 
-        self.gameFrame.grid_rowconfigure(0, weight=1, pad=DEFAULT_PADDING)
-        self.gameFrame.grid_rowconfigure(1, weight=1, pad=DEFAULT_PADDING)
-        self.gameFrame.grid_rowconfigure(2, weight=1, pad=DEFAULT_PADDING)
-        self.gameFrame.grid_rowconfigure(3, weight=1, pad=DEFAULT_PADDING)
-        self.gameFrame.grid_rowconfigure(4, weight=1, pad=DEFAULT_PADDING)
-        self.gameFrame.grid_rowconfigure(5, weight=1, pad=DEFAULT_PADDING)
+        self.container=tk.Frame(self.gameFrame, bg=Colors.BACKGROUND)
+        self.container.pack(side="top", fill="both", expand=True, padx=20, pady=(10,20))
 
-        self.gameFrame.grid_columnconfigure(0, weight=1, uniform="column_size", pad=DEFAULT_PADDING)
-        self.gameFrame.grid_columnconfigure(1, weight=1, uniform="column_size", pad=DEFAULT_PADDING)
+        self.title = CustomLabel(self.container, text=ViewStrings.LABEL_HEADER_OPTIONS.value)
+        self.title.pack(fill=tk.X, pady=(0,20))
 
-        current_row: int = 0
+        self.row1 = tk.Frame(self.container)
+        self.row1.pack(fill=tk.X)
+        self.currentMidiIn = CustomLabel(self.row1)
+        self.currentMidiIn.pack(side=tk.LEFT, expand=1, fill=tk.X)
 
-        self.section1 = tk.Label(self.gameFrame, text=ViewStrings.LABEL_HEADER_OPTIONS.value)
-        self.section1.grid(row=current_row, column=0, sticky=tk.NW)
+        self.currentMidiOut = CustomLabel(self.row1)
+        self.currentMidiOut.pack(side=tk.LEFT, expand=1, fill=tk.X)
 
-        current_row += 1
+        self.row2 = tk.Frame(self.container,bg='red')
+        self.row2.pack(fill=tk.X, expand=1)
+        self.row2.grid_columnconfigure(0,weight=1, uniform='column_size')
+        self.row2.grid_columnconfigure(1,weight=1, uniform='column_size')
 
-        self.currentMidiIn = tk.Label(self.gameFrame)
-        self.currentMidiIn.grid(row=current_row, column=0, sticky=tk.W, padx=20)
+        self.midiInListbox = tk.Listbox(self.row2, selectmode='single', exportselection=0)
+        self.midiInListbox.grid(row=0, column=0,sticky=tk.NSEW)
+        self.midiOutListbox = tk.Listbox(self.row2, selectmode='single', exportselection=0)
+        self.midiOutListbox.grid(row=0,column=1, sticky=tk.NSEW)
 
-        self.currentMidiOut = tk.Label(self.gameFrame)
-        self.currentMidiOut.grid(row=current_row, column=1, sticky=tk.W, padx=20)
+        self.row3 = tk.Frame(self.container,bg='red')
+        self.row3.pack(fill=tk.X, expand=1)
+        self.row3.grid_columnconfigure(0,weight=1, uniform='column_size')
+        self.row3.grid_columnconfigure(1,weight=1, uniform='column_size')
 
-        current_row += 1
+        self.lblNoteInIndication = tk.Label(self.row3, text="Input ?", bg=Colors.BACKGROUND, fg=Colors.TEXT_WHITE)
+        self.lblNoteInIndication.grid(row=0, column=0,sticky=tk.NSEW)
+        self.btnPlayNote = CustomButton(self.row3, text="Test note", background=Colors.BACKGROUND, foreground=Colors.TEXT_WHITE)
+        self.btnPlayNote.grid(row=0,column=1,sticky=tk.NSEW)
 
-        self.midiInListbox = tk.Listbox(self.gameFrame, selectmode='single', exportselection=0)
-        self.midiInListbox.grid(row=current_row, column=0, sticky=tk.NSEW, padx=20)
-
-        self.midiOutListbox = tk.Listbox(self.gameFrame, selectmode='single', exportselection=0)
-        self.midiOutListbox.grid(row=current_row, column=1, sticky=tk.NSEW, padx=20)
-
-        current_row += 1
-
-        self.btnConfig = tk.Button(self.gameFrame, text="Return Default")
-        self.btnConfig.grid(row=current_row, column=1, sticky=tk.SE, padx=20)
-
-        current_row += 1
-
-        self.lblNoteInIndication = tk.Label(self.gameFrame, text="...")
-        self.lblNoteInIndication.grid(row=current_row, column=0, sticky=tk.NSEW)
-        self.lblNoteOutIndication = tk.Label(self.gameFrame, text="...")
-        self.lblNoteOutIndication.grid(row=current_row, column=1, sticky=tk.NSEW)
+        self.btnConfig = CustomButton(self.container, text="Return Default")
+        self.btnConfig.pack(side=tk.RIGHT)
+        # self.btnConfig.grid(row=current_row, column=1, sticky=tk.SE, padx=20)
 
         # =========== CREATION OF THE VIEW_MODEL ====================
-        self.game = OptionsViewModel(self)
+        self.viewModel = OptionsViewModel(self)
         # ===========================================================
-        self.midiInListbox.bind("<<ListboxSelect>>", self.game.midiInChangeCallback)
-        self.midiOutListbox.bind("<<ListboxSelect>>", self.game.midiOutChangeCallback)
+        self.midiInListbox.bind("<<ListboxSelect>>", self.viewModel.midiInChangeCallback)
+        self.midiOutListbox.bind("<<ListboxSelect>>", self.viewModel.midiOutChangeCallback)
+        self.btnPlayNote.config(command=self.viewModel.playTestNotes)
 
     def updateUiMidiInAndOut(self, new_midi_in, new_midi_out):
         # ternary operator
@@ -90,6 +87,8 @@ class OptionsView:
     def updateUiMIDIMessageReceived(self, message):
         self.lblNoteInIndication.config(text=message)
 
+    def didYouHearMelody(self):
+        print('did you heared')
 
     def destroy(self):
         pass

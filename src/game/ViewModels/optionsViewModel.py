@@ -3,6 +3,7 @@ import tkinter
 from src.game.autoload import Autoload
 from src.game.utils.config import getMidiInterfaceIn, getMidiInterfaceOut, updateMidiOutConfig, \
     updateMidiInConfig
+from src.game.utils.questionNote import playWinMelody
 
 
 class OptionsViewModel:
@@ -56,6 +57,7 @@ class OptionsViewModel:
         item_selected = event.widget.get(index)
         self.view.updateUiMidiIn(item_selected)
         self.midiIO.setMidiInput(item_selected)
+        self.midiIO.setCallback(self.handleMIDIInput)
         updateMidiInConfig(item_selected)
 
     def midiOutChangeCallback(self, event):
@@ -64,7 +66,11 @@ class OptionsViewModel:
         item_selected = event.widget.get(index)
         self.view.updateUiMidiOut(item_selected)
         self.midiIO.setMidiOutput(item_selected)
+        self.midiIO.setCallback(self.handleMIDIInput)
         updateMidiOutConfig(item_selected)
+
+    def playTestNotes(self):
+        playWinMelody(self.midiIO, 100, callback_after_melody=self.view.didYouHearMelody)
 
     def handleMIDIInput(self, msg):
         # check if user has midi  listen

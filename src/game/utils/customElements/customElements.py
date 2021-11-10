@@ -19,7 +19,7 @@ class CustomStylesNames(Enum):
     STYLE_BTN_FOOTER_PLUS_MINUS = "custom_footer_plus_minus.TButton"
     STYLE_BTN_CONTROLS_PLUS_MINUS = "custom_controls.TButton"
     STYLE_LBL_FULL = "custom.Inverse.TLabel"
-    STYLE_PROGRESSBAR_RED = "custom.Horizontal.TProgressbar"
+    STYLE_CUSTOM_PROGRESSBAR = "custom.Horizontal.TProgressbar"
 
 
 def getCustomStyles():
@@ -41,10 +41,11 @@ def getCustomStyles():
                     background=Colors.BACKGROUND,
                     font=(DEFAULT_FONT_NAME, 40)
                     )
-    style.configure(CustomStylesNames.STYLE_PROGRESSBAR_RED.value,
-                    background=Colors.PRIMARY,
+    style.configure(CustomStylesNames.STYLE_CUSTOM_PROGRESSBAR.value,
+                    background=Colors.CUSTOM_PROGRESSBAR_COLOR,
                     bordercolor=Colors.BACKGROUND,
-                    troughcolor=Colors.BACKGROUND
+                    troughcolor=Colors.BACKGROUND,
+                    thickness=5
                     )
 
 
@@ -120,7 +121,7 @@ class CustomLabel(tk.Label):
 
 class CustomScale(tk.Scale):
     def __init__(self, parent: tk.Frame,
-                 background=Colors.ERROR,
+                 background=Colors.CUSTOM_SLIDER_BACKGROUND_COLOR,
                  foreground=Colors.TEXT_WHITE,
                  relief=tk.FLAT,
                  from_=0,
@@ -129,7 +130,9 @@ class CustomScale(tk.Scale):
                  width=None,
                  label=None,
                  showvalue=0,
-                 troughcolor=Colors.SLIDER_BACKGROUND,
+                 troughcolor=Colors.CUSTOM_SLIDER_TROUGHCOLOR,
+                 activebackground=Colors.CUSTOM_SLIDER_ACTIVE_COLOR,
+                 borderwidth=0,
                  resolution=None,
                  command=None,
                  sliderlength=60
@@ -148,7 +151,8 @@ class CustomScale(tk.Scale):
                          label=label,
                          showvalue=showvalue,
                          troughcolor=troughcolor,
-                         borderwidth=0,
+                         activebackground=activebackground,
+                         borderwidth=borderwidth,
                          resolution=resolution,
                          command=command
                          )

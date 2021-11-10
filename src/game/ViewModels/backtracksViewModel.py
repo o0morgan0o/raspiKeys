@@ -35,7 +35,6 @@ class ProgressThread(threading.Thread):
         print("PROGRESS THREAD FINISHED")
 
 
-
 # TODO try to implement a waveform viewer
 # https: // github.com / bbc / audiowaveform  # usage
 
@@ -107,7 +106,7 @@ class BacktracksViewModel:
 
     def onBtnPlayClick(self):
         self.view.resetSpeedVariationSlider()
-        print("STATE", self.gameState, "IS playing ", self.audioInstance.getIsPlaying())
+        print("STATE", self.gameState, "is playing ", self.audioInstance.getIsPlaying())
         if self.audioInstance.getIsPlaying():
             return self.stopPlayWithProgressBarReset()
         if self.gameState == GameStatesNames.GAME_STATE_BACKTRACK_MODE_ACTIVE.value:
@@ -151,7 +150,7 @@ class BacktracksViewModel:
         self.currentBacktrack = random_backtrack
         filename = os.path.basename(random_backtrack)
         print("next_audio_file: ", self.currentBacktrack)
-        self.view.setUiCurrentBacktrack(category_name, filename, random_index, len(category_backtracks))
+        self.view.setUiCurrentBacktrack(category=category_name, filename=filename, index=random_index, category_length=len(category_backtracks))
         self.playBacktrack(self.currentBacktrack)
 
     def onBtnMetronomeClick(self):
@@ -181,9 +180,14 @@ class BacktracksViewModel:
         updateMetroBpm(self.tempoMetronome)
 
     def onSliderSpeedVariationMoved(self, event):
+        self.view.setUiConvertInProgress()
+        threading.Thread(target=self.innerThread).start()
+
+    def innerThread(self):
         speedVariation = self.view.slSpeedVariation.get()
         print(speedVariation)
         if speedVariation == 0:
+            self.view.setUiConvertFinished()
             return
         self.speedVariation = speedVariation
         self.audioInstance.stopPlay()
@@ -195,6 +199,7 @@ class BacktracksViewModel:
             self.playBacktrack(self.currentBacktrackModifiedSpeed)
         else:
             print("Not enough data to build track with modified speed", self.speedVariation, self.currentBacktrack)
+        self.view.setUiConvertFinished()
 
     def restartMetronome(self):
         self.stopPlayWithProgressBarReset()
@@ -214,10 +219,10 @@ class BacktracksViewModel:
 
     def playBacktrack(self, current_track: str):
         self.view.setUiShowBacktrackSection()
-        if self.progressThread is not None and self.progressThread.canvasThreadAlive():
+        if self.progressThread is not None and self.progressThread.progressThreadAlive:
             # we cancel previous progress thread
             self.progressThread.progressThreadAlive = False
-        self.audioInstance.simplePlay(current_track)
+        self.audioInstance.simplePlay(current_track, callback_after_waveform_creation=self.view.setUiShowWaveform)
         self.view.setUiChangePlayingIcons(is_playing=True)
 
         self.progressThread = ProgressThread(self.view, self.audioInstance)

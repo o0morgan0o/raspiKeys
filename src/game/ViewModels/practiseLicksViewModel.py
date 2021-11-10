@@ -8,7 +8,7 @@ from PIL import Image, ImageTk
 
 from src.game import env
 from src.game.autoload import Autoload
-from src.game.utils.licksUtils import getAllMidiLicksFiles, getJsonDataFromFile, JsonLickFields, deleteJsonLickFile
+from src.game.utils.licksUtils import getAllMidiLicksFilesForPlatform, getJsonDataFromFile, JsonLickFields, deleteJsonLickFile
 from src.game.utils.midiToNotenames import noteNameFull
 from src.game.utils.questionNote import CustomNote
 
@@ -91,7 +91,7 @@ class PractiseLicksViewModel:
 
         self.numberOfCyclesForEachTranspose = 2
 
-        self.allMidiLicksFilePaths = getAllMidiLicksFiles()
+        self.allMidiLicksFilePaths = getAllMidiLicksFilesForPlatform()
         self.currentLickData = None
         self.allLicksData = self.getAllLicksData(self.allMidiLicksFilePaths)
         self.allLicksDataForTreeView = self.extractLicksDataForTreeView(self.allLicksData)
@@ -105,7 +105,7 @@ class PractiseLicksViewModel:
 
     def reloadLicks(self):
         self.view.clearTreeView()
-        self.allMidiLicksFilePaths = getAllMidiLicksFiles()
+        self.allMidiLicksFilePaths = getAllMidiLicksFilesForPlatform()
         self.currentLickData = None
         self.allLicksData = self.getAllLicksData(self.allMidiLicksFilePaths)
         self.allLicksDataForTreeView = self.extractLicksDataForTreeView(self.allLicksData)

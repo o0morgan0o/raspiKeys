@@ -76,7 +76,7 @@ class PractiseLicksView:
 
         self.btnTreeViewItemMinus.grid(row=1, column=0, sticky=tk.NW)
 
-        self.progressBar = ttk.Progressbar(self.frameRight, style=CustomStylesNames.STYLE_PROGRESSBAR_RED.value, value=0)
+        self.progressBar = ttk.Progressbar(self.frameRight, style=CustomStylesNames.STYLE_CUSTOM_PROGRESSBAR.value, value=0)
         self.progressBar.pack(fill=tk.X, padx=DEFAULT_PADDING_X, pady=8)
         self.progressBar.config(value=0)
 

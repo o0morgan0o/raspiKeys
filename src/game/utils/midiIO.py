@@ -63,6 +63,7 @@ class MidiIO:
         print(80 * "=")
 
     def setMidiInput(self, _input):
+        self.resetInAndOut()
         try:
             self.in_port.close()
         except BaseException as e:
@@ -71,9 +72,10 @@ class MidiIO:
             self.in_port = mido.open_input(_input)
         except BaseException as e:
             print("error setting input port", e)
-        self.resetInAndOut()
+        print("LISTENING ?????? ", self.isListening)
 
     def setMidiOutput(self, _output):
+        self.resetInAndOut()
         try:
             self.out_port.close()
         except BaseException as e:
@@ -82,7 +84,6 @@ class MidiIO:
             self.out_port = mido.open_output(_output)
         except BaseException as e:
             print("error setting output port", e)
-        self.resetInAndOut()
 
     def destroy(self):
         self.in_port.callback = None
@@ -107,7 +108,6 @@ class MidiIO:
     def panic(self):
         self.out_port.panic()
 
-    # def setMidiListening(self):
 
     def getListeningState(self) -> bool:
         return self.isListening

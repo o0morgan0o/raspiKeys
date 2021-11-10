@@ -1,4 +1,5 @@
 import threading
+import os
 from enum import Enum
 import time
 import pygame
@@ -93,6 +94,7 @@ class RecordLickViewModel:
 
     def onBtnSaveClick(self):
         lick_id, json = createJsonMidiLickFromNotes(
+            os=os.name,
             lick_name='',
             lick_key= self.lickKey,
             backtrack_file=self.backtrackFile,

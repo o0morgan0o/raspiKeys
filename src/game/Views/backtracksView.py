@@ -13,6 +13,7 @@ from src.game.ViewModels.backtracksViewModel import BacktracksViewModel, Backtra
 from src.game.Views.recordLickView import RecordLickView
 from src.game.utils.customElements.customElements import *
 from src.game.utils.customElements.labels import *
+from src.game.utils.animations import DotsAnimations
 
 BTN_PADDING_X = 0
 BTN_PADDING_Y = 0
@@ -38,22 +39,30 @@ class ViewImages:
 
 
 class BacktracksView:
+
     def __init__(self, master, game_frame: tk.Frame):
         print("launching game {}".format(GameNames.GAME_BACKTRACKS))
         self.images = ViewImages()
         self.master = master
         self.viewModel = None
         self.gameFrame = game_frame
+        self.waveformImage = ImageTk.PhotoImage(Image.open(os.path.join(env.TEMP_FOLDER_FOR_WAVEFORM_TIMELINE_PNG, "empty_waveform_black.png")))
         if os.name != 'nt':
             self.gameFrame.config(cursor="none")
         self.backtracksCategoriesTuples = []
 
+        self.animation = None
         self.tempRecordView = None
+        self.container = tk.Frame(self.gameFrame, bg='red')
+        self.container.place(relx=0, rely=0, relwidth=1, relheight=1)
+        self.popMessage = tk.Label(self.gameFrame,
+                                   font=(DEFAULT_FONT_NAME, DEFAULT_FONT_SIZE, tkinter.font.ITALIC),
+                                   text="Converting", bg=Colors.POPUP_BACKGROUND, fg=Colors.TEXT_WHITE)
 
         percentageLeft = 40 / 100
-        self.frameLeft = tk.Frame(self.gameFrame, bg=Colors.BACKGROUND, padx=LEFT_PANEL_PADDING_X)
+        self.frameLeft = tk.Frame(self.container, bg=Colors.BACKGROUND, padx=LEFT_PANEL_PADDING_X)
         self.frameLeft.place(x=0, y=0, width=env.GAME_SCREEN_W * percentageLeft, height=env.GAME_SCREEN_H)
-        self.frameRight = tk.Frame(self.gameFrame, bg=Colors.BACKGROUND, padx=RIGHT_PANEL_PADDING_X, pady=RIGHT_PANEL_PADDING_Y)
+        self.frameRight = tk.Frame(self.container, bg=Colors.BACKGROUND, padx=RIGHT_PANEL_PADDING_X, pady=RIGHT_PANEL_PADDING_Y)
         self.frameRight.place(x=env.GAME_SCREEN_W * percentageLeft, y=0, width=env.GAME_SCREEN_W * (1 - percentageLeft), height=env.GAME_SCREEN_H)
 
         # Backtrack Section
@@ -61,6 +70,7 @@ class BacktracksView:
                                       bg=Colors.BACKGROUND, fg=Colors.TEXT_WHITE,
                                       font=(DEFAULT_FONT_NAME, 14),
                                       width=20, wraplength=250, height=4)
+        self.waveformFrame = tk.Button(self.frameLeft, image=self.waveformImage, bg='red', height=70)
         self.lblCategory = tk.Label(self.frameLeft,
                                     font=(DEFAULT_FONT_NAME, 24, tkinter.font.BOLD),
                                     bg=Colors.BACKGROUND,
@@ -68,7 +78,7 @@ class BacktracksView:
                                     # text=ViewStrings.STRING_LBL_TRACK_CATEGORY.value,
                                     justify=tk.CENTER)
         self.slSpeedVariation = CustomScale(self.frameLeft, from_=-1, to=1, resolution=.05, width=40)
-        self.progressBar = ttk.Progressbar(self.frameLeft, style=CustomStylesNames.STYLE_PROGRESSBAR_RED.value, value=0)
+        self.progressBar = ttk.Progressbar(self.frameLeft, style=CustomStylesNames.STYLE_CUSTOM_PROGRESSBAR.value, value=0)
         self.btnRecord = CustomButton(self.frameLeft, image=self.images.IMAGE_RECORD_IMAGE,
                                       background=Colors.BACKGROUND, height=80)
 
@@ -138,6 +148,7 @@ class BacktracksView:
 
     def setUiShowMetronomeSection(self):
         self.lblTrackTitle.pack_forget()
+        self.waveformFrame.pack_forget()
         self.lblCategory.pack_forget()
         self.progressBar.pack_forget()
         self.btnRecord.pack_forget()
@@ -157,7 +168,8 @@ class BacktracksView:
         self.lblCategory.pack(expand=1, fill=tk.X)
         self.lblTrackTitle.pack(expand=1, fill=tk.BOTH)
         self.slSpeedVariation.pack(expand=0, fill=tk.BOTH)
-        self.progressBar.pack(expand=1, fill=tk.X)
+        self.waveformFrame.pack(expand=0, fill=tk.X)
+        self.progressBar.pack(expand=0, fill=tk.X)
         self.btnRecord.pack(expand=1, fill=tk.X)
 
     def setUiLblMetronome(self, tempo: int):
@@ -205,6 +217,25 @@ class BacktracksView:
         else:
             self.btnPlay.config(image=self.images.IMAGE_PAUSE_IMAGE)
 
+    def setUiConvertInProgress(self):
+        self.popMessage.place(relx=0.5, rely=0.5, relwidth=1, relheight=0.4, anchor=tk.CENTER)
+        self.animation = DotsAnimations(self.popMessage, ["Converting", "Converting .", "Converting ..", "Converting ..."])
+        self.animation.animate()
+
+    def setUiConvertFinished(self):
+        self.animation.stop()
+        self.popMessage.place_forget()
+
+    def setUiShowWaveform(self, waveform_png_file):
+        print("SUCCCCCCCCCCESSSSS", waveform_png_file)
+        # waveform_png_file = "D:\\aa.png"
+        waveform_raw = Image.open(waveform_png_file)
+        waveform_resized = waveform_raw.resize((self.waveformFrame.winfo_width(), self.waveformFrame.winfo_height()), Image.ANTIALIAS)
+        self.waveform_image = ImageTk.PhotoImage(waveform_resized)
+        print(self.waveform_image)
+        # self.lblTrackTitle.config(image=waveform_image)
+        self.waveformFrame.config(image=self.waveform_image)
+
     @staticmethod
     def getAllWavFolders():
         raw_wav_folders = glob(env.PROCESSED_WAV_BASE_FOLDER + '/*/')
@@ -219,7 +250,6 @@ class BacktracksView:
             else:
                 raise Exception("Unknown operating system")
         return wav_folders
-
 
     def destroy(self):
         print("Delete BacktracksView")

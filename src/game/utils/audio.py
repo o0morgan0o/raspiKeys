@@ -1,10 +1,12 @@
 import logging
 import subprocess
 import os
+import threading
 
 import pygame
 
 from src.game import env
+from src.game.utils.colors import Colors
 
 
 class Audio:
@@ -64,6 +66,10 @@ class Audio:
             return right_min + (value - left_min) * scaleFactor
 
         return interp_fn
+
+    @staticmethod
+    def getFilePathFromTempPngFolder(file_name):
+        return os.path.join(env.TEMP_FOLDER_FOR_WAVEFORM_TIMELINE_PNG, file_name)
 
     @staticmethod
     def getFilePathFromTempWavFolder(file_name):
@@ -129,15 +135,34 @@ class Audio:
     def playTick():
         pygame.mixer.music.play()
 
-    def simplePlay(self, audio_file_path: str, loops: int = -1, fade_in=200):
+    @staticmethod
+    def generateWaveformTimelineForFile( audio_file_path: str, audio_length, callback ):
+        print('Audiowaveform png creation', 'audio length', audio_length)
+        png_outfile_path = Audio.getFilePathFromTempPngFolder(file_name='waveform-timeline.png')
+        audiowaveform_cmd = 'audiowaveform -i "{}" -o "{}" -e {} --no-axis-labels --background-color {} --waveform-color {} -q'.format(
+            audio_file_path, png_outfile_path, audio_length,'eeeeee', Colors.PRIMARY[1:])
+        pngWaveformCreationProcess = subprocess.Popen(audiowaveform_cmd, shell=True, stdout=subprocess.PIPE)
+        pngWaveformCreationProcess.wait()
+        pngResult = pngWaveformCreationProcess.returncode
+        if pngResult != 0:
+            print("ERROR During rubberband process")
+        else:
+            print('File converted to {}'.format(png_outfile_path))
+        callback(png_outfile_path)
+
+    def simplePlay(self, audio_file_path: str, loops: int = -1, fade_in=200, callback_after_waveform_creation=None):
         self.stopPlay()
         try:
             pygame.mixer.music.load(audio_file_path)
             sound = pygame.mixer.Sound(audio_file_path)
             # pygame.mixer.music.set_pos(0)
-            # we keep trace of the current file if we want to retreive it for the lick recording
+            # we keep trace of the current file if we want to retrieve it for the lick recording
             self.currentFile = audio_file_path
             self.currentFileLength = sound.get_length()
+            # if we have a callback for waveform creation, we create the waveform (audiowaveform C++ library)
+            if callback_after_waveform_creation is not None:
+                threading.Thread(target=self.generateWaveformTimelineForFile, args=(audio_file_path,self.currentFileLength, callback_after_waveform_creation)).start()
+
             print("Current audio file is ... :",
                   sound.get_length(), " ms, ", self.currentFile)
             # _thread.start_new_thread(self.testLatency, (time.time(),))

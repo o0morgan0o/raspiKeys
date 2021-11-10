@@ -136,7 +136,7 @@ class RecordLickView:
                                          foreground=Colors.TEXT_WHITE
                                          )
         self.lblBacktrackName.grid(row=2, sticky=tk.NSEW)
-        self.progressBar = ttk.Progressbar(self.recordFrame, style=CustomStylesNames.STYLE_PROGRESSBAR_RED.value, value=0)
+        self.progressBar = ttk.Progressbar(self.recordFrame, style=CustomStylesNames.STYLE_CUSTOM_PROGRESSBAR.value, value=0)
         self.progressBar.grid(row=3, sticky=tk.NSEW, padx=DEFAULT_PADDING_X, pady=DEFAULT_PADDING_Y)
 
         # =========== CREATION OF THE VIEW_MODEL ====================

@@ -8,6 +8,7 @@ from src.game import env
 
 
 class JsonLickFields(Enum):
+    FIELD_OS_NAME = "os_name"
     FIELD_LICK_ID = "lick_id"
     FIELD_LICK_DATE = "lick_date"
     FIELD_LICK_NAME = "lick_name"
@@ -46,17 +47,25 @@ def getJsonDataFromFile(filename: str):
     return data
 
 
-def getAllMidiLicksFiles():
+def getAllMidiLicksFilesForPlatform():
     all_files = []
     for filename in os.listdir(os.path.join(env.MIDI_FOLDER)):
         if os.path.splitext(filename)[1] == ".json":
-            all_files.append(filename)
+            # check if the lick file is in the correct platform
+            # it is mainly for development purpose
+            with open(os.path.join(env.MIDI_FOLDER, filename), 'r') as lick_file:
+                midi_file = json.loads(lick_file.read())
+                lick_platform = midi_file[JsonLickFields.FIELD_OS_NAME.value]
+                if lick_platform == os.name:
+                    all_files.append(filename)
+
     all_files.sort()
     print("Loading MIDI Files. Found {} file(s)".format(len(all_files)))
     return all_files
 
 
 def createJsonMidiLickFromNotes(
+        os_name,
         lick_name,
         lick_key: int,
         backtrack_file: str,
@@ -69,6 +78,7 @@ def createJsonMidiLickFromNotes(
     today = date.today()
     current_date = today.strftime("%d/%m/%Y %H:%M")
     obj = {
+        JsonLickFields.FIELD_OS_NAME.value : os.name,
         JsonLickFields.FIELD_LICK_ID.value: lick_id,
         JsonLickFields.FIELD_LICK_DATE.value: current_date,
         JsonLickFields.FIELD_LICK_NAME.value: lick_name,
