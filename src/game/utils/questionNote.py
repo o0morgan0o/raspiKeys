@@ -10,8 +10,8 @@ def playWinMelody(midi_instance: MidiIO, velocity: int, callback_before_melody=N
     # little delay before playing the chord melody, because it gives better feeling
     delay_before_playing_chord_melody = 0.4
     CustomNote(midi_instance, note=50, delay_on=delay_before_playing_chord_melody, note_duration=.09, velocity=velocity, callback_before_note_on=callback_before_melody)
-    CustomNote(midi_instance, note=53, delay_on=delay_before_playing_chord_melody+.1, note_duration=.09, velocity=velocity)
-    CustomNote(midi_instance, note=58, delay_on=delay_before_playing_chord_melody+.2, note_duration=.09, velocity=velocity, callback_after_note_off=callback_after_melody)
+    CustomNote(midi_instance, note=53, delay_on=delay_before_playing_chord_melody + .1, note_duration=.09, velocity=velocity)
+    CustomNote(midi_instance, note=58, delay_on=delay_before_playing_chord_melody + .2, note_duration=.09, velocity=velocity, callback_after_note_off=callback_after_melody)
 
 
 def playLooseMelody(self):
@@ -19,21 +19,6 @@ def playLooseMelody(self):
     CustomNote(self.view, 30, .1, .05)
     CustomNote(self.view, 31, .2, .05)
     CustomNote(self.view, 30, .3, .05)
-
-
-class QuestionNote:
-
-    def __init__(self, note, parent, delay):
-        self.noteOnDelay = delay
-        self.isFirstTry = True
-        self.parent = parent
-        self.note = note
-        self.timer = Timer(self.noteOnDelay, lambda: self.parent.prepareNoteOut(self.note))
-        self.timer.start()
-
-    def resetTimer(self):
-        self.timer = Timer(self.noteOnDelay, lambda: self.parent.prepareNoteOut(self.note))
-        self.timer.start()
 
 
 class CustomNote:
@@ -80,6 +65,9 @@ class CustomNote:
                 lambda: self.prepareNoteOut(note, callback_before_note_off=callback_before_note_off, callback_after_note_off=callback_after_note_off)
             )
         self.timer.start()
+
+    def cancelTimer(self):
+        self.timer.cancel()
 
     def prepareNoteOn(self, note: int, velocity: int, callback_before_note_on=None, callback_after_note_on=None, callback_before_note_off=None, callback_after_note_off=None):
         if callback_before_note_on is not None:

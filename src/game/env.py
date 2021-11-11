@@ -37,6 +37,11 @@ RECORD_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "rec.png")
 METRONOME_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "metronome.png")
 ARROW_UP_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "arrow_up.png")
 ARROW_DOWN_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "arrow_down.png")
+ARROW_LEFT_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "arrowLeft.png")
+ARROW_RIGHT_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "arrowRight.png")
+DELETE_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "delete.png")
+RANDOM_KEY_IMAGE= os.path.join(ROOT_DIR, "res", "icons", "randomKey.png")
+NEXT_KEY_IMAGE = os.path.join(ROOT_DIR, "res", "icons", "nextKey.png")
 
 NAVBAR_WIDTH = 80
 FOOTER_HEIGHT = 80

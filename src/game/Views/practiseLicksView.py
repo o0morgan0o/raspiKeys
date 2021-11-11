@@ -14,6 +14,7 @@ from src.game.utils.customElements.customElements import CustomStylesNames, Cust
 from src.game.utils.midiToNotenames import noteNameFull
 from src.game.ViewModels.practiseLicksViewModel import TranspositionMode
 from src.game.Views.keyboardCanvasView import KeyboardCanvasView
+from src.game.utils.customElements.customElements import CustomRadioButton
 
 DEFAULT_PADDING_X = 20
 DEFAULT_PADDING_Y = 20
@@ -27,6 +28,9 @@ class ViewImages:
         self.IMAGE_METRONOME_IMAGE = ImageTk.PhotoImage(Image.open(env.METRONOME_IMAGE))
         self.IMAGE_ARROW_UP = ImageTk.PhotoImage(Image.open(env.ARROW_UP_IMAGE))
         self.IMAGE_ARROW_DOWN = ImageTk.PhotoImage(Image.open(env.ARROW_DOWN_IMAGE))
+        self.IMAGE_DELETE_IMAGE = ImageTk.PhotoImage(Image.open(env.DELETE_IMAGE))
+        self.IMAGE_RANDOM_KEY = ImageTk.PhotoImage(Image.open(env.RANDOM_KEY_IMAGE))
+        self.IMAGE_NEXT_KEY = ImageTk.PhotoImage(Image.open(env.NEXT_KEY_IMAGE))
 
 
 class PractiseLicksView:
@@ -40,79 +44,92 @@ class PractiseLicksView:
 
         self.images = ViewImages()
 
-        percentageLeft = 40 / 100
-        self.frameLeft = tk.Frame(self.gameFrame, bg=Colors.BACKGROUND)
-        self.frameLeft.place(x=0, y=0, width=env.GAME_SCREEN_W * percentageLeft, height=env.GAME_SCREEN_H)
-        self.frameRight = tk.Frame(self.gameFrame, bg=Colors.BACKGROUND)
-        self.frameRight.place(x=env.GAME_SCREEN_W * percentageLeft, y=0, width=env.GAME_SCREEN_W * (1 - percentageLeft), height=env.GAME_SCREEN_H)
+        self.gameFrame.rowconfigure(0, weight=0)
+        self.gameFrame.rowconfigure(1, weight=1)
+        self.gameFrame.rowconfigure(2)
+        self.gameFrame.grid_columnconfigure(0)
+        self.gameFrame.grid_columnconfigure(1)
+        self.gameFrame.grid_columnconfigure(2, weight=3)
 
-        self.treeView = ttk.Treeview(self.frameLeft, selectmode=tk.BROWSE)
-        self.configTreeView()
-        self.treeView.pack(expand=1, fill=tk.BOTH, padx=DEFAULT_PADDING_X, pady=DEFAULT_PADDING_Y)
-
-        self.frameRightUpperSection = tk.Frame(self.frameRight)
-
-        self.frameRightUpperSectionInner = tk.Frame(self.frameRightUpperSection, bg=Colors.BACKGROUND)
-        self.frameRightUpperSectionInner.grid(row=0, column=0, rowspan=2, columnspan=3, sticky=tk.NSEW)
-        self.lblLickKey = tk.Label(self.frameRightUpperSectionInner, text="LICK_KEY", font=(DEFAULT_FONT_NAME, 40), fg=Colors.TEXT_WHITE, bg=Colors.BACKGROUND)
-        # self.lblLickKey.grid(row=0, rowspan=2, column=0, columnspan=3, sticky=tk.NSEW)
-        self.lblLickKey.pack(expand=1, fill=tk.BOTH)
-        self.lblLickNextKey = tk.Label(self.frameRightUpperSectionInner, text="RAND_KEY", font=(DEFAULT_FONT_NAME, 40), fg='orange', bg=Colors.BACKGROUND)
-        self.lblLickNextKey.pack()
-        self.lblCurrentLickInfo = tk.Label(self.frameRightUpperSectionInner, text="INFO", font=(DEFAULT_FONT_NAME, 12), fg=Colors.TEXT_WHITE, bg=Colors.BACKGROUND)
+        LBL_LICK_FONT_SIZE = 65
+        # ================== FRAME CONTAINING KEY INDICATIONS =============================
+        self.frameKeyIndicationContainer = tk.Frame(self.gameFrame, bg=Colors.BACKGROUND)
+        self.frameKeyIndicationContainer.grid(row=0, column=0, columnspan=3, sticky=tk.NSEW)
+        self.rowKeyContainer = tk.Frame(self.frameKeyIndicationContainer, )
+        self.rowKeyContainer.pack(pady=(0, 0))
+        self.lblLickKey = tk.Label(self.rowKeyContainer, text="", font=(DEFAULT_FONT_NAME, LBL_LICK_FONT_SIZE), fg=Colors.TEXT_WHITE, bg=Colors.BACKGROUND)
+        self.lblLickKey.pack(side=tk.LEFT, expand=1, fill=tk.BOTH)
+        self.lblLickNextKey = tk.Label(self.rowKeyContainer, text="RAND_KEY", font=(DEFAULT_FONT_NAME, LBL_LICK_FONT_SIZE), fg=Colors.PRIMARY, bg=Colors.BACKGROUND)
+        self.lblCurrentLickInfo = tk.Label(self.frameKeyIndicationContainer, text="INFO", font=(DEFAULT_FONT_NAME, 12), fg=Colors.TEXT_WHITE, bg=Colors.BACKGROUND)
         self.lblCurrentLickInfo.pack(side=tk.BOTTOM)
 
-        self.btnDeleteLick = CustomButton(self.frameRightUpperSection, text="DELETE", command=self.onBtnDeleteLickClick)
-        self.btnDeleteLick.grid(row=0, column=2, sticky=tk.NE)
-        self.btnTreeViewItemPlus = CustomButton(self.frameRightUpperSection, image=self.images.IMAGE_ARROW_UP, command=lambda: self.selectTreeViewNextItem())
-        self.btnTreeViewItemPlus.grid(row=0, column=0, sticky=tk.SW)
-        self.btnTreeViewItemMinus = CustomButton(self.frameRightUpperSection, image=self.images.IMAGE_ARROW_DOWN, command=lambda: self.selectTreeViewPreviousItem())
-        self.frameRightUpperSection.grid_rowconfigure(0, weight=1)
-        self.frameRightUpperSection.grid_rowconfigure(1, weight=1)
-        self.frameRightUpperSection.grid_columnconfigure(0, weight=1)
-        self.frameRightUpperSection.grid_columnconfigure(1, weight=1)
-        self.frameRightUpperSection.grid_columnconfigure(2, weight=1)
-        self.frameRightUpperSection.pack(expand=1, fill=tk.BOTH, padx=(0, DEFAULT_PADDING_X), pady=(DEFAULT_PADDING_Y, 0))
-
-        self.btnTreeViewItemMinus.grid(row=1, column=0, sticky=tk.NW)
-
-        self.progressBar = ttk.Progressbar(self.frameRight, style=CustomStylesNames.STYLE_CUSTOM_PROGRESSBAR.value, value=0)
-        self.progressBar.pack(fill=tk.X, padx=DEFAULT_PADDING_X, pady=8)
+        # ================== FRAME CONTAINING PROGRESSBAR AND KEYBOARD CANVAS ==============
+        self.keyboardCanvasContainer = tk.Frame(self.gameFrame, bg=Colors.BACKGROUND)
+        self.keyboardCanvasContainer.grid(row=1, column=0, columnspan=3, sticky=tk.NSEW, padx=10, pady=10)
+        self.progressBar = ttk.Progressbar(self.keyboardCanvasContainer, style=CustomStylesNames.STYLE_CUSTOM_PROGRESSBAR.value, value=0)
         self.progressBar.config(value=0)
+        self.progressBar.pack(side=tk.TOP, fill=tk.X)
+        self.keyboardCanvas = KeyboardCanvasView(self.keyboardCanvasContainer)
+        # self.keyboardCanvasContainer.pack()
 
-        self.rowCycles = tk.Frame(self.frameRight)
-        self.btnChangeKeyManual = CustomButton(self.rowCycles, text="x0")
-        self.btnChangeKeyManual.pack(side=tk.LEFT, expand=1, fill=tk.X)
-        self.btnChangeKeyAfter1Cycle = CustomButton(self.rowCycles, text="x1")
-        self.btnChangeKeyAfter1Cycle.pack(side=tk.LEFT, expand=1, fill=tk.X)
-        self.btnChangeKeyAfter2Cycles = CustomButton(self.rowCycles, text="x2")
-        self.btnChangeKeyAfter2Cycles.pack(side=tk.LEFT, expand=1, fill=tk.X)
-        self.btnChangeKeyAfter4Cycles = CustomButton(self.rowCycles, text="x4", command=lambda: self.viewModel.cancelPlayingThread())
-        self.btnChangeKeyAfter4Cycles.pack(side=tk.LEFT, expand=1, fill=tk.X)
-        self.rowCycles.pack(expand=0, fill=tk.X, padx=(0, DEFAULT_PADDING_X))
+        # =================== FRAME CONTAINING TREEVIEW =================================
+        self.licksTreeViewContainer = tk.Frame(self.gameFrame)
+        self.licksTreeViewContainer.grid(row=2, column=0, columnspan=1, sticky=tk.NSEW, padx=(10, 0), pady=(10, 10))
+        self.treeView = ttk.Treeview(self.licksTreeViewContainer, selectmode=tk.BROWSE, show='tree', height=6)
+        self.treeView.pack(side=tk.TOP, expand=0, fill=tk.BOTH)
+        self.configTreeView()
 
-        self.rowRandom = tk.Frame(self.frameRight)
-        self.btnRandomLick = CustomButton(self.rowRandom, text="RANDOM")
-        self.btnRandomLick.pack(side=tk.LEFT, expand=1, fill=tk.X)
-        self.btnTransposeModeRandom = CustomButton(self.rowRandom, text="RAND_KEY")
-        self.btnTransposeModeRandom.pack(side=tk.LEFT, expand=1, fill=tk.BOTH)
-        self.btnTransposeModeSequential = CustomButton(self.rowRandom, text="CHROMA")
-        self.btnTransposeModeSequential.pack(side=tk.LEFT, expand=1, fill=tk.BOTH)
-        self.btnPlay = CustomButton(self.rowRandom, image=self.images.IMAGE_PLAY_IMAGE, height=80, command=lambda: self.viewModel.onBtnPlayClick())
-        self.btnPlay.pack(side=tk.LEFT, expand=1, fill=tk.X)
-        self.rowRandom.pack( fill=tk.X, padx=(0, DEFAULT_PADDING_X), pady=(0, DEFAULT_PADDING_Y))
+        # =================== FRAME CONTAINING TREE CONTROLS =============================
+        self.lickTreeViewControlsContainer = tk.Frame(self.gameFrame, bg=Colors.BACKGROUND)
+        self.lickTreeViewControlsContainer.grid(row=2, column=1, columnspan=1, sticky=tk.NSEW, padx=0, pady=(10, 10))
+        self.btnTreeViewItemPlus = tk.Button(self.lickTreeViewControlsContainer, image=self.images.IMAGE_ARROW_UP,
+                                             background=Colors.PRIMARY, command=lambda: self.selectTreeViewNextItem())
+        self.btnTreeViewItemPlus.pack()
+        self.btnTreeViewItemMinus = tk.Button(self.lickTreeViewControlsContainer, image=self.images.IMAGE_ARROW_DOWN,
+                                              background=Colors.PRIMARY, command=lambda: self.selectTreeViewPreviousItem())
+        self.btnTreeViewItemMinus.pack()
+        self.btnDeleteLick = tk.Button(self.lickTreeViewControlsContainer, image=self.images.IMAGE_DELETE_IMAGE,
+                                       background=Colors.PRIMARY, command=self.onBtnDeleteLickClick)
+        self.btnDeleteLick.pack(side=tk.BOTTOM)
 
-        self.keyboardCanvas = KeyboardCanvasView(self.frameRight)
+        self.radioButtonValue = tk.IntVar()
+
+        # =================== FRAME CONTAINING BTN CONTROLS ========================#
+        self.controlsContainer = tk.Frame(self.gameFrame)
+        self.controlsContainer.grid(row=2, column=2, sticky=tk.NSEW, padx=10, pady=10)
+        # ================= ROW 1 IN CONTROLS ==========================
+        self.rowCycles = tk.Frame(self.controlsContainer)
+        self.rowCycles.pack(expand=1, fill=tk.BOTH)
+        self.btnChangeKeyManual = CustomRadioButton(self.rowCycles, text="x0", value=-1, variable=self.radioButtonValue)
+        self.btnChangeKeyManual.pack(side=tk.LEFT, expand=1, fill=tk.BOTH)
+        self.btnChangeKeyAfter1Cycle = CustomRadioButton(self.rowCycles, text="x1", value=1, variable=self.radioButtonValue)
+        self.btnChangeKeyAfter1Cycle.pack(side=tk.LEFT, expand=1, fill=tk.BOTH)
+        self.btnChangeKeyAfter2Cycles = CustomRadioButton(self.rowCycles, text="x2", value=2, variable=self.radioButtonValue)
+        self.btnChangeKeyAfter2Cycles.pack(side=tk.LEFT, expand=1, fill=tk.BOTH)
+        self.btnChangeKeyAfter4Cycles = CustomRadioButton(self.rowCycles, text="x4", value=4, variable=self.radioButtonValue)
+        self.btnChangeKeyAfter4Cycles.pack(side=tk.LEFT, expand=1, fill=tk.BOTH)
+        # ================= ROW 2 IN CONTROLS ==========================
+        self.rowRandom = tk.Frame(self.controlsContainer)
+        self.rowRandom.pack(expand=1, fill=tk.BOTH)
+        self.btnTransposeNow = CustomButton(self.rowRandom, image=self.images.IMAGE_RANDOM_KEY)
+        self.btnTransposeNow.pack(side=tk.LEFT, expand=1, fill=tk.BOTH)
+        self.btnTransposeMode = CustomButton(self.rowRandom, image=self.images.IMAGE_NEXT_KEY)
+        self.btnTransposeMode.pack(side=tk.LEFT, expand=1, fill=tk.BOTH)
+        self.btnPlay = CustomButton(self.rowRandom, image=self.images.IMAGE_PLAY_IMAGE, command=lambda: self.viewModel.onBtnPlayClick())
+        self.btnPlay.pack(side=tk.LEFT, expand=1, fill=tk.BOTH)
 
         # =========== CREATION OF THE VIEW_MODEL ====================
         self.viewModel = PractiseLicksViewModel(self)
         # ===========================================================
+
         self.btnChangeKeyManual.config(command=partial(self.viewModel.onBtnChangeNumberOfCyclesBeforeTransposeClick, -1))
         self.btnChangeKeyAfter1Cycle.config(command=partial(self.viewModel.onBtnChangeNumberOfCyclesBeforeTransposeClick, 1))
         self.btnChangeKeyAfter2Cycles.config(command=partial(self.viewModel.onBtnChangeNumberOfCyclesBeforeTransposeClick, 2))
         self.btnChangeKeyAfter4Cycles.config(command=partial(self.viewModel.onBtnChangeNumberOfCyclesBeforeTransposeClick, 4))
-        self.btnTransposeModeRandom.config(command=partial(self.viewModel.setTransposeMode, TranspositionMode.TRANSPOSE_RANDOM.value))
-        self.btnTransposeModeSequential.config(command=partial(self.viewModel.setTransposeMode, TranspositionMode.TRANSPOSE_SEQUENTIAL.value))
+        self.btnTransposeMode.config(command=partial(self.viewModel.setTransposeMode, TranspositionMode.TRANSPOSE_SEQUENTIAL.value))
+
+        # self.btnTransposeNow.config(command=partial(self.viewModel.setTransposeMode, TranspositionMode.TRANSPOSE_RANDOM.value))
+        self.btnTransposeNow.config(command=self.viewModel.destroyViewModel)
 
     def selectTreeViewPreviousItem(self):
         self.moveTreeViewSelectionItem(+1)
@@ -160,8 +177,8 @@ class PractiseLicksView:
         self.treeView.column('#0', width=0, stretch=tk.NO)
         self.treeView.column('FILENAME', anchor=tk.W, width=0, stretch=0)
         self.treeView.column('KEY', anchor=tk.W, width=35, stretch=0)
-        self.treeView.column('NAME', anchor=tk.W, width=100, stretch=0)
-        self.treeView.column('DATE', anchor=tk.W, width=110, stretch=0)
+        self.treeView.column('NAME', anchor=tk.W, width=220, stretch=0)
+        self.treeView.column('DATE', anchor=tk.W, width=0, stretch=0)
 
         self.treeView.heading('#0', text='', anchor=tk.CENTER)
         self.treeView.heading('FILENAME', text='', anchor=tk.CENTER)
@@ -169,6 +186,13 @@ class PractiseLicksView:
         self.treeView.heading('NAME', text='NAME', anchor=tk.CENTER)
         self.treeView.heading('DATE', text='DATE', anchor=tk.CENTER)
         self.treeView.bind('<<TreeviewSelect>>', self.identifySelectedItemInTreeView)
+
+    def setUiNumberOfLoopsBeforeTranspose(self, number_of_loops: int):
+        self.radioButtonValue.set(number_of_loops)
+
+        # if number_of_loops == 4:
+        #     self.btnChangeKeyAfter4Cycles.config(background=Colors.PRIMARY, state='normal')
+        # pass
 
     def setUiUpdateProgress(self, value: int):
         self.progressBar.config(value=value)
@@ -191,12 +215,13 @@ class PractiseLicksView:
         self.viewModel.updateShouldTransposeNext(current_cycle == number_of_cycles_per_transpose)
 
     def setUiUpdateLblNextKeyIndication(self, next_key: str):
-        self.lblLickNextKey.config(text="Next key => {}".format(next_key))
+        self.lblLickNextKey.config(text="Next {}...".format(next_key))
         self.lblLickNextKey.pack()
-        self.lblLickKey.pack()
+        self.lblLickKey.pack_forget()
+        # self.lblLickKey.pack()
 
     def setUiResetLblNextKeyIndication(self):
-        self.lblLickNextKey.config(text="EMPTY")
+        self.lblLickNextKey.pack_forget()
         self.lblLickKey.pack()
 
     def identifySelectedItemInTreeView(self, event):
@@ -234,8 +259,8 @@ class PractiseLicksView:
             if counter % 2 == 0:
                 tag = 'even'
             self.treeView.insert(parent='', index=tk.END, values=(lick_id, lick_key, lick_name, lick_date), tags=tag)
-        self.treeView.tag_configure('odd', background='#E8E8E8')
-        self.treeView.tag_configure('even', background='#DFDFDF')
+        self.treeView.tag_configure('odd', background=Colors.TREEVIEW_BACKGROUND_ODD)
+        self.treeView.tag_configure('even', background=Colors.TREEVIEW_BACKGROUND_EVEN)
 
     def clearTreeView(self):
         self.treeView.delete(*self.treeView.get_children())
@@ -243,3 +268,4 @@ class PractiseLicksView:
     def destroy(self):
         print("Deleting PractiseLicksView")
         self.viewModel.destroyViewModel()
+        self.keyboardCanvas.destroy()

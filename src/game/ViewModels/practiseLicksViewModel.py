@@ -8,6 +8,7 @@ from PIL import Image, ImageTk
 
 from src.game import env
 from src.game.autoload import Autoload
+from src.game.utils.config import getNumberOfLoopsBeforeTranspose
 from src.game.utils.licksUtils import getAllMidiLicksFilesForPlatform, getJsonDataFromFile, JsonLickFields, deleteJsonLickFile
 from src.game.utils.midiToNotenames import noteNameFull
 from src.game.utils.questionNote import CustomNote
@@ -30,11 +31,15 @@ class ProgressThread(threading.Thread):
         self.cycleCounter = cycle_counter
         self.numberOfCyclesEachTranspose = number_of_cycles_each_transpose
         self.callback = callback
+        self.callbackCancel = None
         self.progressThreadAlive = True
         self.innerTest = False
 
     def changeNumberOfCyclesEachTranspose(self, new_number_of_cycles_each_transpose: int):
         self.numberOfCyclesEachTranspose = new_number_of_cycles_each_transpose
+
+    def setCancelCallback(self, callback_cancel):
+        self.callbackCancel = callback_cancel
 
     def run(self):
         while self.progressThreadAlive:
@@ -50,8 +55,11 @@ class ProgressThread(threading.Thread):
                     self.callback()
                 if event.type == MUSIC_CANCELED:
                     self.progressThreadAlive = False
+                    if self.callbackCancel is not None:
+                        print("PROGRESS PRACTISE_LICKS_VIEW_MODEL THREAD CANCEL")
+                        return self.callbackCancel()
+        print("PROGRESS PRACTISE_LICKS_VIEW_MODEL THREAD FINISHED")
         self.view.setUiUpdateProgress(0.0)
-        print("PROGRESS THREAD FINISHED")
 
 
 class ViewImages:
@@ -74,11 +82,11 @@ class PractiseLicksViewModel:
         # Default path
         self.midiRepository = env.MIDI_FOLDER
 
-        self.customNotesList = []
+        self.customNotesList: [CustomNote] = []
 
         self.lick_midi_key = None
         self.backtrack_file = None
-        self.number_of_loops_recording = None
+        self.number_of_loops_recording = getNumberOfLoopsBeforeTranspose()
         self.chord_notes = None
         self.melody_notes = None
 
@@ -96,6 +104,7 @@ class PractiseLicksViewModel:
         self.allLicksData = self.getAllLicksData(self.allMidiLicksFilePaths)
         self.allLicksDataForTreeView = self.extractLicksDataForTreeView(self.allLicksData)
         self.initializeTreeView(self.allLicksDataForTreeView)
+        self.view.setUiNumberOfLoopsBeforeTranspose(self.number_of_loops_recording)
 
     def initializeTreeView(self, all_list_data_for_tree_view: list):
         self.view.setUiInitializeTreeView(all_list_data_for_tree_view)
@@ -116,6 +125,7 @@ class PractiseLicksViewModel:
         self.numberOfCyclesForEachTranspose = new_value
         if self.progressThread is not None:
             self.progressThread.changeNumberOfCyclesEachTranspose(self.numberOfCyclesForEachTranspose)
+        self.view.setUiNumberOfLoopsBeforeTranspose(self.numberOfCyclesForEachTranspose)
         self.view.setUiUpdateLblForCyclesInfo(current_cycle=self.cyclesCounter, number_of_cycles_per_transpose=self.numberOfCyclesForEachTranspose)
 
     def updateShouldTransposeNext(self, is_last_bar: bool):
@@ -131,10 +141,6 @@ class PractiseLicksViewModel:
     def playCycle(self):
         nextTranspose = None
         self.view.setUiResetLblNextKeyIndication()
-        # if self.cyclesCounter >= self.numberOfCyclesForEachTranspose - 1:
-        #     nextTranspose = self.getNextTransposeOffset(transposition_mode=self.transpositionMode, current_transpose=self.currentTranspose)
-        #     humanReadableNextTranspose = noteNameFull(nextTranspose)[:-1]
-        #     self.view.setUiUpdateLblNextKeyIndication(next_key=humanReadableNextTranspose)
 
         if self.cyclesCounter >= self.numberOfCyclesForEachTranspose != -1:
             self.currentTranspose = self.bufferedTranspose
@@ -156,13 +162,12 @@ class PractiseLicksViewModel:
         self.cyclesCounter += 1
         self.view.setUiUpdateLblForLickSelected(lick_key=new_readable_key)
         self.view.setUiUpdateLblForCyclesInfo(current_cycle=self.cyclesCounter, number_of_cycles_per_transpose=self.numberOfCyclesForEachTranspose)
-        # if nextTranspose is not None:
-        #     self.currentTranspose = nextTranspose
-        #     return
+
+    def resetCanvas(self):
+        self.keyboardCanvas.resetAllNotes()
 
     def cancelPlayingThread(self):
         pygame.mixer.music.set_endevent(MUSIC_CANCELED)
-        self.keyboardCanvas.resetAllNotes()
         self.cyclesCounter = 0
         self.currentTranspose = 0
         self.audioInstance.stopPlay()
@@ -170,6 +175,7 @@ class PractiseLicksViewModel:
         if len(noteList) != 0:
             for custom_note in noteList:
                 custom_note.timer.cancel()
+        self.customNotesList= []
         self.midiIO.panic()
 
     def cycleFinished(self):
@@ -178,8 +184,10 @@ class PractiseLicksViewModel:
 
     def onBtnPlayClick(self):
         if self.audioInstance.getIsPlaying():
+            self.resetCanvas()
             self.cancelPlayingThread()
             return
+        self.resetCanvas()
         self.cancelPlayingThread()
         # print(self.currentLickData)
         if self.currentLickData is None:
@@ -296,3 +304,9 @@ class PractiseLicksViewModel:
     def destroyViewModel(self):
         print("Deleting PractiseLicksViewModel")
         self.cancelPlayingThread()
+        if self.progressThread is not None:
+            self.progressThread.setCancelCallback(self.destroyPlayingThreadDone)
+
+    def destroyPlayingThreadDone(self):
+        print('should be empty', self.progressThread)
+        print('should be empty', self.customNotesList)

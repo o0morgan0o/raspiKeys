@@ -203,7 +203,7 @@ class EarTrainingNoteViewModel:
 
     def destroyViewModel(self):
         print('Delete EarTrainingNoteViewModel')
-        self.midiIO.setCallback(None)
+        self.midiIO.cancelCallback()
         self.midiIO.setListening(False)
         if self.questionCustomNote is not None:
             self.questionCustomNote.timer.cancel()

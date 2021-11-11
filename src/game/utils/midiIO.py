@@ -91,6 +91,9 @@ class MidiIO:
         except Exception as e:
             print("error in setCallback()", e)
 
+    def cancelCallback(self):
+        self.in_port.callback= None
+
     def sendOut(self, msg_type, note: int, velocity: int = 100):
         # we map the velocity with the global midi volume (global midi_volume is mapped from 0 to 1)
         out_velocity = int(velocity * self.midiVolume)
@@ -106,11 +109,7 @@ class MidiIO:
 
     def setListening(self, is_listening: bool):
         self.isListening = is_listening
-        print("isListening ? ", self.isListening)
-        # if self.isListening:
-        #     self.isListening = False
-        # else:
-        #     self.isListening = True
+        print("MIDI_IO listening :", self.isListening)
 
     def destroy(self):
         self.in_port.callback = None

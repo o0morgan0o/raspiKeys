@@ -20,6 +20,7 @@ class CustomStylesNames(Enum):
     STYLE_BTN_CONTROLS_PLUS_MINUS = "custom_controls.TButton"
     STYLE_LBL_FULL = "custom.Inverse.TLabel"
     STYLE_CUSTOM_PROGRESSBAR = "custom.Horizontal.TProgressbar"
+    STYLE_CUSTOM_BOOTSTRAP_SCALE = "myCustom.Horizontal.TScale"
 
 
 def getCustomStyles():
@@ -47,6 +48,49 @@ def getCustomStyles():
                     troughcolor=Colors.BACKGROUND,
                     thickness=5
                     )
+    style.configure(style="myCustom.Horizontal.TScale",
+                    background='red',
+                    borderwidth=0,
+                    darkcolor='#ff0000',
+                    groovewidth=0,
+                    lightcolor='#00ff00',
+                    sliderwidth=100,
+                    troughcolor='#ffff00',
+                    relief='flat'
+                    )
+
+
+class CustomRadioButton(tk.Radiobutton):
+    def __init__(self,
+                 parent,
+                 value,
+                 font=DEFAULT_FONT,
+                 background=Colors.BTN_STANDARD_BACKGROUND,
+                 foreground=Colors.TEXT_WHITE,
+                 activebackground=Colors.PRIMARY,
+                 activeforeground=Colors.TEXT_WHITE,
+                 # highlightbackground=Colors.PRIMARY,
+                 # highlightcolor=Colors.PRIMARY,
+                 variable=None,
+                 text="",
+                 indicatoron=0,
+                 selectcolor=Colors.PRIMARY,
+                 ):
+        super().__init__(
+            parent,
+            font=font,
+            background=background,
+            activebackground=activebackground,
+            activeforeground=activeforeground,
+            # highlightbackground=highlightbackground,
+            # highlightcolor=highlightcolor,
+            foreground=foreground,
+            value=value,
+            variable=variable,
+            text=text,
+            indicatoron=indicatoron,
+            selectcolor=selectcolor,
+        )
 
 
 class CustomButton(tk.Button):
@@ -61,7 +105,8 @@ class CustomButton(tk.Button):
                  highlightthickness=Colors.BTN_BORDER_THICKNESS,
                  highlightcolor=Colors.BTN_BORDER_COLOR,
                  relief=tk.RIDGE,
-                 height=None
+                 height=None,
+                 width=None,
                  ):
         super().__init__(parent, text=text,
                          image=image,
@@ -74,7 +119,8 @@ class CustomButton(tk.Button):
                          highlightthickness=highlightthickness,
                          highlightcolor=highlightcolor,
                          relief=relief,
-                         height=height
+                         height=height,
+                         width=width
                          )
 
 

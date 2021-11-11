@@ -7,9 +7,9 @@
     "MIDI_interface_in": "reface CP 1",
     "MIDI_interface_out": "reface CP 2",
     "midi_hotkey": 50,
-    "audio_volume": 0.36999999999999955,
+    "audio_volume": 0.5099999999999996,
     "midi_volume": 1,
-    "metroBpm": 121,
+    "metroBpm": 80,
     "max_interval_question_note": 10,
     "note_duration": 0.75
 }

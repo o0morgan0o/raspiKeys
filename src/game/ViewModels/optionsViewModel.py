@@ -79,5 +79,7 @@ class OptionsViewModel:
         print("[-]receiving something", msg)
         self.view.updateUiMIDIMessageReceived(str(msg))
 
-    def destroy(self):
-        pass
+    def destroyViewModel(self):
+        print("Deleting OptionsViewModel")
+        self.midiIO.cancelCallback()
+        self.midiIO.setListening(False)

@@ -51,7 +51,6 @@ class Audio:
             print('File converted to {}'.format(out_file_path))
         return out_file_path, speed_multiplier
 
-
     @staticmethod
     def make_interpolater(left_min, left_max, right_min, right_max):
         # Figure out how 'wide' each range is
@@ -136,11 +135,11 @@ class Audio:
         pygame.mixer.music.play()
 
     @staticmethod
-    def generateWaveformTimelineForFile( audio_file_path: str, audio_length, callback ):
+    def generateWaveformTimelineForFile(audio_file_path: str, audio_length, callback):
         print('Audiowaveform png creation', 'audio length', audio_length)
         png_outfile_path = Audio.getFilePathFromTempPngFolder(file_name='waveform-timeline.png')
         audiowaveform_cmd = 'audiowaveform -i "{}" -o "{}" -e {} --no-axis-labels --background-color {} --waveform-color {} -q'.format(
-            audio_file_path, png_outfile_path, audio_length,'eeeeee', Colors.PRIMARY[1:])
+            audio_file_path, png_outfile_path, audio_length, Colors.WAVEFORM_BACKGROUND_COLOR[1:], Colors.WAVEFORM_FOREGROUND_COLOR[1:])
         pngWaveformCreationProcess = subprocess.Popen(audiowaveform_cmd, shell=True, stdout=subprocess.PIPE)
         pngWaveformCreationProcess.wait()
         pngResult = pngWaveformCreationProcess.returncode
@@ -155,13 +154,12 @@ class Audio:
         try:
             pygame.mixer.music.load(audio_file_path)
             sound = pygame.mixer.Sound(audio_file_path)
-            # pygame.mixer.music.set_pos(0)
             # we keep trace of the current file if we want to retrieve it for the lick recording
             self.currentFile = audio_file_path
             self.currentFileLength = sound.get_length()
             # if we have a callback for waveform creation, we create the waveform (audiowaveform C++ library)
             if callback_after_waveform_creation is not None:
-                threading.Thread(target=self.generateWaveformTimelineForFile, args=(audio_file_path,self.currentFileLength, callback_after_waveform_creation)).start()
+                threading.Thread(target=self.generateWaveformTimelineForFile, args=(audio_file_path, self.currentFileLength, callback_after_waveform_creation)).start()
 
             print("Current audio file is ... :",
                   sound.get_length(), " ms, ", self.currentFile)
@@ -171,7 +169,6 @@ class Audio:
         except Exception as e:
             logging.exception(e)
             print("can't play file !!")
-        # pygame.mixer.music.play(loops=-1, fade_ms=200)
 
     @staticmethod
     def getBusy():
@@ -263,9 +260,6 @@ class Audio:
                 logging.exception(e)
                 print('cannot change volume of metronome')
 
-    # def setMetroVolume(value):
-    # self.realMetro.set_volume(value)
-
     def getCurrentTrack(self):
         return self.currentFile, self.currentFileLength
 
@@ -277,16 +271,14 @@ class Audio:
     def getTimePlayed():
         return pygame.mixer.music.get_pos() / 1000
 
-    def prepareBacktrackForRecord(self, backtrackFile):
-        # print(backtrackFile)
+    @staticmethod
+    def prepareBacktrackForRecord(backtrack_file):
         pygame.mixer.music.stop()
-        pygame.mixer.music.load(backtrackFile)
+        pygame.mixer.music.load(backtrack_file)
 
     @staticmethod
-    def playBacktrackForRecord(nbOfLoops):
-        pygame.mixer.music.play(loops=nbOfLoops)
-
-        # start a thread
+    def playBacktrackForRecord(number_of_loops):
+        pygame.mixer.music.play(loops=number_of_loops)
 
     def stopBacktrackForRecord(self):
         pass

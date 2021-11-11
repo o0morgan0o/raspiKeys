@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+from tkinter import ttk
 
 from src.game import env
 from src.game.GamesNames import GameNames
@@ -29,8 +30,8 @@ class MainApplication(tk.Tk):
         # self.currentGameMode = GameNames.GAME_OPTIONS
         # self.currentGameMode = GameNames.GAME_EAR_TRAINING_NOTE
         # self.currentGameMode = GameNames.GAME_EAR_TRAINING_CHORDS
-        # self.currentGameMode = GameNames.GAME_LICKS_PRACTISE
-        self.currentGameMode = GameNames.GAME_BACKTRACKS
+        self.currentGameMode = GameNames.GAME_LICKS_PRACTISE
+        # self.currentGameMode = GameNames.GAME_BACKTRACKS
         # self.currentGameMode = GameNames.GAME_TEST_CANVAS
         self.app = None
         self.audioInstance = Autoload.get_instance().getAudioInstance()
@@ -38,7 +39,7 @@ class MainApplication(tk.Tk):
         # Main Frame
         self.title("RaspyKeys")
         self.geometry("%sx%s" % (env.FULL_SCREEN_W, env.FULL_SCREEN_H))
-        # self.style = ttk.Style(self)
+        self.style = ttk.Style(self)
         # print("ALL_THEMES" , self.style.theme_names())
 
         self.frame = None
@@ -62,7 +63,7 @@ class MainApplication(tk.Tk):
     def new_window(self, new_game_mode: GameNames, event=None):
         if self.app is not None:
             self.app.destroy()
-            del self.app
+            # del self.app
 
         # Import style for ttk.bootstrap styles
         getCustomStyles()

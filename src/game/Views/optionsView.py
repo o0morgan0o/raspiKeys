@@ -28,11 +28,11 @@ class OptionsView:
 
         DEFAULT_PADDING = 3
 
-        self.container=tk.Frame(self.gameFrame, bg=Colors.BACKGROUND)
-        self.container.pack(side="top", fill="both", expand=True, padx=20, pady=(10,20))
+        self.container = tk.Frame(self.gameFrame, bg=Colors.BACKGROUND)
+        self.container.pack(side="top", fill="both", expand=True, padx=20, pady=(10, 20))
 
         self.title = CustomLabel(self.container, text=ViewStrings.LABEL_HEADER_OPTIONS.value)
-        self.title.pack(fill=tk.X, pady=(0,20))
+        self.title.pack(fill=tk.X, pady=(0, 20))
 
         self.row1 = tk.Frame(self.container)
         self.row1.pack(fill=tk.X)
@@ -42,25 +42,25 @@ class OptionsView:
         self.currentMidiOut = CustomLabel(self.row1)
         self.currentMidiOut.pack(side=tk.LEFT, expand=1, fill=tk.X)
 
-        self.row2 = tk.Frame(self.container,bg='red')
+        self.row2 = tk.Frame(self.container, bg=Colors.BACKGROUND)
         self.row2.pack(fill=tk.X, expand=1)
-        self.row2.grid_columnconfigure(0,weight=1, uniform='column_size')
-        self.row2.grid_columnconfigure(1,weight=1, uniform='column_size')
+        self.row2.grid_columnconfigure(0, weight=1, uniform='column_size')
+        self.row2.grid_columnconfigure(1, weight=1, uniform='column_size')
 
         self.midiInListbox = tk.Listbox(self.row2, selectmode='single', exportselection=0)
-        self.midiInListbox.grid(row=0, column=0,sticky=tk.NSEW)
+        self.midiInListbox.grid(row=0, column=0, sticky=tk.NSEW)
         self.midiOutListbox = tk.Listbox(self.row2, selectmode='single', exportselection=0)
-        self.midiOutListbox.grid(row=0,column=1, sticky=tk.NSEW)
+        self.midiOutListbox.grid(row=0, column=1, sticky=tk.NSEW)
 
-        self.row3 = tk.Frame(self.container,bg='red')
+        self.row3 = tk.Frame(self.container, bg=Colors.BACKGROUND)
         self.row3.pack(fill=tk.X, expand=1)
-        self.row3.grid_columnconfigure(0,weight=1, uniform='column_size')
-        self.row3.grid_columnconfigure(1,weight=1, uniform='column_size')
+        self.row3.grid_columnconfigure(0, weight=1, uniform='column_size')
+        self.row3.grid_columnconfigure(1, weight=1, uniform='column_size')
 
         self.lblNoteInIndication = tk.Label(self.row3, text="Input ?", bg=Colors.BACKGROUND, fg=Colors.TEXT_WHITE)
-        self.lblNoteInIndication.grid(row=0, column=0,sticky=tk.NSEW)
+        self.lblNoteInIndication.grid(row=0, column=0, sticky=tk.NSEW)
         self.btnPlayNote = CustomButton(self.row3, text="Test note", background=Colors.BACKGROUND, foreground=Colors.TEXT_WHITE)
-        self.btnPlayNote.grid(row=0,column=1,sticky=tk.NSEW)
+        self.btnPlayNote.grid(row=0, column=1, sticky=tk.NSEW)
 
         self.btnConfig = CustomButton(self.container, text="Return Default")
         self.btnConfig.pack(side=tk.RIGHT)
@@ -88,10 +88,8 @@ class OptionsView:
         self.lblNoteInIndication.config(text=message)
 
     def didYouHearMelody(self):
-        print('did you heared')
+        print('did you hear')
 
     def destroy(self):
-        pass
-
-    def __del__(self):
-        pass
+        print("Deleting Options")
+        self.viewModel.destroyViewModel()

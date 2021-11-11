@@ -134,6 +134,10 @@ def getMetroBpm() -> int:
     return loadConfig()[ConfigurationFields.METRO_BPM.value]
 
 
+def getNumberOfLoopsBeforeTranspose() -> int:
+    return loadConfig()[ConfigurationFields.NB_OF_TRANSPOSE_BEFORE_CHANGE.value]
+
+
 def loadConfigFromFile(config: dict) -> dict:
     if config is None:
         config = {}

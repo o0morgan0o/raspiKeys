@@ -36,7 +36,7 @@ class EarTrainingChordViewModel:
         self.score = 0
 
         self.originNote = None
-        self.velocity=100
+        self.velocity = 100
 
         self.noteDelay = getNoteDelay()
         self.noteDuration = getNoteDuration()
@@ -98,7 +98,7 @@ class EarTrainingChordViewModel:
 
     def onSliderDurationMoved(self, event):
         self.noteDuration = self.view.slDuration.get()
-        updateEarTrainingNoteDuration(new_value = self.noteDuration)
+        updateEarTrainingNoteDuration(new_value=self.noteDuration)
         self.view.updateLblNoteDuration(self.noteDuration)
 
     def startGame(self):
@@ -155,7 +155,7 @@ class EarTrainingChordViewModel:
                 else:
                     CustomNote(self.midiIO,
                                note=note,
-                               delay_on=additional_delay_before_playing_question +delay_before_on * i,
+                               delay_on=additional_delay_before_playing_question + delay_before_on * i,
                                note_duration=note_duration,
                                velocity=self.velocity,
                                )
@@ -240,5 +240,5 @@ class EarTrainingChordViewModel:
 
     def destroyViewModel(self):
         print('Delete EarTrainingChordViewModel')
-        self.midiIO.setCallback(None)
+        self.midiIO.cancelCallback()
         self.midiIO.setListening(False)

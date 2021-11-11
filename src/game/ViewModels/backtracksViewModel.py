@@ -3,8 +3,12 @@ import random
 import threading
 from enum import Enum
 
+import pygame
+
 from src.game.autoload import Autoload
 from src.game.utils.config import getMetroBpm, getAudioVolume, updateMetroBpm
+
+VIEWMODEL_DESTROY = pygame.USEREVENT + 2
 
 
 class BacktracksConstants(Enum):
@@ -24,6 +28,10 @@ class ProgressThread(threading.Thread):
         self.audioInstance = audio_instance
         self.progressThreadAlive = True
         self.innerTest = False
+        self.callbackCancel = None
+
+    def setCallbackCancel(self, callback_cancel):
+        self.callbackCancel = callback_cancel
 
     def run(self):
         while self.progressThreadAlive:
@@ -31,12 +39,16 @@ class ProgressThread(threading.Thread):
             percentage_played_full = self.audioInstance.getTimePlayed() / self.audioInstance.currentFileLength
             percentage_played = percentage_played_full % 1
             self.view.setUiUpdateProgress(percentage_played * 100)
+            for event in pygame.event.get():
+                if event.type == VIEWMODEL_DESTROY:
+                    self.progressThreadAlive = False
+                    if self.callbackCancel is not None:
+                        print("PROGRESS BACKTRACK THREAD CANCEL")
+                        return self.callbackCancel()
+
         self.view.setUiUpdateProgress(0.0)
-        print("PROGRESS THREAD FINISHED")
+        print("PROGRESS BACKTRACK THREAD FINISHED")
 
-
-# TODO try to implement a waveform viewer
-# https: // github.com / bbc / audiowaveform  # usage
 
 class BacktracksViewModel:
     def __init__(self, view):
@@ -122,7 +134,6 @@ class BacktracksViewModel:
     def onBtnRandomClick(self):
         self.view.resetSpeedVariationSlider()
         self.gameState = GameStatesNames.GAME_STATE_BACKTRACK_MODE_ACTIVE.value
-        # TODO: Refactor this section with random choice method
         # we must get only non null categories
         non_empty_categories = []
         for category in self.allBacktracksInAllCategories:
@@ -138,7 +149,6 @@ class BacktracksViewModel:
     def onBtnCategoryClick(self, category_name: str):
         self.view.resetSpeedVariationSlider()
         self.gameState = GameStatesNames.GAME_STATE_BACKTRACK_MODE_ACTIVE.value
-        # TODO should display somewhere the number of files in the category and the index
         category_tuple_clicked = self.getCategoryByCategoryNameInAllBacktracks(self.allBacktracksInAllCategories, category_name)
         category_name, category_backtracks = category_tuple_clicked
         if len(category_backtracks) <= 0:
@@ -182,6 +192,7 @@ class BacktracksViewModel:
     def onSliderSpeedVariationMoved(self, event):
         self.view.setUiConvertInProgress()
         threading.Thread(target=self.innerThread).start()
+        self.view.setUiUpdateSpeedVariationSlider(self.view.slSpeedVariation.get())
 
     def innerThread(self):
         speedVariation = self.view.slSpeedVariation.get()
@@ -235,5 +246,10 @@ class BacktracksViewModel:
 
     def destroyViewModel(self):
         print("Delete BacktracksViewModel")
+        if self.progressThread is not None:
+            self.progressThread.setCallbackCancel(self.destroyPlayingThreadDone)
+        pygame.mixer.music.set_endevent(VIEWMODEL_DESTROY)
         self.audioInstance.stopPlay()
-        self.view.setUiChangePlayingIcons(is_playing=False)
+
+    def destroyPlayingThreadDone(self):
+        pass

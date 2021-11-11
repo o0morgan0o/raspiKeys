@@ -1,5 +1,6 @@
-import logging
 import tkinter as tk
+
+from src.game.utils.colors import Colors
 
 WHITE_NOTE_STRING = "white_note"
 BLACK_NOTE_STRING = "black_note"
@@ -22,7 +23,7 @@ class KeyboardCanvasView:
 
         self.gameFrame = game_frame
         self.canvas = tk.Canvas(self.gameFrame, width=self.canvasDimensions[0], height=self.canvasDimensions[1])
-        self.canvas.pack(side=tk.BOTTOM, fill=tk.BOTH, padx=(0, 20))
+        self.canvas.pack(expand=1, side=tk.BOTTOM, fill=tk.BOTH)
         self.octaves = []
         self.drawKeyboard()
         self.canvas.bind("<Configure>", self.onCanvasConfigure)
@@ -75,7 +76,7 @@ class KeyboardCanvasView:
         if len(note_to_light) == 1:
             # We want to map the notes for the first octave, so that we don't need to "move" the canvas
             # note_to_light -= self.octaveOffset
-            self.canvas.itemconfig(note_to_light, fill='blue')
+            self.canvas.itemconfig(note_to_light, fill=Colors.KEYBOARD_CANVAS_NOTE_LIGHT)
         else:
             print("SOMETHING BAD, TAG NOT FOUND", note_number, note_to_light)
 
@@ -138,6 +139,9 @@ class KeyboardCanvasView:
         # print('result', min_octave, number_of_octaves_needed)
         return min_octave, number_of_octaves_needed
 
+    def destroy(self):
+        pass
+
 
 class Octave:
     def __init__(self, canvas, keyboard_origin, octave_number, octave_dimensions):
@@ -171,7 +175,7 @@ class Octave:
         counter = 0
         for i in range(0, 7):
             if i in [1, 2, 4, 5, 6]:
-                note_position_X = self.octaveOrigin[0] + i * self.whiteNoteRectWidth - (self.blackNoteRectWidth * (.5))
+                note_position_X = self.octaveOrigin[0] + i * self.whiteNoteRectWidth - (self.blackNoteRectWidth * .5)
                 note_position_Y = self.octaveOrigin[1]
                 self.blackNotes.append(BlackNote(
                     self.canvas,
@@ -234,7 +238,6 @@ class WhiteNote:
             fill='white', tags=('tag{}'.format(12 * self.octave_number + self.midi_note), 'white_note'))
 
     def updateDimensions(self, note_origin: tuple, note_dimensions: tuple):
-        # print('UPDATE DIMENSIONSSSSSSSSSSSSS ?')
         self.rect_width = note_dimensions[0]
         self.rect_height = note_dimensions[1]
         self.canvas.coords(self.note_rectangle,
@@ -266,7 +269,6 @@ class BlackNote:
             fill='black', tag=('tag{}'.format(12 * self.octave_number + self.midi_note), 'black_note'))
 
     def updateDimensions(self, note_origin: tuple, note_dimensions: tuple):
-        # print('UPDATE DIMENSIONSSSSSSSSSSSSS ?')
         self.rect_width = note_dimensions[0]
         self.rect_height = note_dimensions[1]
         self.canvas.coords(self.note_rectangle,
